@@ -5,4 +5,5 @@ description = "Docker-based application deployment tool for developer"
 license = "MIT"
 edition = "2022"
 
-[download]
+[legacy-download]
+getoptions = https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions
