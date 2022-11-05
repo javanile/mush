@@ -1,5 +1,8 @@
-#!/bin/bash
+[package]
+name = "mush"
+version = "0.1.0"
+description = "Docker-based application deployment tool for developer"
+license = "MIT"
+edition = "2022"
 
 [download]
-
-
