@@ -1,18 +1,19 @@
 
 
-parser_definition_build_debug() {
-	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} legacy-fetch [options...] [arguments...]"
-	msg -- '' 'getoptions subcommand example' ''
-	msg -- 'Options:'
+parser_definition_build() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
 	flag    FLAG_C       -c --flag-c
 	param   MODULE_NAME  -n --name
 	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
 
-run_build_debug() {
-  eval "$(getoptions parser_definition_build_debug parse "$0")"
+run_build() {
+  eval "$(getoptions parser_definition_build parse "$0")"
   parse "$@"
   eval "set -- $REST"
   echo "FLAG_C: $FLAG_C"
