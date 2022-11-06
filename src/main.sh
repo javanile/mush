@@ -15,6 +15,7 @@ parser_definition() {
   msg -- '' 'Commands:'
   cmd cmd1 -- "subcommand 1"
   cmd cmd2 -- "subcommand 2"
+  cmd build-debug -- "subcommand 3"
   cmd legacy-fetch -- "subcommand 3"
 }
 
@@ -44,6 +45,9 @@ main() {
         parse "$@"
         eval "set -- $REST"
         echo "FLAG_B: $FLAG_B"
+        ;;
+      build-debug)
+        run_build_debug "$@"
         ;;
       legacy-fetch)
         run_legacy_fetch "$@"
