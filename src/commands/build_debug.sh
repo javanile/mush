@@ -17,9 +17,11 @@ run_build_debug() {
   echo "FLAG_C: $FLAG_C"
   echo "MODULE_NAME: $MODULE_NAME"
 
-  build_file=target/debug/mush
+  build_file=target/debug/mush.tmp
+  final_file=target/debug/mush
 
   echo "#!/usr/bin/env bash" > $build_file
+  echo "## " >> $build_file
   echo "set -e" >> $build_file
   echo "source src/boot/debug_2022.sh" >> $build_file
   echo "source target/debug/legacy/getoptions.sh" >> $build_file
@@ -27,4 +29,8 @@ run_build_debug() {
   echo "source src/commands/legacy_fetch.sh" >> $build_file
   echo "source src/main.sh" >> $build_file
   echo "main \$@" >> $build_file
+
+  mv $build_file $final_file
+
+  echo "Build complete."
 }
