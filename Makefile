@@ -1,4 +1,4 @@
 
 
-test-legacy-download:
-	@bash tests/legacy/download-test.sh
+test-legacy-download-debug:
+	@bash tests/legacy/debug-download-test.sh
