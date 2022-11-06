@@ -6,19 +6,21 @@ legacy getoptions
 #use assets::server::test0
 
 parser_definition() {
-  setup   REST help:usage abbr:true -- \
-  		"Usage: ${2##*/} [global options...] [command] [options...] [arguments...]"
-  msg -- '' 'getoptions subcommand example' ''
-  msg -- 'Options:'
-  flag    GLOBAL  -g --global    -- "global flag"
-  disp    :usage  -h --help
-  disp    VERSION    --version
+  usage="Usage: ${2##*/} [global options...] [command] [options...] [arguments...]"
 
-  msg -- '' 'Commands:'
-  cmd cmd1 -- "subcommand 1"
-  cmd cmd2 -- "subcommand 2"
-  cmd build-debug -- "subcommand 3"
-  cmd legacy-fetch -- "subcommand 3"
+  setup REST help:usage abbr:true -- "$usage"
+
+  msg   -- '' 'getoptions subcommand example' ''
+  msg   -- 'Options:'
+  flag  GLOBAL  -g --global    -- "global flag"
+  disp  :usage  -h --help
+  disp  VERSION    --version
+
+  msg   -- '' 'Commands:'
+  cmd   build        -- "subcommand 1"
+  cmd   build-debug  -- "subcommand 3"
+  cmd   build-dist   -- "subcommand 2"
+  cmd   legacy-fetch -- "subcommand 3"
 }
 
 main() {
