@@ -17,6 +17,8 @@ run_build_debug() {
   echo "FLAG_C: $FLAG_C"
   echo "MODULE_NAME: $MODULE_NAME"
 
+  exec_legacy_build
+
   build_file=target/debug/mush.tmp
   final_file=target/debug/mush
 

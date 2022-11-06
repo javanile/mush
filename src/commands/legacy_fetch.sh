@@ -21,8 +21,10 @@ run_legacy_fetch() {
   i=0
   while [ $# -gt 0 ] && i=$((i + 1)); do
     module_name=$(basename $1)
+    module_file=target/debug/legacy/$module_name
     echo "$i Downloading '$module_name' from $1"
-    curl -sL $1 -o target/debug/legacy/$module_name
+    curl -sL $1 -o $module_file
+    chmod +x $module_file
     shift
   done
 
