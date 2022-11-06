@@ -1,5 +1,5 @@
 
-legacy getoptions
+legacy lib_getoptions
 
 mod assets
 
