@@ -17,10 +17,8 @@ parser_definition() {
   disp  VERSION    --version
 
   msg   -- '' 'Commands:'
-  cmd   build        -- "subcommand 1"
-  cmd   build-debug  -- "subcommand 3"
-  cmd   build-dist   -- "subcommand 2"
-  cmd   legacy-fetch -- "subcommand 3"
+  cmd   build -- "Compile the current package"
+  cmd   legacy -- "Add dependencies to a Manifest.toml file"
 }
 
 main() {
