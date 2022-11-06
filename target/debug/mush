@@ -4,6 +4,8 @@ source src/boot/boot_2022.sh
 
 source target/debug/legacy/getoptions.sh
 
+source src/commands/legacy_fetch.sh
+
 source src/main.sh
 
 main $@
