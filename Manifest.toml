@@ -1,7 +1,7 @@
 [package]
 name = "mush"
 version = "0.1.0"
-description = "Docker-based application deployment tool for developer"
+description = "Mush, a build system for Shell."
 license = "MIT"
 edition = "2022"
 
@@ -11,3 +11,6 @@ gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/
 
 [legacy-build]
 lib-getoptions = "gengetoptions library > getoptions.sh"
+
+[dev-legacy-fetch]
+pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh"
