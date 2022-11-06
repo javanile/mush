@@ -1,28 +1,27 @@
 
 legacy getoptions
 
-#mod assets
+mod assets
 
 #use assets::server::test0
 
 parser_definition() {
-  usage="Usage: ${2##*/} [global options...] [command] [options...] [arguments...]"
+  setup REST help:usage abbr:true -- "Shell's build system"
 
-  setup REST help:usage abbr:true -- "$usage"
+  msg   -- '' 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]"
 
-  msg   -- '' 'getoptions subcommand example' ''
-  msg   -- 'Options:'
-  flag  GLOBAL  -g --global    -- "global flag"
-  disp  :usage  -h --help
-  disp  VERSION    --version
+  msg   -- '' 'OPTIONS:'
+  flag  GLOBAL  -g --global  -- "Global flag"
+  disp  :usage  -h --help    -- "Print help information"
+  disp  VERSION -V --version -- "Print version info and exit"
 
-  msg   -- '' 'Commands:'
+  msg   -- '' 'SUBCOMMANDS:'
   cmd   build -- "Compile the current package"
-  cmd   legacy -- "Add dependencies to a Manifest.toml file"
+  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
 }
 
 main() {
-  echo "ARGS: $@"
+  #echo "ARGS: $@"
 
 
   #chmod +x target/debug/legacy/getoptions
