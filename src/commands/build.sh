@@ -7,6 +7,7 @@ parser_definition_build_debug() {
 	msg -- 'Options:'
 	flag    FLAG_C       -c --flag-c
 	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
 
@@ -16,23 +17,15 @@ run_build_debug() {
   eval "set -- $REST"
   echo "FLAG_C: $FLAG_C"
   echo "MODULE_NAME: $MODULE_NAME"
+  echo "BUILD_TARGET: $BUILD_TARGET"
 
   exec_legacy_build
 
-  build_file=target/debug/mush.tmp
-  final_file=target/debug/mush
-
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "## " >> $build_file
-  echo "set -e" >> $build_file
-  echo "source src/boot/debug_2022.sh" >> $build_file
-  echo "source target/debug/legacy/getoptions.sh" >> $build_file
-  echo "source src/commands/build_debug.sh" >> $build_file
-  echo "source src/commands/legacy_fetch.sh" >> $build_file
-  echo "source src/main.sh" >> $build_file
-  echo "main \$@" >> $build_file
-
-  mv $build_file $final_file
+  if [ $BUILD_TARGET = "debug" ]; then
+    exec_build_debug "$@"
+  else
+    exec_build_dist "$@"
+  fi
 
   echo "Build complete."
 }
