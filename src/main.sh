@@ -1,4 +1,6 @@
 
+legacy getoptions
+
 #mod assets
 
 #use assets::server::test0
