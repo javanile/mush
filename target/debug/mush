@@ -2,6 +2,8 @@
 
 source src/boot/boot_2022.sh
 
+source target/debug/legacy/getoptions.sh
 
+source src/main.sh
 
-main
+main $@

@@ -5,5 +5,8 @@ description = "Docker-based application deployment tool for developer"
 license = "MIT"
 edition = "2022"
 
-[legacy-download]
-getoptions = https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions
+[legacy-fetch]
+gengetoptions = https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions
+
+[legacy-build]
+getoptions = bash
