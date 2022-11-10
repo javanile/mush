@@ -1,5 +1,4 @@
 
-
 parser_definition_legacy_fetch() {
 	setup   REST help:usage abbr:true -- \
 		"Usage: ${2##*/} legacy-fetch [options...] [arguments...]"
