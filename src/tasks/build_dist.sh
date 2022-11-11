@@ -22,7 +22,7 @@ exec_build_dist() {
   cp ${build_file} ${final_file}
   cp ${final_file} ${bin_file}
 
-  echo -e "\e[1;33m[Mush]\e[0m Start"
+  echo -e "\e[1;33m{Mush}\e[0m Start"
   echo -e "       Task completed"
   echo -e "       Search profile"
   echo -e "       \e[1;31mError qui cavallo\e[0m"
