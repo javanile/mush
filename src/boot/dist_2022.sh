@@ -3,8 +3,8 @@ legacy() {
   legacy=$1
 }
 
-mod() {
-  mod=$1
+module() {
+  module=$1
 }
 
 use() {

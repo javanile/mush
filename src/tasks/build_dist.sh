@@ -43,7 +43,7 @@ build_dist_mod() {
 
   grep '^mod [a-z][a-z]*$' "${src_file}" | while read -r line; do
     mod_dir=$(dirname $src_file)
-    mod_name=$(echo "${line##mod}" | xargs)
+    mod_name=$(echo "${line##module}" | xargs)
     mod_file="${mod_dir}/${mod_name}.sh"
     mod_dir_file="${mod_dir}/${mod_name}/mod.sh"
     if [ -e "${mod_file}" ]; then

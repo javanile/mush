@@ -351,6 +351,8 @@ exec_build_dist() {
   #echo -e "       \e[1;33mFinish.\e[0m"
 
   chmod +x ${bin_file}
+
+  console_done "Build complete."
 }
 
 build_dist_mod() {
@@ -359,7 +361,7 @@ build_dist_mod() {
 
   grep '^mod [a-z][a-z]*$' "${src_file}" | while read -r line; do
     mod_dir=$(dirname $src_file)
-    mod_name=$(echo "${line##mod}" | xargs)
+    mod_name=$(echo "${line##module}" | xargs)
     mod_file="${mod_dir}/${mod_name}.sh"
     mod_dir_file="${mod_dir}/${mod_name}/mod.sh"
     if [ -e "${mod_file}" ]; then
@@ -403,8 +405,6 @@ run_build() {
   else
     exec_build_dist "$@"
   fi
-
-  console_log "Build complete."
 }
 
 parser_definition_legacy() {
@@ -439,49 +439,10 @@ run_legacy() {
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
 }
 
-# FATAL
-# ERROR
-# WARNING
-# INFO
-# DEBUG
-# TRACE
-
-case "$(uname -s)" in
-  Darwin*)
-    ESCAPE='\x1B'
-    ;;
-  Linux|*)
-    ESCAPE='\e'
-    ;;
-esac
-
-CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
-console_log() {
-  console_echo "$1"
-}
-
-console_info() {
-  console_echo "$1"
-}
-
-console_error() {
-  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
-}
-
-console_done() {
-  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
-}
-
-console_echo() {
-  echo -e "${CONSOLE_INDENT} $1"
-  CONSOLE_INDENT='      '
-}
-
 legacy lib_getoptions
 
-mod commands
-mod console
+module commands
+module console
 
 #use assets::server::test0
 

@@ -3,7 +3,7 @@ legacy() {
   source target/debug/legacy/$1.sh
 }
 
-mod() {
+module() {
   #echo "Loading module: $1"
   a=0
 }
