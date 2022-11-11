@@ -1,10 +1,12 @@
-#!/usr/bin/env bash
+
+legacy() {
+  legacy=$1
+}
 
 mod() {
-  a=0
+  mod=$1
 }
 
 use() {
-
-  source src/assets/server.sh
+  use=$1
 }

@@ -1,7 +1,5 @@
 
-
 exec_legacy_build() {
-
-
-  echo "A"
+  legacy=1
+  #echo "Legacy build"
 }

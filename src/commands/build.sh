@@ -15,9 +15,9 @@ run_build() {
   eval "$(getoptions parser_definition_build parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  echo "FLAG_C: $FLAG_C"
-  echo "MODULE_NAME: $MODULE_NAME"
-  echo "BUILD_TARGET: $BUILD_TARGET"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
 
   exec_legacy_build
 
@@ -27,5 +27,5 @@ run_build() {
     exec_build_dist "$@"
   fi
 
-  echo "Build complete."
+  #echo "Build complete."
 }

@@ -1,4 +1,3 @@
-#!/usr/bin/env bash
 
 legacy() {
   source target/debug/legacy/$1.sh

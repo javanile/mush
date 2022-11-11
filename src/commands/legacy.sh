@@ -1,8 +1,7 @@
 
-
-parser_definition_fetch() {
+parser_definition_legacy() {
 	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} fetch [options...] [arguments...]"
+		"Usage: ${2##*/} legacy [options...] [arguments...]"
 	msg -- '' 'getoptions subcommand example' ''
 	msg -- 'Options:'
 	flag    FLAG_C       -c --flag-c
@@ -10,8 +9,8 @@ parser_definition_fetch() {
 	disp    :usage       -h --help
 }
 
-run_fetch() {
-  eval "$(getoptions parser_definition_fetch parse "$0")"
+run_legacy() {
+  eval "$(getoptions parser_definition_legacy parse "$0")"
   parse "$@"
   eval "set -- $REST"
   echo "FLAG_C: $FLAG_C"
