@@ -26,6 +26,4 @@ run_build() {
   else
     exec_build_dist "$@"
   fi
-
-  #echo "Build complete."
 }

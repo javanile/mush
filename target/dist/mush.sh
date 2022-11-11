@@ -404,7 +404,7 @@ run_build() {
     exec_build_dist "$@"
   fi
 
-  #echo "Build complete."
+  console_log "Build complete."
 }
 
 parser_definition_legacy() {
@@ -467,6 +467,10 @@ console_info() {
 
 console_error() {
   console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+}
+
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
 }
 
 console_echo() {

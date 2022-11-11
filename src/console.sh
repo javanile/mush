@@ -29,6 +29,10 @@ console_error() {
   console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
 }
 
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
+}
+
 console_echo() {
   echo -e "${CONSOLE_INDENT} $1"
   CONSOLE_INDENT='      '

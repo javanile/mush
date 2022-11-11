@@ -33,6 +33,8 @@ exec_build_dist() {
   #echo -e "       \e[1;33mFinish.\e[0m"
 
   chmod +x ${bin_file}
+
+  console_done "Build complete."
 }
 
 build_dist_mod() {

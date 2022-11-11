@@ -351,6 +351,8 @@ exec_build_dist() {
   #echo -e "       \e[1;33mFinish.\e[0m"
 
   chmod +x ${bin_file}
+
+  console_done "Build complete."
 }
 
 build_dist_mod() {
@@ -403,8 +405,6 @@ run_build() {
   else
     exec_build_dist "$@"
   fi
-
-  #echo "Build complete."
 }
 
 parser_definition_legacy() {
@@ -467,6 +467,10 @@ console_info() {
 
 console_error() {
   console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+}
+
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
 }
 
 console_echo() {
