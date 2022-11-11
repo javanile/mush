@@ -15,5 +15,5 @@ lib-getoptions = "gengetoptions library > getoptions.sh"
 [dev-legacy-fetch]
 pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh"
 
-[dependencies]
-pippo = "basher ciaaio/ciao 1.0"
+#[dependencies]
+#pippo = "basher ciaaio/ciao 1.0"

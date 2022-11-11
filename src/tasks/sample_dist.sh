@@ -1,5 +1,4 @@
 
-
 parser_definition_legacy_fetch() {
 	setup   REST help:usage abbr:true -- \
 		"Usage: ${2##*/} legacy-fetch [options...] [arguments...]"
@@ -10,8 +9,8 @@ parser_definition_legacy_fetch() {
 	disp    :usage       -h --help
 }
 
-run_legacy_fetch() {
-  eval "$(getoptions parser_definition_legacy_fetch parse "$0")"
+run_debug_build() {
+  eval "$(getoptions parser_definition_debug_build parse "$0")"
   parse "$@"
   eval "set -- $REST"
   echo "FLAG_C: $FLAG_C"
@@ -21,10 +20,8 @@ run_legacy_fetch() {
   i=0
   while [ $# -gt 0 ] && i=$((i + 1)); do
     module_name=$(basename $1)
-    module_file=target/debug/legacy/$module_name
     echo "$i Downloading '$module_name' from $1"
-    curl -sL $1 -o $module_file
-    chmod +x $module_file
+    curl -sL $1 -o target/debug/legacy/$module_name
     shift
   done
 
