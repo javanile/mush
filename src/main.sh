@@ -1,7 +1,7 @@
 
 legacy lib_getoptions
 
-#mod assets
+mod commands
 mod console
 
 #use assets::server::test0
@@ -33,7 +33,7 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
-  echo "V $VERBOSE"
+  #echo "V $VERBOSE"
 
 
   if [ $# -gt 0 ]; then

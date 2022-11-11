@@ -14,6 +14,7 @@ cat src/tasks/legacy_build.sh >> $build_file
 cat src/tasks/build_dist.sh >> $build_file
 cat src/commands/build.sh >> $build_file
 cat src/commands/legacy.sh >> $build_file
+cat src/console.sh >> $build_file
 cat src/main.sh >> $build_file
 echo "main \$@" >> $build_file
 

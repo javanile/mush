@@ -44,13 +44,16 @@ build_dist_mod() {
     mod_name=$(echo "${line##mod}" | xargs)
     mod_file="${mod_dir}/${mod_name}.sh"
     mod_dir_file="${mod_dir}/${mod_name}/mod.sh"
-    if [ ! -e "${mod_file}" ]; then
+    if [ -e "${mod_file}" ]; then
+      console_log "Include '${mod_file}' as module file"
+      cat "${mod_file}" >> "${build_file}"
+    elif [ -e "${mod_dir_file}" ]; then
+      console_log "Include '${mod_dir_file}' as directory module file"
+      cat "${mod_dir_file}" >> "${build_file}"
+    else
       console_error "File not found for module '${mod_name}'. Look at '${src_file}' on line 1"
-      console_info  "To create the module '${mod_name}', create file '${mod_file}' or '${mod_file}'."
+      console_info  "To create the module '${mod_name}', create file '${mod_file}' or '${mod_dir_file}'."
       exit 0
     fi
-
-    console_log "Include '${mod_file}' as module file"
-    cat "${mod_file}" >> "${build_file}"
   done
 }
