@@ -13,9 +13,10 @@ parser_definition() {
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
   msg   -- 'OPTIONS:'
-  flag  GLOBAL  -g --global  -- "Global flag"
-  disp  :usage  -h --help    -- "Print help information"
-  disp  VERSION -V --version -- "Print version info and exit"
+  flag  GLOBAL  -g --global                       -- "Global flag"
+  disp  :usage  -h --help                         -- "Print help information"
+  disp  VERSION -V --version                      -- "Print version info and exit"
+  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
@@ -30,6 +31,9 @@ main() {
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"
+
+  echo "V $VERBOSE"
+
 
   if [ $# -gt 0 ]; then
     cmd=$1
