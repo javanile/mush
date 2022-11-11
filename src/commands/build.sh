@@ -21,7 +21,7 @@ run_build() {
 
   exec_legacy_build
 
-  if [ $BUILD_TARGET = "debug" ]; then
+  if [ "$BUILD_TARGET" = "debug" ]; then
     exec_build_debug "$@"
   else
     exec_build_dist "$@"
