@@ -7,6 +7,10 @@ module() {
   module=$1
 }
 
+public() {
+  public=$1
+}
+
 use() {
   use=$1
 }

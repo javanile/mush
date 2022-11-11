@@ -5,8 +5,12 @@ legacy() {
   legacy=$1
 }
 
-mod() {
-  mod=$1
+module() {
+  module=$1
+}
+
+public() {
+  public=$1
 }
 
 use() {
@@ -359,11 +363,11 @@ build_dist_mod() {
   src_file=$1
   build_file=$2
 
-  grep '^mod [a-z][a-z]*$' "${src_file}" | while read -r line; do
+  grep '^module [a-z][a-z]*$' "${src_file}" | while read -r line; do
     mod_dir=$(dirname $src_file)
     mod_name=$(echo "${line##module}" | xargs)
     mod_file="${mod_dir}/${mod_name}.sh"
-    mod_dir_file="${mod_dir}/${mod_name}/mod.sh"
+    mod_dir_file="${mod_dir}/${mod_name}/module.sh"
     if [ -e "${mod_file}" ]; then
       console_log "Include '${mod_file}' as module file"
       cat "${mod_file}" >> "${build_file}"
@@ -437,6 +441,49 @@ run_legacy() {
 
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+public add
+public build
+public legacy
+
+# FATAL
+# ERROR
+# WARNING
+# INFO
+# DEBUG
+# TRACE
+
+case "$(uname -s)" in
+  Darwin*)
+    ESCAPE='\x1B'
+    ;;
+  Linux|*)
+    ESCAPE='\e'
+    ;;
+esac
+
+CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_log() {
+  console_echo "$1"
+}
+
+console_info() {
+  console_echo "$1"
+}
+
+console_error() {
+  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+}
+
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
+}
+
+console_echo() {
+  echo -e "${CONSOLE_INDENT} $1"
+  CONSOLE_INDENT='      '
 }
 
 legacy lib_getoptions

@@ -8,6 +8,10 @@ module() {
   a=0
 }
 
+public() {
+  public=$1
+}
+
 use() {
   source src/assets/server.sh
 }

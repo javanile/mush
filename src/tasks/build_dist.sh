@@ -41,11 +41,11 @@ build_dist_mod() {
   src_file=$1
   build_file=$2
 
-  grep '^mod [a-z][a-z]*$' "${src_file}" | while read -r line; do
+  grep '^module [a-z][a-z]*$' "${src_file}" | while read -r line; do
     mod_dir=$(dirname $src_file)
     mod_name=$(echo "${line##module}" | xargs)
     mod_file="${mod_dir}/${mod_name}.sh"
-    mod_dir_file="${mod_dir}/${mod_name}/mod.sh"
+    mod_dir_file="${mod_dir}/${mod_name}/module.sh"
     if [ -e "${mod_file}" ]; then
       console_log "Include '${mod_file}' as module file"
       cat "${mod_file}" >> "${build_file}"
