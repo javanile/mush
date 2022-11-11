@@ -321,67 +321,6 @@ exec_legacy_build() {
   #echo "Legacy build"
 }
 
-exec_build_dist() {
-  bin_file=bin/mush
-
-  build_file=target/dist/mush.tmp
-  final_file=target/dist/mush
-
-  echo "#!/usr/bin/env bash" > $build_file
-  #echo "## " >> $build_file
-  echo "set -e" >> $build_file
-  cat src/boot/dist_2022.sh >> $build_file
-  cat target/debug/legacy/getoptions.sh >> $build_file
-  cat src/tasks/legacy_build.sh >> $build_file
-  cat src/tasks/build_dist.sh >> $build_file
-  cat src/commands/build.sh >> $build_file
-  cat src/commands/legacy.sh >> $build_file
-
-  build_dist_mod src/main.sh $build_file
-
-  cat src/main.sh >> $build_file
-  echo "main \"\$@\"" >> $build_file
-
-  mkdir -p bin/
-
-  cp ${build_file} ${final_file}
-  cp ${final_file} ${bin_file}
-
-  #echo -e "\e[1;33m{Mush}\e[0m Start"
-  #echo -e "       Task completed"
-  #echo -e "       Search profile"
-  #echo -e "       \e[1;31mError qui cavallo\e[0m"
-  #echo -e "       Search profile n2"
-  #echo -e "       \e[1;33mFinish.\e[0m"
-
-  chmod +x ${bin_file}
-
-  console_done "Build complete."
-}
-
-build_dist_mod() {
-  src_file=$1
-  build_file=$2
-
-  grep '^module [a-z][a-z]*$' "${src_file}" | while read -r line; do
-    mod_dir=$(dirname $src_file)
-    mod_name=$(echo "${line##module}" | xargs)
-    mod_file="${mod_dir}/${mod_name}.sh"
-    mod_dir_file="${mod_dir}/${mod_name}/module.sh"
-    if [ -e "${mod_file}" ]; then
-      console_log "Include '${mod_file}' as module file"
-      cat "${mod_file}" >> "${build_file}"
-    elif [ -e "${mod_dir_file}" ]; then
-      console_log "Include '${mod_dir_file}' as directory module file"
-      cat "${mod_dir_file}" >> "${build_file}"
-    else
-      console_error "File not found for module '${mod_name}'. Look at '${src_file}' on line 1"
-      console_info  "To create the module '${mod_name}', create file '${mod_file}' or '${mod_dir_file}'."
-      exit 0
-    fi
-  done
-}
-
 parser_definition_build() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
@@ -443,53 +382,11 @@ run_legacy() {
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
 }
 
-public add
-public build
-public legacy
-
-# FATAL
-# ERROR
-# WARNING
-# INFO
-# DEBUG
-# TRACE
-
-case "$(uname -s)" in
-  Darwin*)
-    ESCAPE='\x1B'
-    ;;
-  Linux|*)
-    ESCAPE='\e'
-    ;;
-esac
-
-CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
-console_log() {
-  console_echo "$1"
-}
-
-console_info() {
-  console_echo "$1"
-}
-
-console_error() {
-  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
-}
-
-console_done() {
-  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
-}
-
-console_echo() {
-  echo -e "${CONSOLE_INDENT} $1"
-  CONSOLE_INDENT='      '
-}
-
 legacy lib_getoptions
 
 module commands
 module console
+module tasks
 
 #use assets::server::test0
 
@@ -538,4 +435,213 @@ main() {
   fi
 }
 
+
+public add
+public build
+public legacy
+
+test0 () {
+  echo "TEST"
+}
+parser_definition_build() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_build() {
+  eval "$(getoptions parser_definition_build parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_legacy_build
+
+  if [ "$BUILD_TARGET" = "debug" ]; then
+    exec_build_debug "$@"
+  else
+    exec_build_dist "$@"
+  fi
+}
+
+parser_definition_legacy() {
+	setup   REST help:usage abbr:true -- \
+		"Usage: ${2##*/} legacy [options...] [arguments...]"
+	msg -- '' 'getoptions subcommand example' ''
+	msg -- 'Options:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	disp    :usage       -h --help
+}
+
+run_legacy() {
+  eval "$(getoptions parser_definition_legacy parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  echo "FLAG_C: $FLAG_C"
+  echo "MODULE_NAME: $MODULE_NAME"
+
+  echo "GLOBAL: $GLOBAL"
+  i=0
+  while [ $# -gt 0 ] && i=$((i + 1)); do
+    module_name=$(basename $1)
+    module_file=target/debug/legacy/$module_name
+    echo "$i Downloading '$module_name' from $1"
+    curl -sL $1 -o $module_file
+    chmod +x $module_file
+    shift
+  done
+
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+# FATAL
+# ERROR
+# WARNING
+# INFO
+# DEBUG
+# TRACE
+
+case "$(uname -s)" in
+  Darwin*)
+    ESCAPE='\x1B'
+    ;;
+  Linux|*)
+    ESCAPE='\e'
+    ;;
+esac
+
+CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_log() {
+  console_echo "$1"
+}
+
+console_info() {
+  console_echo "$1"
+}
+
+console_error() {
+  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+}
+
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
+}
+
+console_echo() {
+  echo -e "${CONSOLE_INDENT} $1"
+  CONSOLE_INDENT='      '
+}
+
+public build_dist
+
+exec_build_dist() {
+  local bin_file=bin/mush
+
+  local build_file=target/dist/mush.tmp
+  local final_file=target/dist/mush
+
+  echo "#!/usr/bin/env bash" > $build_file
+  #echo "## " >> $build_file
+  echo "set -e" >> $build_file
+  cat src/boot/dist_2022.sh >> $build_file
+  cat target/debug/legacy/getoptions.sh >> $build_file
+  cat src/tasks/legacy_build.sh >> $build_file
+  #cat src/tasks/build_dist.sh >> $build_file
+  cat src/commands/build.sh >> $build_file
+  cat src/commands/legacy.sh >> $build_file
+
+  build_dist_parse "src/main.sh" "${build_file}"
+
+  echo "main \"\$@\"" >> $build_file
+
+  mkdir -p bin/
+
+  cp ${build_file} ${final_file}
+  cp ${final_file} ${bin_file}
+
+  #echo -e "\e[1;33m{Mush}\e[0m Start"
+  #echo -e "       Task completed"
+  #echo -e "       Search profile"
+  #echo -e "       \e[1;31mError qui cavallo\e[0m"
+  #echo -e "       Search profile n2"
+  #echo -e "       \e[1;33mFinish.\e[0m"
+
+  chmod +x ${bin_file}
+
+  console_done "Build complete."
+}
+
+build_dist_parse() {
+  local src_file=$1
+  local build_file=$2
+
+  cat "${src_file}" >> "${build_file}"
+
+  build_dist_parse_public "${src_file}" "${build_file}"
+
+  build_dist_parse_module "${src_file}" "${build_file}"
+
+  return 0
+}
+
+build_dist_parse_public() {
+  local src_file=$1
+  local build_file=$2
+  local public_dir=$(dirname $src_file)
+
+  grep -n '^public [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local public_name=$(echo "${line#*public}" | xargs)
+    local public_file="${public_dir}/${public_name}.sh"
+    local public_dir_file="${public_dir}/${public_name}/module.sh"
+    if [ -e "${public_file}" ]; then
+      console_log "Public '${public_file}' as module file"
+      build_dist_parse "${public_file}" "${build_file}"
+    elif [ -e "${public_dir_file}" ]; then
+      console_log "Public '${public_dir_file}' as directory module file"
+      build_dist_parse "${public_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
+      exit 0
+    fi
+  done
+
+  return 0
+}
+
+build_dist_parse_module() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+
+  grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*module}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+    if [ -e "${module_file}" ]; then
+      console_log "Import '${module_file}' as module file"
+      build_dist_parse "${module_file}" "${build_file}"
+    elif [ -e "${module_dir_file}" ]; then
+      console_log "Import '${module_dir_file}' as directory module file"
+      build_dist_parse "${module_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 0
+    fi
+  done
+
+  return 0
+}
 main "$@"

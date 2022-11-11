@@ -3,6 +3,7 @@ legacy lib_getoptions
 
 module commands
 module console
+module tasks
 
 #use assets::server::test0
 
