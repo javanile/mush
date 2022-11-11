@@ -1,7 +1,8 @@
 
 legacy lib_getoptions
 
-mod assets
+#mod assets
+mod console
 
 #use assets::server::test0
 
