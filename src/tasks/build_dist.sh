@@ -15,7 +15,7 @@ exec_build_dist() {
   cat src/commands/build.sh >> $build_file
   cat src/commands/legacy.sh >> $build_file
   cat src/main.sh >> $build_file
-  echo "main \$@" >> $build_file
+  echo "main \"\$@\"" >> $build_file
 
   mkdir -p bin/
 
