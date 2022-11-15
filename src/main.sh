@@ -30,6 +30,10 @@ main() {
   #chmod +x target/debug/legacy/getoptions
   #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
 
+  if [ $# -eq 0 ]; then
+    eval "set -- --help"
+  fi
+
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"
