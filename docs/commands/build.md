@@ -1,3 +1,10 @@
+---
+layout: default
+title: mush-build
+parent: Commands
+nav_order: 2
+---
+
 # mush-build
 
 ## NAME
