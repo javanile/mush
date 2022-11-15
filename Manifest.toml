@@ -17,3 +17,6 @@ pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh
 
 #[dependencies]
 #pippo = "basher ciaaio/ciao 1.0"
+
+[dev-dependencies]
+shellcheck = "apt shellcheck"
