@@ -405,6 +405,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
+  cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
 }
 
@@ -412,6 +413,10 @@ main() {
   #echo "ARGS: $@"
   #chmod +x target/debug/legacy/getoptions
   #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
+
+  if [ $# -eq 0 ]; then
+    eval "set -- --help"
+  fi
 
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
@@ -427,6 +432,9 @@ main() {
       build)
         run_build "$@"
         ;;
+      install)
+        run_install "$@"
+        ;;
       legacy)
         run_legacy "$@"
         ;;
@@ -438,6 +446,7 @@ main() {
 
 public add
 public build
+public install
 public legacy
 
 test0 () {
@@ -470,6 +479,31 @@ run_build() {
   else
     exec_build_dist "$@"
   fi
+}
+
+parser_definition_install() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_install() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_legacy_build
+  exec_build_dist "$@"
+  exec_install
 }
 
 parser_definition_legacy() {
@@ -544,8 +578,12 @@ console_echo() {
 }
 
 public build_dist
+public install
 
 exec_build_dist() {
+
+  #echo "error: could not find `Cargo.toml` in `/home/francesco` or any parent directory"
+
   local bin_file=bin/mush
 
   local build_file=target/dist/mush.tmp
@@ -644,4 +682,18 @@ build_dist_parse_module() {
 
   return 0
 }
+
+exec_install() {
+  local bin_file=/usr/local/bin/mush
+  local final_file=target/dist/mush
+
+  cp ${final_file} ${bin_file}
+
+  chmod +x ${bin_file}
+
+  echo "Finished release [optimized] target(s) in 0.18s"
+  echo "Installing /home/francesco/.cargo/bin/cask"
+  echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
+}
+
 main "$@"

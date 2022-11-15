@@ -1,4 +1,10 @@
 
+## ===
+## Dev
+## ===
+
+build:
+	@mush build
 
 ## ====
 ## Test
@@ -21,3 +27,6 @@ test-usage-debug:
 
 test-rust:
 	@cd tests/rust && cargo build
+
+test-install: build
+	@bash tests/bare/install-test.sh

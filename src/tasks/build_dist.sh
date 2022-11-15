@@ -1,5 +1,8 @@
 
 exec_build_dist() {
+
+  #echo "error: could not find `Cargo.toml` in `/home/francesco` or any parent directory"
+
   local bin_file=bin/mush
 
   local build_file=target/dist/mush.tmp

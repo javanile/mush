@@ -22,6 +22,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
+  cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
 }
 
@@ -47,6 +48,9 @@ main() {
     case $cmd in
       build)
         run_build "$@"
+        ;;
+      install)
+        run_install "$@"
         ;;
       legacy)
         run_legacy "$@"
