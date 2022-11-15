@@ -3,9 +3,15 @@ exec_install() {
   local bin_file=/usr/local/bin/mush
   local final_file=target/dist/mush
 
-  cp ${final_file} ${bin_file}
+  local cp=cp
+  local chmod=chmod
+  if [[ $EUID -ne 0 ]]; then
+      cp="sudo ${cp}"
+      chmod="sudo ${chmod}"
+  fi
 
-  chmod +x ${bin_file}
+  ${cp} ${final_file} ${bin_file}
+  ${chmod} +x ${bin_file}
 
   echo "Finished release [optimized] target(s) in 0.18s"
   echo "Installing /home/francesco/.cargo/bin/cask"

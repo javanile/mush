@@ -6,3 +6,8 @@ cp target/dist/mush target/dist/mush.sh
 bash target/dist/mush.sh -vv build --target dist
 
 ./bin/mush --version
+
+mkdir -p tests/temp
+cd tests/temp
+
+bash ../../target/dist/mush.sh -vv build

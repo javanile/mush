@@ -341,6 +341,8 @@ run_build() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  exec_manifest_lookup
+
   exec_legacy_build
 
   if [ "$BUILD_TARGET" = "debug" ]; then
@@ -390,7 +392,7 @@ module tasks
 
 #use assets::server::test0
 
-VERSION="Mush 0.1.0 (2022-11-11)"
+VERSION="Mush 0.1.0 (2022-11-15)"
 
 parser_definition() {
   setup REST help:usage abbr:true -- "Shell's build system" ''
@@ -471,6 +473,8 @@ run_build() {
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
 
   exec_legacy_build
 
@@ -579,10 +583,11 @@ console_echo() {
 
 public build_dist
 public install
+public manifest_lookup
 
 exec_build_dist() {
 
-  #echo "error: could not find `Cargo.toml` in `/home/francesco` or any parent directory"
+
 
   local bin_file=bin/mush
 
@@ -687,13 +692,27 @@ exec_install() {
   local bin_file=/usr/local/bin/mush
   local final_file=target/dist/mush
 
-  cp ${final_file} ${bin_file}
+  local cp=cp
+  local chmod=chmod
+  if [[ $EUID -ne 0 ]]; then
+      cp="sudo ${cp}"
+      chmod="sudo ${chmod}"
+  fi
 
-  chmod +x ${bin_file}
+  ${cp} ${final_file} ${bin_file}
+  ${chmod} +x ${bin_file}
 
   echo "Finished release [optimized] target(s) in 0.18s"
   echo "Installing /home/francesco/.cargo/bin/cask"
   echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
 }
 
+
+exec_manifest_lookup() {
+  pwd=$PWD
+  if [ ! -f "Manifest.toml" ]; then
+    console_error "Could not find 'Manifest.toml' in '$pwd' or any parent directory."
+    exit 101
+  fi
+}
 main "$@"

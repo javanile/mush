@@ -7,7 +7,7 @@ module tasks
 
 #use assets::server::test0
 
-VERSION="Mush 0.1.0 (2022-11-11)"
+VERSION="Mush 0.1.0 (2022-11-15)"
 
 parser_definition() {
   setup REST help:usage abbr:true -- "Shell's build system" ''

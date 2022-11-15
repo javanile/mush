@@ -19,6 +19,8 @@ run_build() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  exec_manifest_lookup
+
   exec_legacy_build
 
   if [ "$BUILD_TARGET" = "debug" ]; then
