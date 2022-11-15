@@ -10,7 +10,7 @@ getoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/get
 gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
 
 [legacy-build]
-lib-getoptions = "gengetoptions library > getoptions.sh"
+lib-getoptions = "gengetoptions library > lib_getoptions.sh"
 
 [dev-legacy-fetch]
 pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh"
