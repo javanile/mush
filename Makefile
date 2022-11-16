@@ -28,5 +28,8 @@ test-usage-debug:
 test-rust:
 	@cd tests/rust && cargo build
 
+test-init: build
+	@bash tests/bare/init-test.sh
+
 test-install: build
 	@bash tests/bare/install-test.sh

@@ -406,6 +406,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
+  cmd   init -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
 }
@@ -433,6 +434,9 @@ main() {
       build)
         run_build "$@"
         ;;
+      init)
+        run_init "$@"
+        ;;
       install)
         run_install "$@"
         ;;
@@ -447,6 +451,7 @@ main() {
 
 public add
 public build
+public init
 public install
 public legacy
 
@@ -482,6 +487,29 @@ run_build() {
   else
     exec_build_dist "$@"
   fi
+}
+
+parser_definition_init() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_init() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_init
 }
 
 parser_definition_install() {
@@ -581,6 +609,7 @@ console_echo() {
 }
 
 public build_dist
+public init
 public install
 public manifest_lookup
 
@@ -685,6 +714,20 @@ build_dist_parse_module() {
   done
 
   return 0
+}
+
+exec_init() {
+  package_name=$(basename "$PWD")
+  manifest_file=Manifest.toml
+
+  echo "[package]" > ${manifest_file}
+  echo "name = \"${package_name}\"" >> ${manifest_file}
+  echo "version = \"0.1.0\"" >> ${manifest_file}
+  echo "edition = \"2022\"" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "# See more keys and their definitions at https://mush.javanile.org/manifest.html" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "[dependencies]" >> ${manifest_file}
 }
 
 exec_install() {
