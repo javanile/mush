@@ -33,3 +33,6 @@ test-init: build
 
 test-install: build
 	@bash tests/bare/install-test.sh
+
+test-run: build
+	@bash tests/bare/run-test.sh
