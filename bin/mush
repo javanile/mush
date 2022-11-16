@@ -400,7 +400,6 @@ parser_definition() {
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
   msg   -- 'OPTIONS:'
-  flag  GLOBAL  -g --global                       -- "Global flag"
   disp  :usage  -h --help                         -- "Print help information"
   disp  VERSION -V --version                      -- "Print version info and exit"
   flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
