@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Commands
+title: Mush Commands
 nav_order: 2
 has_children: true
 ---
