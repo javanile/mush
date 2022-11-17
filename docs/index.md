@@ -6,6 +6,8 @@ nav_order: 1
 
 # Mush
 
+[Hey Duggee](assets/img/hey-duggee.gif)
+
 Mush is the shell package builder. Mush downloads your shell package's dependencies, 
 compiles your packages, makes distributable packages, and uploads them to GitHub, 
 as public community’s package registry. You can contribute to this project on GitHub.

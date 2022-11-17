@@ -1,3 +1,9 @@
+---
+layout: default
+title: Manifest File
+nav_order: 3
+---
+
 # The Manifest Format
 
 The `Manifest.toml` file for each package is called its *manifest*. It is written
