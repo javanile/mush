@@ -409,6 +409,7 @@ parser_definition() {
   cmd   init -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new -- "Create a new Mush package"
 }
 
 main() {
@@ -443,6 +444,9 @@ main() {
       legacy)
         run_legacy "$@"
         ;;
+      new)
+        run_new "$@"
+        ;;
       --) # no subcommand, arguments only
     esac
   fi
@@ -454,6 +458,8 @@ public build
 public init
 public install
 public legacy
+public new
+public run
 
 test0 () {
   echo "TEST"
@@ -508,6 +514,11 @@ run_init() {
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "Manifest.toml" ]; then
+    console_error "'cargo init' cannot be run on existing Mush packages"
+    exit 101
+  fi
 
   exec_init
 }
@@ -567,6 +578,65 @@ run_legacy() {
 
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+parser_definition_new() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_new() {
+  eval "$(getoptions parser_definition_new parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "$1" ]; then
+    console_error "Destination '$1' already exists"
+    exit 101
+  fi
+
+  mkdir -p "$1"
+
+  cd "$1"
+
+  exec_init
+}
+
+parser_definition_run() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_run() {
+  eval "$(getoptions parser_definition_run parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+
+  exec_legacy_build
+
+  exec_build_debug "$@"
 }
 
 # FATAL
@@ -717,8 +787,12 @@ build_dist_parse_module() {
 }
 
 exec_init() {
-  package_name=$(basename "$PWD")
-  manifest_file=Manifest.toml
+  local package_name=$(basename "$PWD")
+  local manifest_file=Manifest.toml
+  local main_file=src/main.sh
+  local lib_file=src/lib.sh
+
+  mkdir -p src
 
   echo "[package]" > ${manifest_file}
   echo "name = \"${package_name}\"" >> ${manifest_file}
@@ -728,6 +802,13 @@ exec_init() {
   echo "# See more keys and their definitions at https://mush.javanile.org/manifest.html" >> ${manifest_file}
   echo "" >> ${manifest_file}
   echo "[dependencies]" >> ${manifest_file}
+
+  if [ ! -f "${main_file}" ]; then
+    echo "" > ${main_file}
+    echo "main() {" >> ${main_file}
+    echo "  echo \"Hello World!\"" >> ${main_file}
+    echo "}" >> ${main_file}
+  fi
 }
 
 exec_install() {

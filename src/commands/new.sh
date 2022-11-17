@@ -1,5 +1,5 @@
 
-parser_definition_init() {
+parser_definition_new() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
@@ -11,18 +11,22 @@ parser_definition_init() {
 	disp    :usage       -h --help
 }
 
-run_init() {
-  eval "$(getoptions parser_definition_init parse "$0")"
+run_new() {
+  eval "$(getoptions parser_definition_new parse "$0")"
   parse "$@"
   eval "set -- $REST"
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
-  if [ -e "Manifest.toml" ]; then
-    console_error "'cargo init' cannot be run on existing Mush packages"
+  if [ -e "$1" ]; then
+    console_error "Destination '$1' already exists"
     exit 101
   fi
+
+  mkdir -p "$1"
+
+  cd "$1"
 
   exec_init
 }

@@ -36,3 +36,6 @@ test-install: build
 
 test-run: build
 	@bash tests/bare/run-test.sh
+
+test-new: build
+	@bash tests/bare/new-test.sh
