@@ -2,5 +2,5 @@ title: "🍄 Mush"
 remote_theme: "pmarsceill/just-the-docs"
 
 aux_links:
-  "Mush on GitHub <img src='assets/img/github.svg'/>":
+  "<img src='assets/img/github.svg'/>":
     - "https://github.com/javanile/mush"
