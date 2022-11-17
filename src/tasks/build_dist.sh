@@ -1,15 +1,15 @@
 
 exec_build_dist() {
+  name=$MUSH_PACKAGE_NAME
 
+  echo "NAME: $name"
 
+  local bin_file=bin/${name}
 
-  local bin_file=bin/mush
-
-  local build_file=target/dist/mush.tmp
-  local final_file=target/dist/mush
+  local build_file=target/dist/${name}.tmp
+  local final_file=target/dist/${name}
 
   echo "#!/usr/bin/env bash" > $build_file
-  #echo "## " >> $build_file
   echo "set -e" >> $build_file
   cat src/boot/dist_2022.sh >> $build_file
   cat target/debug/legacy/getoptions.sh >> $build_file
@@ -26,13 +26,6 @@ exec_build_dist() {
 
   cp ${build_file} ${final_file}
   cp ${final_file} ${bin_file}
-
-  #echo -e "\e[1;33m{Mush}\e[0m Start"
-  #echo -e "       Task completed"
-  #echo -e "       Search profile"
-  #echo -e "       \e[1;31mError qui cavallo\e[0m"
-  #echo -e "       Search profile n2"
-  #echo -e "       \e[1;33mFinish.\e[0m"
 
   chmod +x ${bin_file}
 

@@ -343,6 +343,8 @@ run_build() {
 
   exec_manifest_lookup
 
+  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
+
   exec_legacy_build
 
   if [ "$BUILD_TARGET" = "debug" ]; then
@@ -485,6 +487,8 @@ run_build() {
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
   exec_manifest_lookup
+
+  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
 
   exec_legacy_build
 
@@ -684,16 +688,16 @@ public install
 public manifest_lookup
 
 exec_build_dist() {
+  name=$MUSH_PACKAGE_NAME
 
+  echo "NAME: $name"
 
+  local bin_file=bin/${name}
 
-  local bin_file=bin/mush
-
-  local build_file=target/dist/mush.tmp
-  local final_file=target/dist/mush
+  local build_file=target/dist/${name}.tmp
+  local final_file=target/dist/${name}
 
   echo "#!/usr/bin/env bash" > $build_file
-  #echo "## " >> $build_file
   echo "set -e" >> $build_file
   cat src/boot/dist_2022.sh >> $build_file
   cat target/debug/legacy/getoptions.sh >> $build_file
@@ -710,13 +714,6 @@ exec_build_dist() {
 
   cp ${build_file} ${final_file}
   cp ${final_file} ${bin_file}
-
-  #echo -e "\e[1;33m{Mush}\e[0m Start"
-  #echo -e "       Task completed"
-  #echo -e "       Search profile"
-  #echo -e "       \e[1;31mError qui cavallo\e[0m"
-  #echo -e "       Search profile n2"
-  #echo -e "       \e[1;33mFinish.\e[0m"
 
   chmod +x ${bin_file}
 
@@ -837,5 +834,25 @@ exec_manifest_lookup() {
     console_error "Could not find 'Manifest.toml' in '$pwd' or any parent directory."
     exit 101
   fi
+
+  section=MUSH_USTABLE
+  while IFS= read line || [[ -n "${line}" ]]; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    line_number=$((line_number + 1))
+    [[ -z "${line}" ]] && continue
+    [[ "${line::1}" == "#" ]] && continue
+    case $line in
+      "[package]")
+        section=MUSH_PACKAGE
+        ;;
+      [a-z]*)
+        field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+        value=$(echo "$line" | cut -d'=' -f2 | xargs)
+        eval "${section}_${field}=\$value"
+        ;;
+    esac
+    #echo "L: $line"
+  done < "Manifest.toml"
 }
 main "$@"
