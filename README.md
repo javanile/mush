@@ -21,6 +21,10 @@ We try to do everything possible to ensure maximum compatibility with these plat
 [![yash](https://img.shields.io/badge/yash-&ge;2.29-lightgrey.svg?style=flat)](https://yash.osdn.jp/)
 [![zsh](https://img.shields.io/badge/zsh-&ge;3.1.9-lightgrey.svg?style=flat)](https://www.zsh.org/)
 
+## Documentation
+
+To start using Mush, learn more at the [Mush website](https://mush.javanile.org).
+
 ## Contributing
 
 See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CONTRIBUTING.md), obviously pull-request are welcome.
