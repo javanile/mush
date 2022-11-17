@@ -6,13 +6,17 @@ nav_order: 1
 
 # Mush
 
+Mush is the shell package builder. Mush downloads your shell package's dependencies, 
+compiles your packages, makes distributable packages, and uploads them to GitHub, 
+as public community’s package registry. You can contribute to this project on GitHub.
+
 ## Get Started
 
 The easiest way to get Mush is to install the current stable release from GitHub by using curl. Installing Mush using curl will also install libmush.
 
 On Linux and macOS systems, this is done as follows:
 
-```shell
+```console
 $ curl get.javanile.org/mush | sh
 ```
 
@@ -93,4 +97,4 @@ Hello, world!
 
 ### Going further
 
-For more details on using Cargo, check out the [Mush Guide](../guide/index.md)
+For more details on using Mush, check out the [CLI Commands](commands.md)
