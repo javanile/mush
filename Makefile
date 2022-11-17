@@ -22,6 +22,9 @@ test-build-dist:
 test-task-build-dist:
 	@bash tests/bare/tasks/build-dist-test.sh
 
+test-task-manifest-lookup:
+	@bash tests/bare/tasks/manifest-lookup-test.sh
+
 test-usage-debug:
 	@bash tests/bare/usage-debug-test.sh
 
