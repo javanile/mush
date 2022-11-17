@@ -31,7 +31,7 @@ See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CON
 
 ## Community & Questions
 
-- [GitHub Issues](https://github.com/javanile/mush/issues): report a bug or raise a feature request to the Pipetest core team
+- [GitHub Issues](https://github.com/javanile/mush/issues): report a bug or raise a feature request to the Mush core team
 - [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): see existing Q&A for `BASH` and `Unit Testing`. We look at them often
 
 ## License
