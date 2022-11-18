@@ -17,10 +17,36 @@ exec_manifest_lookup() {
       "[package]")
         section=MUSH_PACKAGE
         ;;
+      "[dependencies]")
+        section=MUSH_DEPENDENCIES
+        ;;
+      "[dev-dependencies]")
+        section=MUSH_DEV_DEPENDENCIES
+        ;;
+      "[legacy-fetch]")
+        section=MUSH_LEGACY_FETCH
+        ;;
+      "[legacy-build]")
+        section=MUSH_LEGACY_BUILD
+        ;;
+      "[dev-legacy-fetch]")
+        section=MUSH_DEV_LEGACY_FETCH
+        ;;
+      "[dev-legacy-build]")
+        section=MUSH_DEV_LEGACY_BUILD
+        ;;
       [a-z]*)
-        field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
-        value=$(echo "$line" | cut -d'=' -f2 | xargs)
-        eval "${section}_${field}=\$value"
+        case $section in
+          MUSH_PACKAGE)
+            field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+            value=$(echo "$line" | cut -d'=' -f2 | xargs)
+            eval "${section}_${field}=\$value"
+            ;;
+          *)
+            ;;
+        esac
+        ;;
+      *)
         ;;
     esac
     #echo "L: $line"
