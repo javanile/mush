@@ -7,4 +7,4 @@ bash target/debug/mush.sh build --target dist
 
 ## Build Basic App
 cd tests/fixtures/basic-app
-bash ../../../target/dist/mush.sh --vv build --target debug
+bash ../../../target/dist/mush.sh --vvv build --target debug
