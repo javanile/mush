@@ -42,3 +42,6 @@ test-run: build
 
 test-new: build
 	@bash tests/bare/new-test.sh
+
+test-build-debug-basic-app:
+	@bash tests/bare/build/debug-basic-app-test.sh
