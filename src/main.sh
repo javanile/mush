@@ -1,6 +1,7 @@
 
 legacy lib_getoptions
 
+module api
 module commands
 module console
 module tasks

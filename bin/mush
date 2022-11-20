@@ -316,78 +316,9 @@ getoptions_help() {
 	echo "}"
 }
 
-exec_legacy_build() {
-  legacy=1
-  #echo "Legacy build"
-}
-
-parser_definition_build() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
-
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
-}
-
-run_build() {
-  eval "$(getoptions parser_definition_build parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
-
-  exec_manifest_lookup
-
-  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
-
-  exec_legacy_build
-
-  if [ "$BUILD_TARGET" = "debug" ]; then
-    exec_build_debug "$@"
-  else
-    exec_build_dist "$@"
-  fi
-}
-
-parser_definition_legacy() {
-	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} legacy [options...] [arguments...]"
-	msg -- '' 'getoptions subcommand example' ''
-	msg -- 'Options:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	disp    :usage       -h --help
-}
-
-run_legacy() {
-  eval "$(getoptions parser_definition_legacy parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  echo "FLAG_C: $FLAG_C"
-  echo "MODULE_NAME: $MODULE_NAME"
-
-  echo "GLOBAL: $GLOBAL"
-  i=0
-  while [ $# -gt 0 ] && i=$((i + 1)); do
-    module_name=$(basename $1)
-    module_file=target/debug/legacy/$module_name
-    echo "$i Downloading '$module_name' from $1"
-    curl -sL $1 -o $module_file
-    chmod +x $module_file
-    shift
-  done
-
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
-}
-
 legacy lib_getoptions
 
+module api
 module commands
 module console
 module tasks
@@ -454,6 +385,71 @@ main() {
   fi
 }
 
+
+public embed
+public debug_2022
+public dist_2022
+
+embed() {
+  caller | tail -1
+
+  #MUSH_TARGET_DIR
+
+  eval "$1() { echo \"CIAO\"; }"
+}
+
+
+embed api_debug_2022
+
+legacy() {
+  source target/debug/legacy/$1.sh
+}
+
+module() {
+  local module_file=src/$1.sh
+  local module_dir_file=src/$1/module.sh
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  else
+    MUSH_RUNTIME_MODULE=$1
+    source "$module_dir_file"
+  fi
+}
+
+public() {
+  echo "PUBLIC: $1 $MUSH_RUNTIME_MODULE"
+  public=$1
+
+  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
+  local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
+
+  echo $module_file
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  elif [ -f "$module_dir_file" ]; then
+    source "$module_dir_file"
+  fi
+}
+
+use() {
+  source src/assets/server.sh
+}
+
+legacy() {
+  legacy=$1
+}
+
+module() {
+  module=$1
+}
+
+public() {
+  public=$1
+}
+
+use() {
+  use=$1
+}
 
 public add
 public build
@@ -698,7 +694,7 @@ exec_build_debug() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
-  boot_debug_2022 >> $build_file
+  api_debug_2022 >> $build_file
 
   echo "source src/main.sh" >> $build_file
   echo "main \"\$@\"" >> $build_file
@@ -720,12 +716,15 @@ exec_build_dist() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
+
   cat src/api/dist_2022.sh >> $build_file
+
   cat target/debug/legacy/getoptions.sh >> $build_file
-  cat src/tasks/legacy_build.sh >> $build_file
+
+  #cat src/tasks/legacy_build.sh >> $build_file
   #cat src/tasks/build_dist.sh >> $build_file
-  cat src/commands/build.sh >> $build_file
-  cat src/commands/legacy.sh >> $build_file
+  #cat src/commands/build.sh >> $build_file
+  #cat src/commands/legacy.sh >> $build_file
 
   build_dist_parse "src/main.sh" "${build_file}"
 
