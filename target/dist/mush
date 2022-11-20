@@ -682,10 +682,31 @@ console_echo() {
   CONSOLE_INDENT='      '
 }
 
+public build_debug
 public build_dist
 public init
 public install
+public legacy_build
 public manifest_lookup
+
+exec_build_debug() {
+  local name=$MUSH_PACKAGE_NAME
+
+  local build_file=target/debug/${name}.tmp
+  local final_file=target/debug/${name}
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "set -e" >> $build_file
+
+  boot_debug_2022 >> $build_file
+
+  echo "source src/main.sh" >> $build_file
+  echo "main \"\$@\"" >> $build_file
+
+  mv "$build_file" "$final_file"
+
+  echo "Build complete."
+}
 
 exec_build_dist() {
   name=$MUSH_PACKAGE_NAME
@@ -699,7 +720,7 @@ exec_build_dist() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
-  cat src/boot/dist_2022.sh >> $build_file
+  cat src/api/dist_2022.sh >> $build_file
   cat target/debug/legacy/getoptions.sh >> $build_file
   cat src/tasks/legacy_build.sh >> $build_file
   #cat src/tasks/build_dist.sh >> $build_file
@@ -828,6 +849,11 @@ exec_install() {
 }
 
 
+exec_legacy_build() {
+  legacy=1
+  #echo "Legacy build"
+}
+
 exec_manifest_lookup() {
   pwd=$PWD
   if [ ! -f "Manifest.toml" ]; then
@@ -846,10 +872,36 @@ exec_manifest_lookup() {
       "[package]")
         section=MUSH_PACKAGE
         ;;
+      "[dependencies]")
+        section=MUSH_DEPENDENCIES
+        ;;
+      "[dev-dependencies]")
+        section=MUSH_DEV_DEPENDENCIES
+        ;;
+      "[legacy-fetch]")
+        section=MUSH_LEGACY_FETCH
+        ;;
+      "[legacy-build]")
+        section=MUSH_LEGACY_BUILD
+        ;;
+      "[dev-legacy-fetch]")
+        section=MUSH_DEV_LEGACY_FETCH
+        ;;
+      "[dev-legacy-build]")
+        section=MUSH_DEV_LEGACY_BUILD
+        ;;
       [a-z]*)
-        field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
-        value=$(echo "$line" | cut -d'=' -f2 | xargs)
-        eval "${section}_${field}=\$value"
+        case $section in
+          MUSH_PACKAGE)
+            field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+            value=$(echo "$line" | cut -d'=' -f2 | xargs)
+            eval "${section}_${field}=\$value"
+            ;;
+          *)
+            ;;
+        esac
+        ;;
+      *)
         ;;
     esac
     #echo "L: $line"

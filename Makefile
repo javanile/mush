@@ -48,3 +48,15 @@ test-build-debug-basic-app:
 
 test-api-embed:
 	@bash tests/bare/api/embed-test.sh
+
+test-auto-build-debug-debug:
+	@bash tests/bare/build/auto-debug-debug-test.sh
+
+test-auto-build-debug-dist:
+	@bash tests/bare/build/auto-debug-dist-test.sh
+
+test-auto-build-dist-debug:
+	@bash tests/bare/build/auto-dist-debug-test.sh
+
+test-auto-build-dist-dist:
+	@bash tests/bare/build/auto-dist-dist-test.sh

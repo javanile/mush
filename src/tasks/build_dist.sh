@@ -11,7 +11,7 @@ exec_build_dist() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
-  cat src/boot/dist_2022.sh >> $build_file
+  cat src/api/dist_2022.sh >> $build_file
   cat target/debug/legacy/getoptions.sh >> $build_file
   cat src/tasks/legacy_build.sh >> $build_file
   #cat src/tasks/build_dist.sh >> $build_file
