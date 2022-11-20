@@ -2,6 +2,8 @@
 
 source src/api/embed.sh
 
-embed this_file
+embed_file module_name ./tests/fixtures/module.sh > ./tests/temp/embed_file.sh
 
-this_file
+source ./tests/temp/embed_file.sh
+
+module_name

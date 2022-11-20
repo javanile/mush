@@ -1,6 +1,4 @@
 
-embed api_debug_2022
-
 legacy() {
   source target/debug/legacy/$1.sh
 }
@@ -34,3 +32,12 @@ public() {
 use() {
   source src/assets/server.sh
 }
+
+embed() {
+ # caller | tail -1
+
+  #MUSH_TARGET_DIR
+
+  eval "$1() { echo \"CIAO\"; }"
+}
+

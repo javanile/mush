@@ -1,9 +1,11 @@
 
-embed() {
- # caller | tail -1
+embed_file() {
+  local module_name=$1
+  local module_file=$2
 
-  #MUSH_TARGET_DIR
-
-  eval "$1() { echo \"CIAO\"; }"
+  echo "$module_name() {"
+  echo "  cat <<EOF"
+  cat $module_file
+  echo "EOF"
+  echo "}"
 }
-

@@ -12,7 +12,7 @@ exec_build_dist() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
-  cat src/api/dist_2022.sh >> $build_file
+  dist_2022 >> $build_file
 
   cat target/debug/legacy/getoptions.sh >> $build_file
 
@@ -39,6 +39,8 @@ build_dist_parse() {
   build_dist_parse_public "${src_file}" "${build_file}"
 
   build_dist_parse_module "${src_file}" "${build_file}"
+
+  build_dist_parse_embed "${src_file}" "${build_file}"
 
   return 0
 }
@@ -86,6 +88,28 @@ build_dist_parse_module() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 0
+    fi
+  done
+
+  return 0
+}
+
+build_dist_parse_embed() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+
+  grep -n '^embed [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*module}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+    if [ -e "${module_file}" ]; then
+      console_log "Embed '${module_file}' as module file"
+      embed_file "$module_name" "$module_file" >> $build_file
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${module_name}', create file '${module_file}'."
       exit 0
     fi
   done

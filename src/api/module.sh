@@ -1,4 +1,5 @@
 
 public embed
-public debug_2022
-public dist_2022
+
+embed debug_2022
+embed dist_2022
