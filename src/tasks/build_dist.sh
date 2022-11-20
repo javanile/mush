@@ -63,7 +63,7 @@ build_dist_parse_public() {
     else
       console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
       console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
-      exit 0
+      exit 101
     fi
   done
 
@@ -88,7 +88,7 @@ build_dist_parse_module() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
-      exit 0
+      exit 101
     fi
   done
 
@@ -101,7 +101,7 @@ build_dist_parse_embed() {
   local module_dir=$(dirname $src_file)
 
   grep -n '^embed [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local module_name=$(echo "${line#*module}" | xargs)
+    local module_name=$(echo "${line#*embed}" | xargs)
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
     if [ -e "${module_file}" ]; then
@@ -110,7 +110,7 @@ build_dist_parse_embed() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_info  "To create the module '${module_name}', create file '${module_file}'."
-      exit 0
+      exit 101
     fi
   done
 

@@ -15,12 +15,6 @@ use() {
   use=$1
 }
 
-
 embed() {
- # caller | tail -1
-
-  #MUSH_TARGET_DIR
-
-  eval "$1() { echo \"\"; }"
+  embed=$1
 }
-

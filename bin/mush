@@ -17,15 +17,9 @@ use() {
   use=$1
 }
 
-
 embed() {
- # caller | tail -1
-
-  #MUSH_TARGET_DIR
-
-  eval "$1() { echo \"\"; }"
+  embed=$1
 }
-
 # [getoptions] License: Creative Commons Zero v1.0 Universal
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions() {
@@ -326,263 +320,6 @@ getoptions_help() {
 	echo "}"
 }
 
-exec_legacy_build() {
-  legacy=1
-  #echo "Legacy build"
-}
-
-exec_build_dist() {
-  name=$MUSH_PACKAGE_NAME
-
-  echo "NAME: $name"
-
-  local bin_file=bin/${name}
-
-  local build_file=target/dist/${name}.tmp
-  local final_file=target/dist/${name}
-
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "set -e" >> $build_file
-
-  dist_2022 >> $build_file
-
-  cat target/debug/legacy/getoptions.sh >> $build_file
-
-  build_dist_parse "src/main.sh" "${build_file}"
-
-  echo "main \"\$@\"" >> $build_file
-
-  mkdir -p bin/
-
-  cp ${build_file} ${final_file}
-  cp ${final_file} ${bin_file}
-
-  chmod +x ${bin_file}
-
-  console_done "Build complete."
-}
-
-build_dist_parse() {
-  local src_file=$1
-  local build_file=$2
-
-  cat "${src_file}" >> "${build_file}"
-
-  build_dist_parse_public "${src_file}" "${build_file}"
-
-  build_dist_parse_module "${src_file}" "${build_file}"
-
-  return 0
-}
-
-build_dist_parse_public() {
-  local src_file=$1
-  local build_file=$2
-  local public_dir=$(dirname $src_file)
-
-  grep -n '^public [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local public_name=$(echo "${line#*public}" | xargs)
-    local public_file="${public_dir}/${public_name}.sh"
-    local public_dir_file="${public_dir}/${public_name}/module.sh"
-    if [ -e "${public_file}" ]; then
-      console_log "Public '${public_file}' as module file"
-      build_dist_parse "${public_file}" "${build_file}"
-    elif [ -e "${public_dir_file}" ]; then
-      console_log "Public '${public_dir_file}' as directory module file"
-      build_dist_parse "${public_dir_file}" "${build_file}"
-    else
-      console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
-      exit 0
-    fi
-  done
-
-  return 0
-}
-
-build_dist_parse_module() {
-  local src_file=$1
-  local build_file=$2
-  local module_dir=$(dirname $src_file)
-
-  grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local module_name=$(echo "${line#*module}" | xargs)
-    local module_file="${module_dir}/${module_name}.sh"
-    local module_dir_file="${module_dir}/${module_name}/module.sh"
-    if [ -e "${module_file}" ]; then
-      console_log "Import '${module_file}' as module file"
-      build_dist_parse "${module_file}" "${build_file}"
-    elif [ -e "${module_dir_file}" ]; then
-      console_log "Import '${module_dir_file}' as directory module file"
-      build_dist_parse "${module_dir_file}" "${build_file}"
-    else
-      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
-      exit 0
-    fi
-  done
-
-  return 0
-}
-
-exec_manifest_lookup() {
-  pwd=$PWD
-  if [ ! -f "Manifest.toml" ]; then
-    console_error "Could not find 'Manifest.toml' in '$pwd' or any parent directory."
-    exit 101
-  fi
-
-  section=MUSH_USTABLE
-  while IFS= read line || [[ -n "${line}" ]]; do
-    line="${line#"${line%%[![:space:]]*}"}"
-    line="${line%"${line##*[![:space:]]}"}"
-    line_number=$((line_number + 1))
-    [[ -z "${line}" ]] && continue
-    [[ "${line::1}" == "#" ]] && continue
-    case $line in
-      "[package]")
-        section=MUSH_PACKAGE
-        ;;
-      "[dependencies]")
-        section=MUSH_DEPENDENCIES
-        ;;
-      "[dev-dependencies]")
-        section=MUSH_DEV_DEPENDENCIES
-        ;;
-      "[legacy-fetch]")
-        section=MUSH_LEGACY_FETCH
-        ;;
-      "[legacy-build]")
-        section=MUSH_LEGACY_BUILD
-        ;;
-      "[dev-legacy-fetch]")
-        section=MUSH_DEV_LEGACY_FETCH
-        ;;
-      "[dev-legacy-build]")
-        section=MUSH_DEV_LEGACY_BUILD
-        ;;
-      [a-z]*)
-        case $section in
-          MUSH_PACKAGE)
-            field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
-            value=$(echo "$line" | cut -d'=' -f2 | xargs)
-            eval "${section}_${field}=\$value"
-            ;;
-          *)
-            ;;
-        esac
-        ;;
-      *)
-        ;;
-    esac
-    #echo "L: $line"
-  done < "Manifest.toml"
-}
-
-parser_definition_build() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
-
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
-}
-
-run_build() {
-  eval "$(getoptions parser_definition_build parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
-
-  exec_manifest_lookup
-
-  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
-
-  exec_legacy_build
-
-  if [ "$BUILD_TARGET" = "debug" ]; then
-    exec_build_debug "$@"
-  else
-    exec_build_dist "$@"
-  fi
-}
-
-parser_definition_legacy() {
-	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} legacy [options...] [arguments...]"
-	msg -- '' 'getoptions subcommand example' ''
-	msg -- 'Options:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	disp    :usage       -h --help
-}
-
-run_legacy() {
-  eval "$(getoptions parser_definition_legacy parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  echo "FLAG_C: $FLAG_C"
-  echo "MODULE_NAME: $MODULE_NAME"
-
-  echo "GLOBAL: $GLOBAL"
-  i=0
-  while [ $# -gt 0 ] && i=$((i + 1)); do
-    module_name=$(basename $1)
-    module_file=target/debug/legacy/$module_name
-    echo "$i Downloading '$module_name' from $1"
-    curl -sL $1 -o $module_file
-    chmod +x $module_file
-    shift
-  done
-
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
-}
-
-# FATAL
-# ERROR
-# WARNING
-# INFO
-# DEBUG
-# TRACE
-
-case "$(uname -s)" in
-  Darwin*)
-    ESCAPE='\x1B'
-    ;;
-  Linux|*)
-    ESCAPE='\e'
-    ;;
-esac
-
-CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
-console_log() {
-  console_echo "$1"
-}
-
-console_info() {
-  console_echo "$1"
-}
-
-console_error() {
-  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
-}
-
-console_done() {
-  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
-}
-
-console_echo() {
-  echo -e "${CONSOLE_INDENT} $1"
-  CONSOLE_INDENT='      '
-}
-
 legacy lib_getoptions
 
 module api
@@ -652,4 +389,566 @@ main() {
   fi
 }
 
-main $@
+
+public embed
+
+embed debug_2022
+embed dist_2022
+
+embed_file() {
+  local module_name=$1
+  local module_file=$2
+
+  echo "$module_name() {"
+  echo "  cat <<'EOF'"
+  cat $module_file
+  echo "EOF"
+  echo "}"
+}
+debug_2022() {
+  cat <<'EOF'
+
+legacy() {
+  source target/debug/legacy/$1.sh
+}
+
+module() {
+  local module_file=src/$1.sh
+  local module_dir_file=src/$1/module.sh
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  else
+    MUSH_RUNTIME_MODULE=$1
+    source "$module_dir_file"
+  fi
+}
+
+public() {
+  echo "PUBLIC: $1 $MUSH_RUNTIME_MODULE"
+  public=$1
+
+  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
+  local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
+
+  echo $module_file
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  elif [ -f "$module_dir_file" ]; then
+    source "$module_dir_file"
+  fi
+}
+
+use() {
+  source src/assets/server.sh
+}
+
+embed() {
+ # caller | tail -1
+
+  #MUSH_TARGET_DIR
+
+  eval "$1() { echo \"CIAO\"; }"
+}
+
+EOF
+}
+dist_2022() {
+  cat <<'EOF'
+
+legacy() {
+  legacy=$1
+}
+
+module() {
+  module=$1
+}
+
+public() {
+  public=$1
+}
+
+use() {
+  use=$1
+}
+
+embed() {
+  embed=$1
+}
+EOF
+}
+
+public add
+public build
+public init
+public install
+public legacy
+public new
+public run
+
+test0 () {
+  echo "TEST"
+}
+parser_definition_build() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_build() {
+  eval "$(getoptions parser_definition_build parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+
+  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
+
+  exec_legacy_build
+
+  if [ "$BUILD_TARGET" = "debug" ]; then
+    exec_build_debug "$@"
+  else
+    exec_build_dist "$@"
+  fi
+}
+
+parser_definition_init() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_init() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "Manifest.toml" ]; then
+    console_error "'cargo init' cannot be run on existing Mush packages"
+    exit 101
+  fi
+
+  exec_init
+}
+
+parser_definition_install() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_install() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_legacy_build
+  exec_build_dist "$@"
+  exec_install
+}
+
+parser_definition_legacy() {
+	setup   REST help:usage abbr:true -- \
+		"Usage: ${2##*/} legacy [options...] [arguments...]"
+	msg -- '' 'getoptions subcommand example' ''
+	msg -- 'Options:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	disp    :usage       -h --help
+}
+
+run_legacy() {
+  eval "$(getoptions parser_definition_legacy parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  echo "FLAG_C: $FLAG_C"
+  echo "MODULE_NAME: $MODULE_NAME"
+
+  echo "GLOBAL: $GLOBAL"
+  i=0
+  while [ $# -gt 0 ] && i=$((i + 1)); do
+    module_name=$(basename $1)
+    module_file=target/debug/legacy/$module_name
+    echo "$i Downloading '$module_name' from $1"
+    curl -sL $1 -o $module_file
+    chmod +x $module_file
+    shift
+  done
+
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+parser_definition_new() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_new() {
+  eval "$(getoptions parser_definition_new parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "$1" ]; then
+    console_error "Destination '$1' already exists"
+    exit 101
+  fi
+
+  mkdir -p "$1"
+
+  cd "$1"
+
+  exec_init
+}
+
+parser_definition_run() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_run() {
+  eval "$(getoptions parser_definition_run parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+
+  exec_legacy_build
+
+  exec_build_debug "$@"
+}
+
+# FATAL
+# ERROR
+# WARNING
+# INFO
+# DEBUG
+# TRACE
+
+case "$(uname -s)" in
+  Darwin*)
+    ESCAPE='\x1B'
+    ;;
+  Linux|*)
+    ESCAPE='\e'
+    ;;
+esac
+
+CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_log() {
+  console_echo "$1"
+}
+
+console_info() {
+  console_echo "$1"
+}
+
+console_error() {
+  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+}
+
+console_done() {
+  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
+}
+
+console_echo() {
+  echo -e "${CONSOLE_INDENT} $1"
+  CONSOLE_INDENT='      '
+}
+
+public build_debug
+public build_dist
+public init
+public install
+public legacy_build
+public manifest_lookup
+
+exec_build_debug() {
+  local name=$MUSH_PACKAGE_NAME
+
+  local build_file=target/debug/${name}.tmp
+  local final_file=target/debug/${name}
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "set -e" >> $build_file
+
+  debug_2022 >> $build_file
+
+  echo "source src/main.sh" >> $build_file
+  echo "main \"\$@\"" >> $build_file
+
+  mv "$build_file" "$final_file"
+
+  echo "Build complete."
+}
+
+exec_build_dist() {
+  name=$MUSH_PACKAGE_NAME
+
+  echo "NAME: $name"
+
+  local bin_file=bin/${name}
+
+  local build_file=target/dist/${name}.tmp
+  local final_file=target/dist/${name}
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "set -e" >> $build_file
+
+  dist_2022 >> $build_file
+
+  cat target/debug/legacy/getoptions.sh >> $build_file
+
+  build_dist_parse "src/main.sh" "${build_file}"
+
+  echo "main \"\$@\"" >> $build_file
+
+  mkdir -p bin/
+
+  cp ${build_file} ${final_file}
+  cp ${final_file} ${bin_file}
+
+  chmod +x ${bin_file}
+
+  console_done "Build complete."
+}
+
+build_dist_parse() {
+  local src_file=$1
+  local build_file=$2
+
+  cat "${src_file}" >> "${build_file}"
+
+  build_dist_parse_public "${src_file}" "${build_file}"
+
+  build_dist_parse_module "${src_file}" "${build_file}"
+
+  build_dist_parse_embed "${src_file}" "${build_file}"
+
+  return 0
+}
+
+build_dist_parse_public() {
+  local src_file=$1
+  local build_file=$2
+  local public_dir=$(dirname $src_file)
+
+  grep -n '^public [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local public_name=$(echo "${line#*public}" | xargs)
+    local public_file="${public_dir}/${public_name}.sh"
+    local public_dir_file="${public_dir}/${public_name}/module.sh"
+    if [ -e "${public_file}" ]; then
+      console_log "Public '${public_file}' as module file"
+      build_dist_parse "${public_file}" "${build_file}"
+    elif [ -e "${public_dir_file}" ]; then
+      console_log "Public '${public_dir_file}' as directory module file"
+      build_dist_parse "${public_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+build_dist_parse_module() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+
+  grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*module}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+    if [ -e "${module_file}" ]; then
+      console_log "Import '${module_file}' as module file"
+      build_dist_parse "${module_file}" "${build_file}"
+    elif [ -e "${module_dir_file}" ]; then
+      console_log "Import '${module_dir_file}' as directory module file"
+      build_dist_parse "${module_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+build_dist_parse_embed() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+
+  grep -n '^embed [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*embed}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+    if [ -e "${module_file}" ]; then
+      console_log "Embed '${module_file}' as module file"
+      embed_file "$module_name" "$module_file" >> $build_file
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_info  "To create the module '${module_name}', create file '${module_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+exec_init() {
+  local package_name=$(basename "$PWD")
+  local manifest_file=Manifest.toml
+  local main_file=src/main.sh
+  local lib_file=src/lib.sh
+
+  mkdir -p src
+
+  echo "[package]" > ${manifest_file}
+  echo "name = \"${package_name}\"" >> ${manifest_file}
+  echo "version = \"0.1.0\"" >> ${manifest_file}
+  echo "edition = \"2022\"" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "# See more keys and their definitions at https://mush.javanile.org/manifest.html" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "[dependencies]" >> ${manifest_file}
+
+  if [ ! -f "${main_file}" ]; then
+    echo "" > ${main_file}
+    echo "main() {" >> ${main_file}
+    echo "  echo \"Hello World!\"" >> ${main_file}
+    echo "}" >> ${main_file}
+  fi
+}
+
+exec_install() {
+  local bin_file=/usr/local/bin/mush
+  local final_file=target/dist/mush
+
+  local cp=cp
+  local chmod=chmod
+  if [[ $EUID -ne 0 ]]; then
+      cp="sudo ${cp}"
+      chmod="sudo ${chmod}"
+  fi
+
+  ${cp} ${final_file} ${bin_file}
+  ${chmod} +x ${bin_file}
+
+  echo "Finished release [optimized] target(s) in 0.18s"
+  echo "Installing /home/francesco/.cargo/bin/cask"
+  echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
+}
+
+
+exec_legacy_build() {
+  legacy=1
+  #echo "Legacy build"
+}
+
+exec_manifest_lookup() {
+  pwd=$PWD
+  if [ ! -f "Manifest.toml" ]; then
+    console_error "Could not find 'Manifest.toml' in '$pwd' or any parent directory."
+    exit 101
+  fi
+
+  section=MUSH_USTABLE
+  while IFS= read line || [[ -n "${line}" ]]; do
+    line="${line#"${line%%[![:space:]]*}"}"
+    line="${line%"${line##*[![:space:]]}"}"
+    line_number=$((line_number + 1))
+    [[ -z "${line}" ]] && continue
+    [[ "${line::1}" == "#" ]] && continue
+    case $line in
+      "[package]")
+        section=MUSH_PACKAGE
+        ;;
+      "[dependencies]")
+        section=MUSH_DEPENDENCIES
+        ;;
+      "[dev-dependencies]")
+        section=MUSH_DEV_DEPENDENCIES
+        ;;
+      "[legacy-fetch]")
+        section=MUSH_LEGACY_FETCH
+        ;;
+      "[legacy-build]")
+        section=MUSH_LEGACY_BUILD
+        ;;
+      "[dev-legacy-fetch]")
+        section=MUSH_DEV_LEGACY_FETCH
+        ;;
+      "[dev-legacy-build]")
+        section=MUSH_DEV_LEGACY_BUILD
+        ;;
+      [a-z]*)
+        case $section in
+          MUSH_PACKAGE)
+            field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+            value=$(echo "$line" | cut -d'=' -f2 | xargs)
+            eval "${section}_${field}=\$value"
+            ;;
+          *)
+            ;;
+        esac
+        ;;
+      *)
+        ;;
+    esac
+    #echo "L: $line"
+  done < "Manifest.toml"
+}
+main "$@"

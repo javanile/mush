@@ -8,7 +8,7 @@ exec_build_debug() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
-  api_debug_2022 >> $build_file
+  debug_2022 >> $build_file
 
   echo "source src/main.sh" >> $build_file
   echo "main \"\$@\"" >> $build_file

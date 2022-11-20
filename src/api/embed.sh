@@ -4,7 +4,7 @@ embed_file() {
   local module_file=$2
 
   echo "$module_name() {"
-  echo "  cat <<EOF"
+  echo "  cat <<'EOF'"
   cat $module_file
   echo "EOF"
   echo "}"

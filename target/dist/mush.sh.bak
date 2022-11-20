@@ -5,10 +5,14 @@ bin_file=bin/mush
 build_file=target/dist/mush.tmp
 final_file=target/dist/mush
 
+source src/api/embed.sh
+
 echo "#!/usr/bin/env bash" > $build_file
 #echo "## " >> $build_file
 echo "set -e" >> $build_file
 cat src/api/dist_2022.sh >> $build_file
+embed_file dist_2022 src/api/dist_2022.sh >> $build_file
+cat src/api/embed.sh >> $build_file
 cat target/debug/legacy/getoptions.sh >> $build_file
 cat src/tasks/legacy_build.sh >> $build_file
 cat src/tasks/build_dist.sh >> $build_file
