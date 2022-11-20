@@ -1,6 +1,6 @@
 
 embed() {
-  caller | tail -1
+ # caller | tail -1
 
   #MUSH_TARGET_DIR
 

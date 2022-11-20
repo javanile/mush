@@ -391,7 +391,7 @@ public debug_2022
 public dist_2022
 
 embed() {
-  caller | tail -1
+ # caller | tail -1
 
   #MUSH_TARGET_DIR
 
@@ -720,11 +720,6 @@ exec_build_dist() {
   cat src/api/dist_2022.sh >> $build_file
 
   cat target/debug/legacy/getoptions.sh >> $build_file
-
-  #cat src/tasks/legacy_build.sh >> $build_file
-  #cat src/tasks/build_dist.sh >> $build_file
-  #cat src/commands/build.sh >> $build_file
-  #cat src/commands/legacy.sh >> $build_file
 
   build_dist_parse "src/main.sh" "${build_file}"
 
