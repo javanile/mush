@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
-set -e
+
+embed api_debug_2022
 
 legacy() {
   source target/debug/legacy/$1.sh
@@ -15,6 +15,7 @@ module() {
     source "$module_dir_file"
   fi
 }
+
 public() {
   echo "PUBLIC: $1 $MUSH_RUNTIME_MODULE"
   public=$1
@@ -29,9 +30,7 @@ public() {
     source "$module_dir_file"
   fi
 }
+
 use() {
   source src/assets/server.sh
 }
-
-source src/main.sh
-main "$@"

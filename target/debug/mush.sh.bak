@@ -2,6 +2,7 @@
 set -e
 
 source src/boot/debug_2022.sh
+eval "$(boot_debug_2022)"
 source target/debug/legacy/getoptions.sh
 source src/commands/build.sh
 source src/commands/legacy.sh

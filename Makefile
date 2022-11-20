@@ -45,3 +45,6 @@ test-new: build
 
 test-build-debug-basic-app:
 	@bash tests/bare/build/debug-basic-app-test.sh
+
+test-api-embed:
+	@bash tests/bare/api/embed-test.sh
