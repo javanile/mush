@@ -16,9 +16,10 @@ parser_definition() {
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
   msg   -- 'OPTIONS:'
-  disp  :usage  -h --help                         -- "Print help information"
   disp  VERSION -V --version                      -- "Print version info and exit"
   flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage  -h --help                         -- "Print help information"
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"

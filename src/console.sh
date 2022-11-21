@@ -43,5 +43,7 @@ console_error() {
 }
 
 console_print() {
-  echo -e "$1 $2" >&2
+  if [ -z "${QUIET}" ]; then
+    echo -e "$1 $2" >&2
+  fi
 }

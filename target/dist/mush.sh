@@ -337,9 +337,10 @@ parser_definition() {
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
   msg   -- 'OPTIONS:'
-  disp  :usage  -h --help                         -- "Print help information"
   disp  VERSION -V --version                      -- "Print version info and exit"
   flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage  -h --help                         -- "Print help information"
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
@@ -347,6 +348,7 @@ parser_definition() {
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
+  cmd   run -- "Run a binary or example of the local package"
 }
 
 main() {
@@ -384,6 +386,9 @@ main() {
       new)
         run_new "$@"
         ;;
+      run)
+        run_run "$@"
+        ;;
       --) # no subcommand, arguments only
     esac
   fi
@@ -401,7 +406,7 @@ embed_file() {
 
   echo "$module_name() {"
   echo "  cat <<'EOF'"
-  cat $module_file
+  cat "$module_file"
   echo "EOF"
   echo "}"
 }
@@ -637,9 +642,9 @@ run_new() {
 }
 
 parser_definition_run() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+	setup   REST help:usage abbr:true -- "Run a binary or example of the local package" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
 	msg -- 'OPTIONS:'
 	flag    FLAG_C       -c --flag-c
@@ -661,6 +666,12 @@ run_run() {
   exec_legacy_build
 
   exec_build_debug "$@"
+
+  bin_file=target/debug/$MUSH_PACKAGE_NAME
+
+  console_status "Running" "'${bin_file}'"
+
+  exec "$bin_file"
 }
 
 # FATAL
@@ -707,7 +718,9 @@ console_error() {
 }
 
 console_print() {
-  echo -e "$1 $2" >&2
+  if [ -z "${QUIET}" ]; then
+    echo -e "$1 $2" >&2
+  fi
 }
 
 public build_debug
@@ -734,6 +747,8 @@ exec_build_debug() {
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"
+
+  chmod +x "$final_file"
 }
 
 exec_build_dist() {

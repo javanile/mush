@@ -1,8 +1,8 @@
 
 parser_definition_run() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+	setup   REST help:usage abbr:true -- "Run a binary or example of the local package" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
 	msg -- 'OPTIONS:'
 	flag    FLAG_C       -c --flag-c
@@ -24,4 +24,10 @@ run_run() {
   exec_legacy_build
 
   exec_build_debug "$@"
+
+  bin_file=target/debug/$MUSH_PACKAGE_NAME
+
+  console_status "Running" "'${bin_file}'"
+
+  exec "$bin_file"
 }
