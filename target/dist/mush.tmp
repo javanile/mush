@@ -414,7 +414,12 @@ debug_2022() {
   cat <<'EOF'
 
 legacy() {
-  source target/debug/legacy/$1.sh
+  legacy_file=target/debug/legacy/$1.sh
+  if [ ! -f "$legacy_file" ]; then
+    error "errrore"
+    exit 101
+  fi
+  source "${legacy_file}"
 }
 
 module() {
@@ -447,6 +452,10 @@ use() {
 embed() {
   local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
   eval "$(embed_file $1 $module_file)"
+}
+
+error() {
+  echo "$1"
 }
 EOF
 }
@@ -669,6 +678,10 @@ run_run() {
 
   bin_file=target/debug/$MUSH_PACKAGE_NAME
 
+  console_status "Compiling" "'${bin_file}'"
+
+  compile_file "src/main.sh"
+
   console_status "Running" "'${bin_file}'"
 
   exec "$bin_file"
@@ -729,6 +742,7 @@ public init
 public install
 public legacy_build
 public manifest_lookup
+public compile
 
 exec_build_debug() {
   local name=$MUSH_PACKAGE_NAME
@@ -770,7 +784,7 @@ exec_build_dist() {
 
   cat target/debug/legacy/getoptions.sh >> $build_file
 
-  build_dist_parse "src/main.sh" "${build_file}"
+  compile_file "src/main.sh" "${build_file}"
 
   echo "main \"\$@\"" >> $build_file
 
@@ -782,92 +796,6 @@ exec_build_dist() {
   chmod +x ${bin_file}
 }
 
-build_dist_parse() {
-  local src_file=$1
-  local build_file=$2
-
-  cat "${src_file}" >> "${build_file}"
-
-  build_dist_parse_public "${src_file}" "${build_file}"
-
-  build_dist_parse_module "${src_file}" "${build_file}"
-
-  build_dist_parse_embed "${src_file}" "${build_file}"
-
-  return 0
-}
-
-build_dist_parse_public() {
-  local src_file=$1
-  local build_file=$2
-  local public_dir=$(dirname $src_file)
-
-  grep -n '^public [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local public_name=$(echo "${line#*public}" | xargs)
-    local public_file="${public_dir}/${public_name}.sh"
-    local public_dir_file="${public_dir}/${public_name}/module.sh"
-    if [ -e "${public_file}" ]; then
-      console_info "Public" "file '${public_file}' as module file"
-      build_dist_parse "${public_file}" "${build_file}"
-    elif [ -e "${public_dir_file}" ]; then
-      console_info "Public" "file '${public_dir_file}' as directory module file"
-      build_dist_parse "${public_dir_file}" "${build_file}"
-    else
-      console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
-      exit 101
-    fi
-  done
-
-  return 0
-}
-
-build_dist_parse_module() {
-  local src_file=$1
-  local build_file=$2
-  local module_dir=$(dirname $src_file)
-
-  grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local module_name=$(echo "${line#*module}" | xargs)
-    local module_file="${module_dir}/${module_name}.sh"
-    local module_dir_file="${module_dir}/${module_name}/module.sh"
-    if [ -e "${module_file}" ]; then
-      console_info "Import" "file '${module_file}' as module file"
-      build_dist_parse "${module_file}" "${build_file}"
-    elif [ -e "${module_dir_file}" ]; then
-      console_info "Import" "file '${module_dir_file}' as directory module file"
-      build_dist_parse "${module_dir_file}" "${build_file}"
-    else
-      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
-      exit 101
-    fi
-  done
-
-  return 0
-}
-
-build_dist_parse_embed() {
-  local src_file=$1
-  local build_file=$2
-  local module_dir=$(dirname $src_file)
-
-  grep -n '^embed [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
-    local module_name=$(echo "${line#*embed}" | xargs)
-    local module_file="${module_dir}/${module_name}.sh"
-    local module_dir_file="${module_dir}/${module_name}/module.sh"
-    if [ -e "${module_file}" ]; then
-      console_info "Embed" "file '${module_file}' as module file"
-      embed_file "$module_name" "$module_file" >> $build_file
-    else
-      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_log  "To create the module '${module_name}', create file '${module_file}'."
-      exit 101
-    fi
-  done
-
-  return 0
-}
 
 exec_init() {
   local package_name=$(basename "$PWD")
@@ -971,5 +899,98 @@ exec_manifest_lookup() {
     esac
     #echo "L: $line"
   done < "Manifest.toml"
+}
+
+compile_file() {
+  local src_file=$1
+  local build_file=$2
+
+  if [ -n "${build_file}" ]; then
+    cat "${src_file}" >> "${build_file}"
+  fi
+
+  compile_scan_public "${src_file}" "${build_file}"
+
+  compile_scan_module "${src_file}" "${build_file}"
+
+  compile_scan_embed "${src_file}" "${build_file}"
+
+  return 0
+}
+
+compile_scan_public() {
+  local src_file=$1
+  local build_file=$2
+  local public_dir=$(dirname "$src_file")
+
+  grep -n '^public [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local public_name=$(echo "${line#*public}" | xargs)
+    local public_file="${public_dir}/${public_name}.sh"
+    local public_dir_file="${public_dir}/${public_name}/module.sh"
+
+    if [ -e "${public_file}" ]; then
+      console_info "Public" "file '${public_file}' as module file"
+      compile_file "${public_file}" "${build_file}"
+    elif [ -e "${public_dir_file}" ]; then
+      console_info "Public" "file '${public_dir_file}' as directory module file"
+      compile_file "${public_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+compile_scan_module() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+
+  grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*module}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+    if [ -e "${module_file}" ]; then
+      console_info "Import" "file '${module_file}' as module file"
+      compile_file "${module_file}" "${build_file}"
+    elif [ -e "${module_dir_file}" ]; then
+      console_info "Import" "file '${module_dir_file}' as directory module file"
+      compile_file "${module_dir_file}" "${build_file}"
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+compile_scan_embed() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname "$src_file")
+
+  grep -n '^embed [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local module_name=$(echo "${line#*embed}" | xargs)
+    local module_file="${module_dir}/${module_name}.sh"
+    local module_dir_file="${module_dir}/${module_name}/module.sh"
+
+    if [ -e "${module_file}" ]; then
+      console_info "Embed" "file '${module_file}' as module file"
+      if [ -n "$build_file" ]; then
+        embed_file "$module_name" "$module_file" >> $build_file
+      fi
+    else
+      console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_log  "To create the module '${module_name}', create file '${module_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
 }
 main "$@"

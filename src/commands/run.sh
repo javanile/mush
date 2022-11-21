@@ -27,6 +27,10 @@ run_run() {
 
   bin_file=target/debug/$MUSH_PACKAGE_NAME
 
+  console_status "Compiling" "'${bin_file}'"
+
+  compile_file "src/main.sh"
+
   console_status "Running" "'${bin_file}'"
 
   exec "$bin_file"

@@ -5,3 +5,4 @@ public init
 public install
 public legacy_build
 public manifest_lookup
+public compile

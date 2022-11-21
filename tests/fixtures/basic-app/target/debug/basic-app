@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+set -e
 
 legacy() {
   legacy_file=target/debug/legacy/$1.sh
@@ -43,3 +45,5 @@ embed() {
 error() {
   echo "$1"
 }
+source src/main.sh
+main "$@"
