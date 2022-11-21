@@ -902,6 +902,8 @@ exec_manifest_lookup() {
 }
 
 compile_file() {
+  #echo "COMPILE: $1 ($PWD)"
+
   local src_file=$1
   local build_file=$2
 
@@ -909,11 +911,37 @@ compile_file() {
     cat "${src_file}" >> "${build_file}"
   fi
 
+  compile_scan_legacy "${src_file}" "${build_file}"
+
   compile_scan_public "${src_file}" "${build_file}"
 
   compile_scan_module "${src_file}" "${build_file}"
 
   compile_scan_embed "${src_file}" "${build_file}"
+
+  return 0
+}
+
+compile_scan_legacy() {
+  local src_file=$1
+  local build_file=$2
+  local legacy_dir=target/debug/legacy
+
+  grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local legacy_name=$(echo "${line#*legacy}" | xargs)
+    local legacy_file="${legacy_dir}/${legacy_name}.sh"
+    local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
+    echo "LEGACY: $legacy_file"
+    if [ -e "${legacy_file}" ]; then
+      console_info "Legacy" "file '${legacy_file}' as module file"
+    elif [ -e "${legacy_dir_file}" ]; then
+      console_info "Legacy" "file '${public_dir_file}' as directory module file"
+    else
+      console_error "file not found for module '${legacy_name}'. Look at '${src_file}' on line ${line%:*}"
+      console_log  "To create the module '${legacy_name}', create file '${legacy_file}' or '${legacy_dir_file}'."
+      exit 101
+    fi
+  done
 
   return 0
 }
