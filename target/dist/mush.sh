@@ -20,41 +20,6 @@ use() {
 embed() {
   embed=$1
 }
-dist_2022() {
-  cat <<'EOF'
-
-legacy() {
-  legacy=$1
-}
-
-module() {
-  module=$1
-}
-
-public() {
-  public=$1
-}
-
-use() {
-  use=$1
-}
-
-embed() {
-  embed=$1
-}
-EOF
-}
-
-embed_file() {
-  local module_name=$1
-  local module_file=$2
-
-  echo "$module_name() {"
-  echo "  cat <<'EOF'"
-  cat "$module_file"
-  echo "EOF"
-  echo "}"
-}
 # [getoptions] License: Creative Commons Zero v1.0 Universal
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions() {
@@ -355,9 +320,449 @@ getoptions_help() {
 	echo "}"
 }
 
-exec_legacy_build() {
-  legacy=1
-  #echo "Legacy build"
+legacy lib_getoptions
+
+module api
+module commands
+module console
+module tasks
+
+#use assets::server::test0
+
+VERSION="Mush 0.1.0 (2022-11-17)"
+
+parser_definition() {
+  setup REST help:usage abbr:true -- "Shell's build system" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
+
+  msg   -- 'OPTIONS:'
+  disp  VERSION -V --version                      -- "Print version info and exit"
+  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage  -h --help                         -- "Print help information"
+
+  msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build -- "Compile the current package"
+  cmd   init -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new -- "Create a new Mush package"
+  cmd   run -- "Run a binary or example of the local package"
+}
+
+main() {
+  #echo "ARGS: $@"
+  #chmod +x target/debug/legacy/getoptions
+  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
+
+  if [ $# -eq 0 ]; then
+    eval "set -- --help"
+  fi
+
+  eval "$(getoptions parser_definition parse "$0") exit 1"
+  parse "$@"
+  eval "set -- $REST"
+
+  #echo "V $VERBOSE"
+
+
+  if [ $# -gt 0 ]; then
+    cmd=$1
+    shift
+    case $cmd in
+      build)
+        run_build "$@"
+        ;;
+      init)
+        run_init "$@"
+        ;;
+      install)
+        run_install "$@"
+        ;;
+      legacy)
+        run_legacy "$@"
+        ;;
+      new)
+        run_new "$@"
+        ;;
+      run)
+        run_run "$@"
+        ;;
+      --) # no subcommand, arguments only
+    esac
+  fi
+}
+
+
+public embed
+
+embed debug_2022
+embed dist_2022
+
+embed_file() {
+  local module_name=$1
+  local module_file=$2
+
+  echo "$module_name() {"
+  echo "  cat <<'EOF'"
+  cat "$module_file"
+  echo "EOF"
+  echo "}"
+}
+debug_2022() {
+  cat <<'EOF'
+
+legacy() {
+  legacy_file=target/debug/legacy/$1.sh
+  if [ ! -f "$legacy_file" ]; then
+    error "errrore"
+    exit 101
+  fi
+  source "${legacy_file}"
+}
+
+module() {
+  local module_file=src/$1.sh
+  local module_dir_file=src/$1/module.sh
+
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  else
+    MUSH_RUNTIME_MODULE=$1
+    source "$module_dir_file"
+  fi
+}
+
+public() {
+  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
+  local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
+
+  if [ -f "$module_file" ]; then
+    source "$module_file"
+  elif [ -f "$module_dir_file" ]; then
+    source "$module_dir_file"
+  fi
+}
+
+use() {
+  source src/assets/server.sh
+}
+
+embed() {
+  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
+  eval "$(embed_file $1 $module_file)"
+}
+
+error() {
+  echo "$1"
+}
+EOF
+}
+dist_2022() {
+  cat <<'EOF'
+
+legacy() {
+  legacy=$1
+}
+
+module() {
+  module=$1
+}
+
+public() {
+  public=$1
+}
+
+use() {
+  use=$1
+}
+
+embed() {
+  embed=$1
+}
+EOF
+}
+
+public add
+public build
+public init
+public install
+public legacy
+public new
+public run
+
+test0 () {
+  echo "TEST"
+}
+parser_definition_build() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_build() {
+  eval "$(getoptions parser_definition_build parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+
+  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
+
+  #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
+
+  exec_legacy_build
+
+  if [ "$BUILD_TARGET" = "dist" ]; then
+    exec_build_dist "$@"
+  else
+    exec_build_debug "$@"
+  fi
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
+}
+
+parser_definition_init() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_init() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "Manifest.toml" ]; then
+    console_error "'cargo init' cannot be run on existing Mush packages"
+    exit 101
+  fi
+
+  exec_init
+}
+
+parser_definition_install() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_install() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+  exec_legacy_build
+  exec_build_dist "$@"
+  exec_install
+}
+
+parser_definition_legacy() {
+	setup   REST help:usage abbr:true -- \
+		"Usage: ${2##*/} legacy [options...] [arguments...]"
+	msg -- '' 'getoptions subcommand example' ''
+	msg -- 'Options:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	disp    :usage       -h --help
+}
+
+run_legacy() {
+  eval "$(getoptions parser_definition_legacy parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  echo "FLAG_C: $FLAG_C"
+  echo "MODULE_NAME: $MODULE_NAME"
+
+  echo "GLOBAL: $GLOBAL"
+  i=0
+  while [ $# -gt 0 ] && i=$((i + 1)); do
+    module_name=$(basename $1)
+    module_file=target/debug/legacy/$module_name
+    echo "$i Downloading '$module_name' from $1"
+    curl -sL $1 -o $module_file
+    chmod +x $module_file
+    shift
+  done
+
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+parser_definition_new() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_new() {
+  eval "$(getoptions parser_definition_new parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "$1" ]; then
+    console_error "Destination '$1' already exists"
+    exit 101
+  fi
+
+  mkdir -p "$1"
+
+  cd "$1"
+
+  exec_init
+}
+
+parser_definition_run() {
+	setup   REST help:usage abbr:true -- "Run a binary or example of the local package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_run() {
+  eval "$(getoptions parser_definition_run parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+
+  exec_legacy_build
+
+  exec_build_debug "$@"
+
+  bin_file=target/debug/$MUSH_PACKAGE_NAME
+
+  console_status "Compiling" "'${bin_file}'"
+
+  compile_file "src/main.sh"
+
+  console_status "Running" "'${bin_file}'"
+
+  exec "$bin_file"
+}
+
+# FATAL
+# ERROR
+# WARNING
+# INFO
+# DEBUG
+# TRACE
+# SUCCESS
+
+case "$(uname -s)" in
+  Darwin*)
+    ESCAPE='\x1B'
+    ;;
+  Linux|*)
+    ESCAPE='\e'
+    ;;
+esac
+
+#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_pad() {
+  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
+}
+
+console_log() {
+  console_print "$1" "$2"
+}
+
+console_info() {
+  console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_warning() {
+  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_status() {
+  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_error() {
+  echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
+}
+
+console_print() {
+  if [ -z "${QUIET}" ]; then
+    echo -e "$1 $2" >&2
+  fi
+}
+
+public build_debug
+public build_dist
+public init
+public install
+public legacy_build
+public manifest_lookup
+public compile
+
+exec_build_debug() {
+  local name=$MUSH_PACKAGE_NAME
+
+  local build_file=target/debug/${name}.tmp
+  local final_file=target/debug/${name}
+
+  mkdir -p target/debug/
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "set -e" >> $build_file
+
+  debug_2022 >> $build_file
+
+  echo "source src/main.sh" >> $build_file
+  echo "main \"\$@\"" >> $build_file
+
+  mv "$build_file" "$final_file"
+
+  chmod +x "$final_file"
 }
 
 exec_build_dist() {
@@ -391,6 +796,56 @@ exec_build_dist() {
   chmod +x ${bin_file}
 }
 
+
+exec_init() {
+  local package_name=$(basename "$PWD")
+  local manifest_file=Manifest.toml
+  local main_file=src/main.sh
+  local lib_file=src/lib.sh
+
+  mkdir -p src
+
+  echo "[package]" > ${manifest_file}
+  echo "name = \"${package_name}\"" >> ${manifest_file}
+  echo "version = \"0.1.0\"" >> ${manifest_file}
+  echo "edition = \"2022\"" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "# See more keys and their definitions at https://mush.javanile.org/manifest.html" >> ${manifest_file}
+  echo "" >> ${manifest_file}
+  echo "[dependencies]" >> ${manifest_file}
+
+  if [ ! -f "${main_file}" ]; then
+    echo "" > ${main_file}
+    echo "main() {" >> ${main_file}
+    echo "  echo \"Hello World!\"" >> ${main_file}
+    echo "}" >> ${main_file}
+  fi
+}
+
+exec_install() {
+  local bin_file=/usr/local/bin/mush
+  local final_file=target/dist/mush
+
+  local cp=cp
+  local chmod=chmod
+  if [[ $EUID -ne 0 ]]; then
+      cp="sudo ${cp}"
+      chmod="sudo ${chmod}"
+  fi
+
+  ${cp} ${final_file} ${bin_file}
+  ${chmod} +x ${bin_file}
+
+  echo "Finished release [optimized] target(s) in 0.18s"
+  echo "Installing /home/francesco/.cargo/bin/cask"
+  echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
+}
+
+
+exec_legacy_build() {
+  legacy=1
+  #echo "Legacy build"
+}
 
 exec_manifest_lookup() {
   pwd=$PWD
@@ -476,14 +931,14 @@ compile_scan_legacy() {
     local legacy_name=$(echo "${line#*legacy}" | xargs)
     local legacy_file="${legacy_dir}/${legacy_name}.sh"
     local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
-    echo "LEGACY: $legacy_file"
+    #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
     else
       console_error "file not found for module '${legacy_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_log  "To create the module '${legacy_name}', create file '${legacy_file}' or '${legacy_dir_file}'."
+      console_log  "To add the module '${legacy_name}', type 'mush legacy --name ${legacy_name} <MODULE_URL>'."
       exit 101
     fi
   done
@@ -566,243 +1021,4 @@ compile_scan_embed() {
 
   return 0
 }
-
-exec_install() {
-  local bin_file=/usr/local/bin/mush
-  local final_file=target/dist/mush
-
-  local cp=cp
-  local chmod=chmod
-  if [[ $EUID -ne 0 ]]; then
-      cp="sudo ${cp}"
-      chmod="sudo ${chmod}"
-  fi
-
-  ${cp} ${final_file} ${bin_file}
-  ${chmod} +x ${bin_file}
-
-  echo "Finished release [optimized] target(s) in 0.18s"
-  echo "Installing /home/francesco/.cargo/bin/cask"
-  echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
-}
-
-
-parser_definition_build() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
-
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
-}
-
-run_build() {
-  eval "$(getoptions parser_definition_build parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
-
-  exec_manifest_lookup
-
-  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
-
-  #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
-
-  exec_legacy_build
-
-  if [ "$BUILD_TARGET" = "dist" ]; then
-    exec_build_dist "$@"
-  else
-    exec_build_debug "$@"
-  fi
-
-  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
-}
-
-parser_definition_install() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
-
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
-}
-
-run_install() {
-  eval "$(getoptions parser_definition_install parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
-
-  exec_manifest_lookup
-  exec_legacy_build
-  exec_build_dist "$@"
-  exec_install
-}
-
-parser_definition_legacy() {
-	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} legacy [options...] [arguments...]"
-	msg -- '' 'getoptions subcommand example' ''
-	msg -- 'Options:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	disp    :usage       -h --help
-}
-
-run_legacy() {
-  eval "$(getoptions parser_definition_legacy parse "$0")"
-  parse "$@"
-  eval "set -- $REST"
-  echo "FLAG_C: $FLAG_C"
-  echo "MODULE_NAME: $MODULE_NAME"
-
-  echo "GLOBAL: $GLOBAL"
-  i=0
-  while [ $# -gt 0 ] && i=$((i + 1)); do
-    module_name=$(basename $1)
-    module_file=target/debug/legacy/$module_name
-    echo "$i Downloading '$module_name' from $1"
-    curl -sL $1 -o $module_file
-    chmod +x $module_file
-    shift
-  done
-
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
-  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
-}
-
-# FATAL
-# ERROR
-# WARNING
-# INFO
-# DEBUG
-# TRACE
-# SUCCESS
-
-case "$(uname -s)" in
-  Darwin*)
-    ESCAPE='\x1B'
-    ;;
-  Linux|*)
-    ESCAPE='\e'
-    ;;
-esac
-
-#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
-console_pad() {
-  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
-}
-
-console_log() {
-  console_print "$1" "$2"
-}
-
-console_info() {
-  console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-}
-
-console_warning() {
-  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-}
-
-console_status() {
-  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-}
-
-console_error() {
-  echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
-}
-
-console_print() {
-  if [ -z "${QUIET}" ]; then
-    echo -e "$1 $2" >&2
-  fi
-}
-
-legacy lib_getoptions
-
-module api
-module commands
-module console
-module tasks
-
-#use assets::server::test0
-
-VERSION="Mush 0.1.0 (2022-11-17)"
-
-parser_definition() {
-  setup REST help:usage abbr:true -- "Shell's build system" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
-
-  msg   -- 'OPTIONS:'
-  disp  VERSION -V --version                      -- "Print version info and exit"
-  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
-  disp  :usage  -h --help                         -- "Print help information"
-
-  msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build -- "Compile the current package"
-  cmd   init -- "Create a new package in an existing directory"
-  cmd   install -- "Build and install a Mush binary"
-  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new -- "Create a new Mush package"
-  cmd   run -- "Run a binary or example of the local package"
-}
-
-main() {
-  #echo "ARGS: $@"
-  #chmod +x target/debug/legacy/getoptions
-  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
-
-  if [ $# -eq 0 ]; then
-    eval "set -- --help"
-  fi
-
-  eval "$(getoptions parser_definition parse "$0") exit 1"
-  parse "$@"
-  eval "set -- $REST"
-
-  #echo "V $VERBOSE"
-
-
-  if [ $# -gt 0 ]; then
-    cmd=$1
-    shift
-    case $cmd in
-      build)
-        run_build "$@"
-        ;;
-      init)
-        run_init "$@"
-        ;;
-      install)
-        run_install "$@"
-        ;;
-      legacy)
-        run_legacy "$@"
-        ;;
-      new)
-        run_new "$@"
-        ;;
-      run)
-        run_run "$@"
-        ;;
-      --) # no subcommand, arguments only
-    esac
-  fi
-}
-
-main $@
+main "$@"

@@ -2,7 +2,7 @@
 legacy() {
   legacy_file=target/debug/legacy/$1.sh
   if [ ! -f "$legacy_file" ]; then
-    error "errrore"
+    echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
     exit 101
   fi
   source "${legacy_file}"
@@ -38,8 +38,4 @@ use() {
 embed() {
   local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
   eval "$(embed_file $1 $module_file)"
-}
-
-error() {
-  echo "$1"
 }

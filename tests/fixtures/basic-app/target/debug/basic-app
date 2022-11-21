@@ -42,8 +42,5 @@ embed() {
   eval "$(embed_file $1 $module_file)"
 }
 
-error() {
-  echo "$1"
-}
 source src/main.sh
 main "$@"

@@ -931,14 +931,14 @@ compile_scan_legacy() {
     local legacy_name=$(echo "${line#*legacy}" | xargs)
     local legacy_file="${legacy_dir}/${legacy_name}.sh"
     local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
-    echo "LEGACY: $legacy_file"
+    #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
     else
       console_error "file not found for module '${legacy_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_log  "To create the module '${legacy_name}', create file '${legacy_file}' or '${legacy_dir_file}'."
+      console_log  "To add the module '${legacy_name}', type 'mush legacy --name ${legacy_name} <MODULE_URL>'."
       exit 101
     fi
   done
