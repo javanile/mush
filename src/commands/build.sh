@@ -21,7 +21,7 @@ run_build() {
 
   exec_manifest_lookup
 
-  echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
+  #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
 
   exec_legacy_build
 

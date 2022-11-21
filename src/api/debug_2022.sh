@@ -19,7 +19,6 @@ public() {
   local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
   local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
 
-  echo $module_file
   if [ -f "$module_file" ]; then
     source "$module_file"
   elif [ -f "$module_dir_file" ]; then

@@ -2,7 +2,7 @@
 exec_build_dist() {
   name=$MUSH_PACKAGE_NAME
 
-  echo "NAME: $name"
+  #echo "NAME: $name"
 
   local bin_file=bin/${name}
 
