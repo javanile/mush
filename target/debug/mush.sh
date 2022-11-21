@@ -15,6 +15,7 @@ module() {
     source "$module_dir_file"
   fi
 }
+
 public() {
   echo "PUBLIC: $1 $MUSH_RUNTIME_MODULE"
   public=$1
@@ -29,8 +30,20 @@ public() {
     source "$module_dir_file"
   fi
 }
+
 use() {
   source src/assets/server.sh
+}
+
+embed() {
+  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
+  eval "$(embed_file $1 $module_file)"
+ # caller | tail -1
+  embed=$1
+  #MUSH_TARGET_DIR
+  echo "EMBED"
+  #eval "$1() { echo \"CIAO\"; }"
+  #exit 2
 }
 
 source src/main.sh
