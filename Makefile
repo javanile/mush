@@ -34,7 +34,7 @@ test-rust:
 test-init: build
 	@bash tests/bare/init-test.sh
 
-test-install: build
+test-install:
 	@bash tests/bare/install-test.sh
 
 test-run: build

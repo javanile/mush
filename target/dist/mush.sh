@@ -562,6 +562,7 @@ run_install() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  exec_manifest_lookup
   exec_legacy_build
   exec_build_dist "$@"
   exec_install
@@ -710,6 +711,8 @@ exec_build_debug() {
   local build_file=target/debug/${name}.tmp
   local final_file=target/debug/${name}
 
+  mkdir -p target/debug/
+
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
@@ -732,6 +735,8 @@ exec_build_dist() {
 
   local build_file=target/dist/${name}.tmp
   local final_file=target/dist/${name}
+
+  mkdir -p target/dist/
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file

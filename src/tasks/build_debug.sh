@@ -5,6 +5,8 @@ exec_build_debug() {
   local build_file=target/debug/${name}.tmp
   local final_file=target/debug/${name}
 
+  mkdir -p target/debug/
+
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
