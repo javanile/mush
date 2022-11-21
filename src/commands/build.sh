@@ -21,6 +21,8 @@ run_build() {
 
   exec_manifest_lookup
 
+  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
+
   #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
 
   exec_legacy_build
@@ -30,4 +32,6 @@ run_build() {
   else
     exec_build_debug "$@"
   fi
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }

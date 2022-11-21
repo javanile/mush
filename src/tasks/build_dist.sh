@@ -28,8 +28,6 @@ exec_build_dist() {
   cp ${final_file} ${bin_file}
 
   chmod +x ${bin_file}
-
-  console_done "Build complete."
 }
 
 build_dist_parse() {
@@ -57,14 +55,14 @@ build_dist_parse_public() {
     local public_file="${public_dir}/${public_name}.sh"
     local public_dir_file="${public_dir}/${public_name}/module.sh"
     if [ -e "${public_file}" ]; then
-      console_log "Public '${public_file}' as module file"
+      console_info "Public" "file '${public_file}' as module file"
       build_dist_parse "${public_file}" "${build_file}"
     elif [ -e "${public_dir_file}" ]; then
-      console_log "Public '${public_dir_file}' as directory module file"
+      console_info "Public" "file '${public_dir_file}' as directory module file"
       build_dist_parse "${public_dir_file}" "${build_file}"
     else
       console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
+      console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
       exit 101
     fi
   done
@@ -82,14 +80,14 @@ build_dist_parse_module() {
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
     if [ -e "${module_file}" ]; then
-      console_log "Import '${module_file}' as module file"
+      console_info "Import" "file '${module_file}' as module file"
       build_dist_parse "${module_file}" "${build_file}"
     elif [ -e "${module_dir_file}" ]; then
-      console_log "Import '${module_dir_file}' as directory module file"
+      console_info "Import" "file '${module_dir_file}' as directory module file"
       build_dist_parse "${module_dir_file}" "${build_file}"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
       exit 101
     fi
   done
@@ -107,11 +105,11 @@ build_dist_parse_embed() {
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
     if [ -e "${module_file}" ]; then
-      console_log "Embed '${module_file}' as module file"
+      console_info "Embed" "file '${module_file}' as module file"
       embed_file "$module_name" "$module_file" >> $build_file
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${module_name}', create file '${module_file}'."
+      console_log  "To create the module '${module_name}', create file '${module_file}'."
       exit 101
     fi
   done

@@ -16,6 +16,4 @@ exec_build_debug() {
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"
-
-  echo "Build complete."
 }

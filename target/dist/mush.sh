@@ -503,6 +503,8 @@ run_build() {
 
   exec_manifest_lookup
 
+  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
+
   #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
 
   exec_legacy_build
@@ -512,6 +514,8 @@ run_build() {
   else
     exec_build_debug "$@"
   fi
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
 
 parser_definition_init() {
@@ -665,6 +669,7 @@ run_run() {
 # INFO
 # DEBUG
 # TRACE
+# SUCCESS
 
 case "$(uname -s)" in
   Darwin*)
@@ -675,27 +680,34 @@ case "$(uname -s)" in
     ;;
 esac
 
-CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_pad() {
+  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
+}
 
 console_log() {
-  console_echo "$1"
+  console_print "$1" "$2"
 }
 
 console_info() {
-  console_echo "$1"
+  console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_warning() {
+  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_status() {
+  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
 }
 
 console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
 }
 
-console_done() {
-  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
-}
-
-console_echo() {
-  echo -e "${CONSOLE_INDENT} $1"
-  CONSOLE_INDENT='      '
+console_print() {
+  echo -e "$1 $2" >&2
 }
 
 public build_debug
@@ -722,8 +734,6 @@ exec_build_debug() {
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"
-
-  echo "Build complete."
 }
 
 exec_build_dist() {
@@ -755,8 +765,6 @@ exec_build_dist() {
   cp ${final_file} ${bin_file}
 
   chmod +x ${bin_file}
-
-  console_done "Build complete."
 }
 
 build_dist_parse() {
@@ -784,14 +792,14 @@ build_dist_parse_public() {
     local public_file="${public_dir}/${public_name}.sh"
     local public_dir_file="${public_dir}/${public_name}/module.sh"
     if [ -e "${public_file}" ]; then
-      console_log "Public '${public_file}' as module file"
+      console_info "Public" "file '${public_file}' as module file"
       build_dist_parse "${public_file}" "${build_file}"
     elif [ -e "${public_dir_file}" ]; then
-      console_log "Public '${public_dir_file}' as directory module file"
+      console_info "Public" "file '${public_dir_file}' as directory module file"
       build_dist_parse "${public_dir_file}" "${build_file}"
     else
       console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
+      console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
       exit 101
     fi
   done
@@ -809,14 +817,14 @@ build_dist_parse_module() {
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
     if [ -e "${module_file}" ]; then
-      console_log "Import '${module_file}' as module file"
+      console_info "Import" "file '${module_file}' as module file"
       build_dist_parse "${module_file}" "${build_file}"
     elif [ -e "${module_dir_file}" ]; then
-      console_log "Import '${module_dir_file}' as directory module file"
+      console_info "Import" "file '${module_dir_file}' as directory module file"
       build_dist_parse "${module_dir_file}" "${build_file}"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
       exit 101
     fi
   done
@@ -834,11 +842,11 @@ build_dist_parse_embed() {
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
     if [ -e "${module_file}" ]; then
-      console_log "Embed '${module_file}' as module file"
+      console_info "Embed" "file '${module_file}' as module file"
       embed_file "$module_name" "$module_file" >> $build_file
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
-      console_info  "To create the module '${module_name}', create file '${module_file}'."
+      console_log  "To create the module '${module_name}', create file '${module_file}'."
       exit 101
     fi
   done
@@ -899,7 +907,7 @@ exec_legacy_build() {
 exec_manifest_lookup() {
   pwd=$PWD
   if [ ! -f "Manifest.toml" ]; then
-    console_error "Could not find 'Manifest.toml' in '$pwd' or any parent directory."
+    console_error "could not find 'Manifest.toml' in '$pwd' or any parent directory"
     exit 101
   fi
 

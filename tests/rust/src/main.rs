@@ -1,12 +1,11 @@
 
 //mod notfound;
 
-mod mod1;
+//mod mod1;
 
-use mod1::hello;
+//use mod1::hello;
 
 fn main() {
     println!("Hello World!");
-    hello();
-
+    //hello();
 }
