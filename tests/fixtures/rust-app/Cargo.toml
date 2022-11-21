@@ -1,5 +1,5 @@
 [package]
-name = "mush-test"
+name = "rust-app"
 version = "0.1.0"
 description = "Mush, a build system for shell."
 license = "MIT"
