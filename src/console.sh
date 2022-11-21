@@ -26,7 +26,7 @@ console_info() {
 }
 
 console_error() {
-  console_echo "${ESCAPE}[1;31m$1${ESCAPE}[0m"
+  echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
 }
 
 console_done() {
