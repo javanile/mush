@@ -26,6 +26,7 @@ parser_definition() {
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
+  cmd   run -- "Run a binary or example of the local package"
 }
 
 main() {
@@ -62,6 +63,9 @@ main() {
         ;;
       new)
         run_new "$@"
+        ;;
+      run)
+        run_run "$@"
         ;;
       --) # no subcommand, arguments only
     esac

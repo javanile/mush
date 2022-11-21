@@ -3,12 +3,8 @@ set -e
 
 cp target/dist/mush target/dist/mush.sh
 
-bash target/dist/mush.sh -vv build
+bash target/dist/mush.sh build
 
-mkdir -p tests/temp
-cd tests/temp
-rm -fr Manifest.toml
+cd tests/fixtures/basic-app
 
-bash ../../target/dist/mush.sh -vv init
-
-cat Manifest.toml
+bash ../../../target/dist/mush.sh -vv run
