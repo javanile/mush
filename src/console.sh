@@ -5,6 +5,7 @@
 # INFO
 # DEBUG
 # TRACE
+# SUCCESS
 
 case "$(uname -s)" in
   Darwin*)
@@ -15,25 +16,32 @@ case "$(uname -s)" in
     ;;
 esac
 
-CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_pad() {
+  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
+}
 
 console_log() {
-  console_echo "$1"
+  console_print "$1" "$2"
 }
 
 console_info() {
-  console_echo "$1"
+  console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_warning() {
+  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_status() {
+  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
 }
 
 console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
 }
 
-console_done() {
-  console_echo "${ESCAPE}[1;32m$1${ESCAPE}[0m"
-}
-
-console_echo() {
-  echo -e "${CONSOLE_INDENT} $1"
-  CONSOLE_INDENT='      '
+console_print() {
+  echo -e "$1 $2" >&2
 }

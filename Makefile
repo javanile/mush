@@ -60,3 +60,6 @@ test-auto-build-dist-debug:
 
 test-auto-build-dist-dist:
 	@bash tests/bare/build/auto-dist-dist-test.sh
+
+test-console:
+	@bash tests/bare/console-test.sh
