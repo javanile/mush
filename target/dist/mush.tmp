@@ -1170,11 +1170,6 @@ exec_publish() {
 #    Finished dev [unoptimized + debuginfo] target(s) in 13.89s
 #   Uploading cask-cli v0.2.0 (/Users/francescobian
 
-
-
-
-  echo "publish"
-
   [ -f .env ] && source .env
 
   release_tag=0.2.0
