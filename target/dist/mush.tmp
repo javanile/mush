@@ -1151,7 +1151,7 @@ exec_publish() {
   # See https://mush.javanile.org/manifest.html#package-metadata for more info.
 
   if [ ! -z "$(git status --porcelain)" ]; then
-    local changed_files="$(git --no-pager diff --name-only)"
+    local changed_files="$(git status -s | cut -c4-)"
     local error="some files in the working directory contain changes that were not yet committed into git:"
     local hint="to proceed despite this and include the uncommitted changes, pass the '--allow-dirty' flag"
     console_error "$error\n\n${changed_files}\n\n${hint}"
