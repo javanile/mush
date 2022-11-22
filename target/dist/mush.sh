@@ -500,13 +500,13 @@ test0 () {
 parser_definition_build() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE      -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET        -q --quiet                        -- "Do not print cargo log messages"
+  param  BUILD_TARGET -t --target                       -- "Build for the specific target"
+	disp   :usage       -h --help                         -- "Print help information"
 }
 
 run_build() {
@@ -1162,7 +1162,7 @@ exec_publish() {
     local error="some files in the working directory contain changes that were not yet committed into git:"
     local hint="to proceed despite this and include the uncommitted changes, pass the '--allow-dirty' flag"
     console_error "$error\n\n${changed_files}\n\n${hint}"
-    #exit 101
+    exit 101
   fi
 
   #    Updating crates.io index
@@ -1187,7 +1187,6 @@ exec_publish() {
 
   if [ -z "${release_id}" ]; then
     release_id=$(github_create_release "${release_tag}")
-    echo "$release_id"
   fi
 
   asset_id="$(github_get_release_asset_id "${release_id}")"

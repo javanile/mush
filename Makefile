@@ -1,10 +1,13 @@
 
-## ===
-## Dev
-## ===
+## ====
+## Mush
+## ====
 
-build:
-	@mush build
+.DEFAULT:
+	@mush $@
+
+build-dist:
+	@mush build -v --target dist
 
 ## ====
 ## Test

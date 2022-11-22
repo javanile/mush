@@ -2,13 +2,13 @@
 parser_definition_build() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE      -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET        -q --quiet                        -- "Do not print cargo log messages"
+  param  BUILD_TARGET -t --target                       -- "Build for the specific target"
+	disp   :usage       -h --help                         -- "Print help information"
 }
 
 run_build() {

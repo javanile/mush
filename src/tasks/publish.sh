@@ -19,7 +19,7 @@ exec_publish() {
     local error="some files in the working directory contain changes that were not yet committed into git:"
     local hint="to proceed despite this and include the uncommitted changes, pass the '--allow-dirty' flag"
     console_error "$error\n\n${changed_files}\n\n${hint}"
-    #exit 101
+    exit 101
   fi
 
   #    Updating crates.io index

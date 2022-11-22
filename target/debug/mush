@@ -2,7 +2,12 @@
 set -e
 
 legacy() {
-  source target/debug/legacy/$1.sh
+  legacy_file=target/debug/legacy/$1.sh
+  if [ ! -f "$legacy_file" ]; then
+    echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
+    exit 101
+  fi
+  source "${legacy_file}"
 }
 
 module() {
