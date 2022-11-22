@@ -773,13 +773,14 @@ github_create_release() {
   local repository=mush
   local asset_file=target/dist/mush
   local release_id=$1
+  local release_tag=$1
 
   curl \
      -s -X POST \
      -H "Accept: application/vnd.github+json" \
      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
      https://api.github.com/repos/${owner}/${repository}/releases \
-     -d '{"tag_name":"0.2.0","target_commitish":"master","name":"0.2.0","body":"Description of the release","draft":false,"prerelease":false,"generate_release_notes":false}'
+     -d "{\"tag_name\":\"${release_tag}\",\"target_commitish\":\"main\",\"name\":\"${release_tag}\",\"body\":\"Description of the release\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
 }
 
 github_upload_release_asset() {
@@ -958,51 +959,62 @@ exec_manifest_lookup() {
     exit 101
   fi
 
-  section=MUSH_USTABLE
-  while IFS= read line || [[ -n "${line}" ]]; do
-    line="${line#"${line%%[![:space:]]*}"}"
-    line="${line%"${line##*[![:space:]]}"}"
-    line_number=$((line_number + 1))
-    [[ -z "${line}" ]] && continue
-    [[ "${line::1}" == "#" ]] && continue
-    case $line in
-      "[package]")
-        section=MUSH_PACKAGE
-        ;;
-      "[dependencies]")
-        section=MUSH_DEPENDENCIES
-        ;;
-      "[dev-dependencies]")
-        section=MUSH_DEV_DEPENDENCIES
-        ;;
-      "[legacy-fetch]")
-        section=MUSH_LEGACY_FETCH
-        ;;
-      "[legacy-build]")
-        section=MUSH_LEGACY_BUILD
-        ;;
-      "[dev-legacy-fetch]")
-        section=MUSH_DEV_LEGACY_FETCH
-        ;;
-      "[dev-legacy-build]")
-        section=MUSH_DEV_LEGACY_BUILD
-        ;;
-      [a-z]*)
-        case $section in
-          MUSH_PACKAGE)
-            field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
-            value=$(echo "$line" | cut -d'=' -f2 | xargs)
-            eval "${section}_${field}=\$value"
-            ;;
-          *)
-            ;;
-        esac
-        ;;
-      *)
-        ;;
-    esac
-    #echo "L: $line"
-  done < "Manifest.toml"
+  manifest_parse
+
+  if [ ! -n "$MUSH_PACKAGE_VERSION" ]; then
+    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
+    exit 101
+  fi
+}
+
+manifest_parse() {
+    echo "S:"
+    section=MUSH_USTABLE
+    while IFS= read line || [[ -n "${line}" ]]; do
+      line="${line#"${line%%[![:space:]]*}"}"
+      line="${line%"${line##*[![:space:]]}"}"
+      line_number=$((line_number + 1))
+      [[ -z "${line}" ]] && continue
+      [[ "${line::1}" == "#" ]] && continue
+      case $line in
+        "[package]")
+          section=MUSH_PACKAGE
+          ;;
+        "[dependencies]")
+          section=MUSH_DEPENDENCIES
+          ;;
+        "[dev-dependencies]")
+          section=MUSH_DEV_DEPENDENCIES
+          ;;
+        "[legacy-fetch]")
+          section=MUSH_LEGACY_FETCH
+          ;;
+        "[legacy-build]")
+          section=MUSH_LEGACY_BUILD
+          ;;
+        "[dev-legacy-fetch]")
+          section=MUSH_DEV_LEGACY_FETCH
+          ;;
+        "[dev-legacy-build]")
+          section=MUSH_DEV_LEGACY_BUILD
+          ;;
+        [a-z]*)
+          case $section in
+            MUSH_PACKAGE)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              eval "${section}_${field}=\$value"
+              ;;
+            *)
+              ;;
+          esac
+          ;;
+        *)
+          ;;
+      esac
+      echo "L: $line"
+    done < "Manifest.toml"
+    echo "E."
 }
 
 compile_file() {
@@ -1129,15 +1141,48 @@ compile_scan_embed() {
 exec_publish() {
   local bin_file=/usr/local/bin/mush
   local final_file=target/dist/mush
+  local release_tag="$MUSH_PACKAGE_VERSION"
+
+  ## TODO: add the following message when an index will be implemented
+  # Updating crates.io index
+
+  ## TODO: add the following message when no stuff
+  # warning: manifest has no documentation, homepage or repository.
+  # See https://mush.javanile.org/manifest.html#package-metadata for more info.
+
+  if [ ! -z "$(git status --porcelain)" ]; then
+    local changed_files="$(git --no-pager diff --name-only)"
+    local error="some files in the working directory contain changes that were not yet committed into git:"
+    local hint="to proceed despite this and include the uncommitted changes, pass the '--allow-dirty' flag"
+    console_error "$error\n\n${changed_files}\n\n${hint}"
+    exit 101
+  fi
+
+#    Updating crates.io index
+# warning: manifest has no documentation, homepage or repository.
+# See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info.
+#   Packaging cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
+#   Verifying cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
+#  Downloaded rand_core v0.6.4
+#  Downloaded 9 crates (2.5 MB) in 1.90s (largest was `run_script` at 1.1 MB)
+#   Compiling serde_yaml v0.9.14
+#   Compiling cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask/target/package/cask-cli-0.2.0)
+#    Finished dev [unoptimized + debuginfo] target(s) in 13.89s
+#   Uploading cask-cli v0.2.0 (/Users/francescobian
+
+
+
 
   echo "publish"
 
   [ -f .env ] && source .env
 
-  git tag -f -a 0.2.0 -m "Tag 0.1.0"
-  git push origin 0.2.0 -f
+  release_tag=0.2.0
 
-  github_create_release
+  git tag -f -a "$release_tag" -m "Tag $release_tag"
+  git push origin "$release_tag" -f
+
+  github_create_release $release_tag
 
   #release_id="$(github_get_release_id)"
   #asset_id="$(github_get_release_asset_id $release_id)"

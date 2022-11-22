@@ -4,13 +4,14 @@ github_create_release() {
   local repository=mush
   local asset_file=target/dist/mush
   local release_id=$1
+  local release_tag=$1
 
   curl \
      -s -X POST \
      -H "Accept: application/vnd.github+json" \
      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
      https://api.github.com/repos/${owner}/${repository}/releases \
-     -d '{"tag_name":"0.2.0","target_commitish":"main","name":"0.2.0","body":"Description of the release","draft":false,"prerelease":false,"generate_release_notes":false}'
+     -d "{\"tag_name\":\"${release_tag}\",\"target_commitish\":\"main\",\"name\":\"${release_tag}\",\"body\":\"Description of the release\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
 }
 
 github_upload_release_asset() {
