@@ -768,75 +768,79 @@ console_print() {
 
 public github
 
+github_get_repository() {
+  local repository_url=$(git config --get remote.origin.url)
+
+  case "${repository_url}" in
+    http*)
+      echo "${repository_url}" | sed 's#.*github\.com/##g' | sed 's/\.git$//g'
+      ;;
+    git*)
+      echo "${repository_url}" | cut -d: -f2 | sed 's/\.git$//g'
+      ;;
+  esac
+}
+
 github_create_release() {
-  local owner=javanile
-  local repository=mush
-  local asset_file=target/dist/mush
-  local release_id=$1
-  local release_tag=$1
+  local repository="${MUSH_GITHUB_REPOSITORY}"
+  local release_tag="$1"
 
   curl \
      -s -X POST \
      -H "Accept: application/vnd.github+json" \
      -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-     https://api.github.com/repos/${owner}/${repository}/releases \
-     -d "{\"tag_name\":\"${release_tag}\",\"target_commitish\":\"main\",\"name\":\"${release_tag}\",\"body\":\"Description of the release\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}"
+     https://api.github.com/repos/${repository}/releases \
+     -d "{\"tag_name\":\"${release_tag}\",\"target_commitish\":\"main\",\"name\":\"${release_tag}\",\"body\":\"Description of the release\",\"draft\":false,\"prerelease\":false,\"generate_release_notes\":false}" \
+     | grep '"id"' | head -1 | sed 's/[^0-9]*//g'
 }
 
 github_upload_release_asset() {
-  local owner=javanile
-  local repository=mush
+  local repository="${MUSH_GITHUB_REPOSITORY}"
+  local release_id="$1"
+  local asset_name=mush
   local asset_file=target/dist/mush
-  local release_id=$1
 
   curl \
     -s -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
-    https://uploads.github.com/repos/${owner}/${repository}/releases/$release_id/assets?name=mush \
+    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
     --data-binary @"$asset_file" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
 
 github_delete_release_asset() {
-  echo "DELETE: $1"
-  #echo "GITHUB_TOKEN: $GITHUB_TOKEN"
-
-  local owner=javanile
-  local repository=mush
-  local asset_file=target/dist/mush
-  local asset_id=$1
+  local repository="${MUSH_GITHUB_REPOSITORY}"
+  local asset_id="$1"
 
   curl \
     -s -X DELETE \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    https://api.github.com/repos/${owner}/${repository}/releases/assets/${asset_id}
+    https://api.github.com/repos/${repository}/releases/assets/${asset_id}
 }
 
 github_get_release_asset_id() {
-  local owner=javanile
-  local repository=mush
-  local asset_file=target/dist/mush
-  local release_id=$1
+  local repository="${MUSH_GITHUB_REPOSITORY}"
+  local release_id="$1"
+  local asset_name=mush
 
   curl \
     -s -X GET \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    https://api.github.com/repos/${owner}/${repository}/releases/${release_id}/assets \
-    | grep '^    "id"\|"name"' | paste - - | grep '"mush"' | cut -d, -f1 | cut -d: -f2 | xargs
+    https://api.github.com/repos/${repository}/releases/${release_id}/assets \
+    | grep '^    "id"\|"name"' | paste - - | grep "\"${asset_name}\"" | cut -d, -f1 | cut -d: -f2 | xargs
 }
 
 github_get_release_id() {
-  local owner=javanile
-  local repository=mush
-  local asset_file=target/dist/mush
+  local repository="${MUSH_GITHUB_REPOSITORY}"
+  local release_tag="$1"
 
   curl \
     -s -X GET \
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
-    https://api.github.com/repos/${owner}/${repository}/releases/tags/0.1.0 \
+    "https://api.github.com/repos/${repository}/releases/tags/${release_tag}" \
     | grep '"id"' | head -1 | sed 's/[^0-9]*//g'
 }
 
@@ -968,7 +972,7 @@ exec_manifest_lookup() {
 }
 
 manifest_parse() {
-    echo "S:"
+    #echo "S:"
     section=MUSH_USTABLE
     while IFS= read line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
@@ -1012,9 +1016,9 @@ manifest_parse() {
         *)
           ;;
       esac
-      echo "L: $line"
+      #echo "L: $line"
     done < "Manifest.toml"
-    echo "E."
+    #echo "E."
 }
 
 compile_file() {
@@ -1141,7 +1145,10 @@ compile_scan_embed() {
 exec_publish() {
   local bin_file=/usr/local/bin/mush
   local final_file=target/dist/mush
-  local release_tag="$MUSH_PACKAGE_VERSION"
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local release_tag="${MUSH_PACKAGE_VERSION}"
+
+  MUSH_GITHUB_REPOSITORY="$(github_get_repository)"
 
   ## TODO: add the following message when an index will be implemented
   # Updating crates.io index
@@ -1155,38 +1162,42 @@ exec_publish() {
     local error="some files in the working directory contain changes that were not yet committed into git:"
     local hint="to proceed despite this and include the uncommitted changes, pass the '--allow-dirty' flag"
     console_error "$error\n\n${changed_files}\n\n${hint}"
-    exit 101
+    #exit 101
   fi
 
-#    Updating crates.io index
-# warning: manifest has no documentation, homepage or repository.
-# See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info.
-#   Packaging cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
-#   Verifying cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
-#  Downloaded rand_core v0.6.4
-#  Downloaded 9 crates (2.5 MB) in 1.90s (largest was `run_script` at 1.1 MB)
-#   Compiling serde_yaml v0.9.14
-#   Compiling cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask/target/package/cask-cli-0.2.0)
-#    Finished dev [unoptimized + debuginfo] target(s) in 13.89s
-#   Uploading cask-cli v0.2.0 (/Users/francescobian
+  #    Updating crates.io index
+  # warning: manifest has no documentation, homepage or repository.
+  # See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info.
+  #   Packaging cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
+  #   Verifying cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask)
+  #  Downloaded rand_core v0.6.4
+  #  Downloaded 9 crates (2.5 MB) in 1.90s (largest was `run_script` at 1.1 MB)
+  #   Compiling serde_yaml v0.9.14
+  #   Compiling cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask/target/package/cask-cli-0.2.0)
+  #    Finished dev [unoptimized + debuginfo] target(s) in 13.89s
+  #   Uploading cask-cli v0.2.0 (/Users/francescobian
 
   [ -f .env ] && source .env
 
-  release_tag=0.2.0
+  ## Create or update the git tag
+  git tag -f -a "$release_tag" -m "Tag $release_tag" > /dev/null 2>&1
+  git push origin "$release_tag" -f > /dev/null 2>&1
 
-  git tag -f -a "$release_tag" -m "Tag $release_tag"
-  git push origin "$release_tag" -f
+  release_id="$(github_get_release_id "${release_tag}")"
 
-  github_create_release $release_tag
+  if [ -z "${release_id}" ]; then
+    release_id=$(github_create_release "${release_tag}")
+    echo "$release_id"
+  fi
 
-  #release_id="$(github_get_release_id)"
-  #asset_id="$(github_get_release_asset_id $release_id)"
+  asset_id="$(github_get_release_asset_id "${release_id}")"
 
-  #if [ -n "$asset_id" ]; then
-  #  github_delete_release_asset $asset_id
-  #fi
+  if [ -n "${asset_id}" ]; then
+    github_delete_release_asset "${asset_id}"
+  fi
 
-  #github_upload_release_asset $release_id
+  console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
+
+  download_url="$(github_upload_release_asset "${release_id}")"
 }
-
 main "$@"

@@ -66,3 +66,6 @@ test-console:
 
 test-publish:
 	@bash tests/bare/publish-test.sh
+
+test-registry-github:
+	@bash tests/bare/registry/github-test.sh

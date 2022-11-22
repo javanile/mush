@@ -15,7 +15,7 @@ exec_manifest_lookup() {
 }
 
 manifest_parse() {
-    echo "S:"
+    #echo "S:"
     section=MUSH_USTABLE
     while IFS= read line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
@@ -59,7 +59,7 @@ manifest_parse() {
         *)
           ;;
       esac
-      echo "L: $line"
+      #echo "L: $line"
     done < "Manifest.toml"
-    echo "E."
+    #echo "E."
 }
