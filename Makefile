@@ -28,6 +28,12 @@ test-task-build-dist:
 test-task-manifest-lookup:
 	@bash tests/bare/tasks/manifest-lookup-test.sh
 
+test-task-legacy-build:
+	@bash tests/bare/tasks/legacy-build-test.sh
+
+test-task-legacy-fetch:
+	@bash tests/bare/tasks/legacy-fetch-test.sh
+
 test-usage-debug:
 	@bash tests/bare/usage-debug-test.sh
 
