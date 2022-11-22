@@ -52,6 +52,14 @@ manifest_parse() {
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               eval "${section}_${field}=\$value"
               ;;
+            MUSH_LEGACY_FETCH)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              url=$(echo "$line" | cut -d'=' -f2 | xargs)
+              newline='
+'
+              MUSH_LEGACY_FETCH="${MUSH_LEGACY_FETCH}${package}=${url}${newline}"
+              eval "${section}_${field}=\$value"
+              ;;
             *)
               ;;
           esac
