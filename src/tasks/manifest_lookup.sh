@@ -55,9 +55,15 @@ manifest_parse() {
             MUSH_LEGACY_FETCH)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               url=$(echo "$line" | cut -d'=' -f2 | xargs)
-              newline='
-'
+              newline=$'\n'
               MUSH_LEGACY_FETCH="${MUSH_LEGACY_FETCH}${package}=${url}${newline}"
+              eval "${section}_${field}=\$value"
+              ;;
+            MUSH_LEGACY_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              newline=$'\n'
+              MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
               eval "${section}_${field}=\$value"
               ;;
             *)

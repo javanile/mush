@@ -1,8 +1,12 @@
 #!/usr/bin/env bash
 
 source src/console.sh
-source src/tasks/build_dist.sh
+source src/tasks/legacy_build.sh
+source src/tasks/legacy_fetch.sh
+source src/tasks/manifest_lookup.sh
 
-build_file=$(mktemp /tmp/build_file_XXXXXX)
+rm -fr target/dist
 
-build_dist_parse "src/main.sh" "${build_file}"
+exec_manifest_lookup
+exec_legacy_fetch target/dist
+exec_legacy_build target/dist
