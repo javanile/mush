@@ -27,7 +27,9 @@ console_log() {
 }
 
 console_info() {
-  console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+  if [ "${VERBOSE}" -gt "0" ]; then
+    console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+  fi
 }
 
 console_warning() {
