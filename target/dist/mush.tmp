@@ -1187,7 +1187,6 @@ exec_publish() {
 
   if [ -z "${release_id}" ]; then
     release_id=$(github_create_release "${release_tag}")
-    echo "$release_id"
   fi
 
   asset_id="$(github_get_release_asset_id "${release_id}")"
