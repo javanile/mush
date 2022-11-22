@@ -63,3 +63,6 @@ test-auto-build-dist-dist:
 
 test-console:
 	@bash tests/bare/console-test.sh
+
+test-publish:
+	@bash tests/bare/publish-test.sh

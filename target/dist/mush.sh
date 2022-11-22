@@ -349,6 +349,7 @@ parser_definition() {
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
   cmd   run -- "Run a binary or example of the local package"
+  cmd   publish -- "Package and upload this package to the registry"
 }
 
 main() {
@@ -389,6 +390,9 @@ main() {
       run)
         run_run "$@"
         ;;
+      publish)
+        run_publish "$@"
+        ;;
       --) # no subcommand, arguments only
     esac
   fi
@@ -416,7 +420,7 @@ debug_2022() {
 legacy() {
   legacy_file=target/debug/legacy/$1.sh
   if [ ! -f "$legacy_file" ]; then
-    error "errrore"
+    echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
     exit 101
   fi
   source "${legacy_file}"
@@ -453,10 +457,6 @@ embed() {
   local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
   eval "$(embed_file $1 $module_file)"
 }
-
-error() {
-  echo "$1"
-}
 EOF
 }
 dist_2022() {
@@ -491,6 +491,7 @@ public install
 public legacy
 public new
 public run
+public publish
 
 test0 () {
   echo "TEST"
@@ -687,6 +688,32 @@ run_run() {
   exec "$bin_file"
 }
 
+parser_definition_publish() {
+	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
+
+  msg     -- 'USAGE:' "  ${2##*/} publish [OPTIONS]" ''
+
+	msg     -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_publish() {
+  eval "$(getoptions parser_definition_publish parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+  exec_legacy_build
+  exec_build_dist "$@"
+  exec_publish
+}
+
 # FATAL
 # ERROR
 # WARNING
@@ -743,6 +770,7 @@ public install
 public legacy_build
 public manifest_lookup
 public compile
+public publish
 
 exec_build_debug() {
   local name=$MUSH_PACKAGE_NAME
@@ -1021,4 +1049,12 @@ compile_scan_embed() {
 
   return 0
 }
+
+exec_publish() {
+  local bin_file=/usr/local/bin/mush
+  local final_file=target/dist/mush
+
+  echo "publish"
+}
+
 main "$@"

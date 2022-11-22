@@ -1,0 +1,26 @@
+
+parser_definition_publish() {
+	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
+
+  msg     -- 'USAGE:' "  ${2##*/} publish [OPTIONS]" ''
+
+	msg     -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_publish() {
+  eval "$(getoptions parser_definition_publish parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
+  exec_legacy_build
+  exec_build_dist "$@"
+  exec_publish
+}

@@ -28,6 +28,7 @@ parser_definition() {
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
   cmd   run -- "Run a binary or example of the local package"
+  cmd   publish -- "Package and upload this package to the registry"
 }
 
 main() {
@@ -67,6 +68,9 @@ main() {
         ;;
       run)
         run_run "$@"
+        ;;
+      publish)
+        run_publish "$@"
         ;;
       --) # no subcommand, arguments only
     esac

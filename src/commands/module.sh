@@ -6,3 +6,4 @@ public install
 public legacy
 public new
 public run
+public publish
