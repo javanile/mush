@@ -1,5 +1,5 @@
 
-legacy lib_helloworld
+#legacy lib_helloworld
 
 main() {
   echo "Hello World!"

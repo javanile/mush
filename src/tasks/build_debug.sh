@@ -12,9 +12,12 @@ exec_build_debug() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
+  MUSH_DEBUG_PATH=${PWD}
+  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> $build_file
+
   debug_2022 >> $build_file
 
-  echo "source src/main.sh" >> $build_file
+  echo "source ${MUSH_DEBUG_PATH}/src/main.sh" >> $build_file
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"

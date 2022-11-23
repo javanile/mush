@@ -19,10 +19,15 @@ run_build() {
   MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
 
   exec_manifest_lookup
+
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ "$BUILD_TARGET" = "dist" ]; then
     exec_build_dist "$@"
