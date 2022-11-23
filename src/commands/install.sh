@@ -20,7 +20,13 @@ run_install() {
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
   exec_manifest_lookup
-  exec_legacy_build
+
+  MUSH_TARGET_DIR=target/dist
+
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
+
   exec_build_dist "$@"
+
   exec_install
 }

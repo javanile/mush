@@ -419,34 +419,41 @@ debug_2022() {
   cat <<'EOF'
 
 legacy() {
-  legacy_file=target/debug/legacy/$1.sh
-  if [ ! -f "$legacy_file" ]; then
+  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
+
+  if [ ! -f "$legacy_file_path" ]; then
     echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
     exit 101
   fi
-  source "${legacy_file}"
+
+  source "${legacy_file_path}"
 }
 
 module() {
-  local module_file=src/$1.sh
-  local module_dir_file=src/$1/module.sh
+  local module_file="src/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+  local module_dir_file="src/$1/module.sh"
+  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
-  if [ -f "$module_file" ]; then
-    source "$module_file"
+  if [ -f "${module_file_path}" ]; then
+    source "${module_file_path}"
   else
     MUSH_RUNTIME_MODULE=$1
-    source "$module_dir_file"
+    source "${module_dir_file_path}"
   fi
 }
 
 public() {
-  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
-  local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
+  local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+  local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
+  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
-  if [ -f "$module_file" ]; then
-    source "$module_file"
-  elif [ -f "$module_dir_file" ]; then
-    source "$module_dir_file"
+  if [ -f "${module_file_path}" ]; then
+    source "${module_file_path}"
+  elif [ -f "${module_dir_file_path}" ]; then
+    source "${module_dir_file_path}"
   fi
 }
 
@@ -455,8 +462,10 @@ use() {
 }
 
 embed() {
-  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
-  eval "$(embed_file $1 $module_file)"
+  local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+
+  eval "$(embed_file "$1" "${module_file_path}")"
 }
 EOF
 }
@@ -517,10 +526,15 @@ run_build() {
   MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
 
   exec_manifest_lookup
+
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ "$BUILD_TARGET" = "dist" ]; then
     exec_build_dist "$@"
@@ -580,8 +594,14 @@ run_install() {
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
   exec_manifest_lookup
-  exec_legacy_build
+
+  MUSH_TARGET_DIR=target/dist
+
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
+
   exec_build_dist "$@"
+
   exec_install
 }
 
@@ -671,7 +691,10 @@ run_run() {
 
   exec_manifest_lookup
 
-  exec_legacy_build
+  MUSH_TARGET_DIR=target/debug
+
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
 
   exec_build_debug "$@"
 
@@ -864,11 +887,12 @@ exec_build_debug() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
-  echo "echo \$0" >> $build_file
+  MUSH_DEBUG_PATH=${PWD}
+  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> $build_file
 
   debug_2022 >> $build_file
 
-  echo "source src/main.sh" >> $build_file
+  echo "source ${MUSH_DEBUG_PATH}/src/main.sh" >> $build_file
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"
@@ -1006,7 +1030,7 @@ exec_manifest_lookup() {
 
   manifest_parse
 
-  if [ ! -n "$MUSH_PACKAGE_VERSION" ]; then
+  if [ -z "$MUSH_PACKAGE_VERSION" ]; then
     console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
     exit 101
   fi

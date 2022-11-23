@@ -8,7 +8,7 @@ exec_manifest_lookup() {
 
   manifest_parse
 
-  if [ ! -n "$MUSH_PACKAGE_VERSION" ]; then
+  if [ -z "$MUSH_PACKAGE_VERSION" ]; then
     console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
     exit 101
   fi
