@@ -19,8 +19,8 @@ run_build() {
   MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
 
   exec_manifest_lookup
-  exec_legacy_fetch
-  exec_legacy_build
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
 
   console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
 

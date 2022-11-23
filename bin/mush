@@ -513,17 +513,14 @@ run_build() {
   eval "$(getoptions parser_definition_build parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
 
   exec_manifest_lookup
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
 
   console_status "Compiling" "mush-test v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/rust)"
-
-  #echo "MUSH_PACKAGE_NAME: $MUSH_PACKAGE_NAME"
-
-  exec_legacy_build
 
   if [ "$BUILD_TARGET" = "dist" ]; then
     exec_build_dist "$@"
@@ -848,6 +845,7 @@ public build_debug
 public build_dist
 public init
 public install
+public legacy_fetch
 public legacy_build
 public manifest_lookup
 public compile
@@ -860,6 +858,8 @@ exec_build_debug() {
   local final_file=target/debug/${name}
 
   mkdir -p target/debug/
+
+  compile_file "src/main.sh"
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
@@ -951,9 +951,48 @@ exec_install() {
 }
 
 
+exec_legacy_fetch() {
+  local target_dir=$1
+  local legacy_dir="${target_dir}/legacy"
+
+  mkdir -p "${legacy_dir}"
+
+  echo "${MUSH_LEGACY_FETCH}" | while IFS=$'\n' read package && [ -n "$package" ]; do
+    package_name=${package%=*}
+    package_file=${legacy_dir}/${package_name}.sh
+    package_bin=${legacy_dir}/${package_name}
+    package_url=${package#*=}
+
+    if [ ! -f "${package_file}" ]; then
+      console_status "Downloading" "$package_name => $package_url ($package_file)"
+      curl -s -L -X GET -o "${package_file}" "${package_url}"
+      ln "${package_file}" "${package_bin}"
+      chmod +x "${package_bin}"
+    fi
+  done
+}
+
 exec_legacy_build() {
-  legacy=1
-  #echo "Legacy build"
+  local target_dir=$1
+  local legacy_dir="${target_dir}/legacy"
+
+  mkdir -p "${legacy_dir}"
+
+  echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read package && [ -n "$package" ]; do
+    package_name=${package%=*}
+    package_file=${legacy_dir}/${package_name}.sh
+    package_script=${package#*=}
+
+    if [ ! -f "${package_file}" ]; then
+      console_status "Compiling" "$package_name => $package_script ($package_file)"
+      local pwd=$PWD
+      cd "$legacy_dir"
+      eval "PATH=${PATH}:${PWD} ${package_script}"
+      cd "$pwd"
+    fi
+  done
+
+
 }
 
 exec_manifest_lookup() {
@@ -1007,6 +1046,20 @@ manifest_parse() {
             MUSH_PACKAGE)
               field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              eval "${section}_${field}=\$value"
+              ;;
+            MUSH_LEGACY_FETCH)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              url=$(echo "$line" | cut -d'=' -f2 | xargs)
+              newline=$'\n'
+              MUSH_LEGACY_FETCH="${MUSH_LEGACY_FETCH}${package}=${url}${newline}"
+              eval "${section}_${field}=\$value"
+              ;;
+            MUSH_LEGACY_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              newline=$'\n'
+              MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
               eval "${section}_${field}=\$value"
               ;;
             *)

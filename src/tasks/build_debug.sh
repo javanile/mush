@@ -7,6 +7,8 @@ exec_build_debug() {
 
   mkdir -p target/debug/
 
+  compile_file "src/main.sh"
+
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
