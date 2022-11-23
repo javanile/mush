@@ -19,8 +19,14 @@ run_publish() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  MUSH_TARGET_DIR=target/dist
+
   exec_manifest_lookup
-  exec_legacy_build
+
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
+
   exec_build_dist "$@"
+
   exec_publish
 }
