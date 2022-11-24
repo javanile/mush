@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Get Started
+title: Lectures
 nav_order: 100
 ---
 

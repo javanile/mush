@@ -923,8 +923,6 @@ exec_build_dist() {
 
   dist_2022 >> $build_file
 
-  cat target/debug/legacy/getoptions.sh >> $build_file
-
   compile_file "src/main.sh" "${build_file}"
 
   echo "main \"\$@\"" >> $build_file
