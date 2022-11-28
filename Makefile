@@ -78,3 +78,6 @@ test-publish:
 
 test-registry-github:
 	@bash tests/bare/registry/github-test.sh
+
+test-package-manager-git:
+	@bash tests/bare/package_managers/git-test.sh

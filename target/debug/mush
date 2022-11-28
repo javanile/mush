@@ -1,35 +1,43 @@
 #!/usr/bin/env bash
 set -e
+MUSH_DEBUG_PATH=/Users/francescobianco/Develop/Javanile/mush
 
 legacy() {
-  legacy_file=target/debug/legacy/$1.sh
-  if [ ! -f "$legacy_file" ]; then
+  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
+
+  if [ ! -f "$legacy_file_path" ]; then
     echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
     exit 101
   fi
-  source "${legacy_file}"
+
+  source "${legacy_file_path}"
 }
 
 module() {
-  local module_file=src/$1.sh
-  local module_dir_file=src/$1/module.sh
+  local module_file="src/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+  local module_dir_file="src/$1/module.sh"
+  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
-  if [ -f "$module_file" ]; then
-    source "$module_file"
+  if [ -f "${module_file_path}" ]; then
+    source "${module_file_path}"
   else
     MUSH_RUNTIME_MODULE=$1
-    source "$module_dir_file"
+    source "${module_dir_file_path}"
   fi
 }
 
 public() {
-  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
-  local module_dir_file=src/$MUSH_RUNTIME_MODULE/$1/module.sh
+  local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+  local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
+  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
-  if [ -f "$module_file" ]; then
-    source "$module_file"
-  elif [ -f "$module_dir_file" ]; then
-    source "$module_dir_file"
+  if [ -f "${module_file_path}" ]; then
+    source "${module_file_path}"
+  elif [ -f "${module_dir_file_path}" ]; then
+    source "${module_dir_file_path}"
   fi
 }
 
@@ -38,8 +46,10 @@ use() {
 }
 
 embed() {
-  local module_file=src/$MUSH_RUNTIME_MODULE/$1.sh
-  eval "$(embed_file $1 $module_file)"
+  local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
+  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+
+  eval "$(embed_file "$1" "${module_file_path}")"
 }
-source src/main.sh
+source /Users/francescobianco/Develop/Javanile/mush/src/main.sh
 main "$@"

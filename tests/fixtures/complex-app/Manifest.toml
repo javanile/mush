@@ -3,6 +3,8 @@ name = "complex-app"
 version = "0.1.0"
 edition = "2022"
 
-# See more keys and their definitions at https://mush.javanile.org/manifest.html
+[dev-dependencies]
+bats = "git https://github.com/sstephenson/bats.git v0.4.0"
 
-[dependencies]
+[dev-dependencies-build]
+bats = "exec install.sh ."

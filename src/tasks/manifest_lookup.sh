@@ -16,6 +16,7 @@ exec_manifest_lookup() {
 
 manifest_parse() {
     #echo "S:"
+    newline=$'\n'
     section=MUSH_USTABLE
     while IFS= read line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
@@ -28,10 +29,16 @@ manifest_parse() {
           section=MUSH_PACKAGE
           ;;
         "[dependencies]")
-          section=MUSH_DEPENDENCIES
+          section=MUSH_DEPS
+          ;;
+        "[dependencies-build]")
+          section=MUSH_DEPS_BUILD
           ;;
         "[dev-dependencies]")
-          section=MUSH_DEV_DEPENDENCIES
+          section=MUSH_DEV_DEPS
+          ;;
+        "[dev-dependencies-build]")
+          section=MUSH_DEV_DEPS_BUILD
           ;;
         "[legacy-fetch]")
           section=MUSH_LEGACY_FETCH
@@ -55,16 +62,22 @@ manifest_parse() {
             MUSH_LEGACY_FETCH)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               url=$(echo "$line" | cut -d'=' -f2 | xargs)
-              newline=$'\n'
               MUSH_LEGACY_FETCH="${MUSH_LEGACY_FETCH}${package}=${url}${newline}"
-              eval "${section}_${field}=\$value"
               ;;
             MUSH_LEGACY_BUILD)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
-              newline=$'\n'
               MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
-              eval "${section}_${field}=\$value"
+              ;;
+            MUSH_DEV_DEPS)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              signature=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEV_DEPS="${MUSH_DEV_DEPS}${package}=${signature}${newline}"
+              ;;
+            MUSH_DEV_DEPS_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
             *)
               ;;

@@ -17,11 +17,15 @@ run_build() {
   eval "set -- $REST"
 
   MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
+  MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
+  mkdir -p "${MUSH_DEPS_DIR}"
 
   exec_manifest_lookup
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
+
+  exec_dependencies "${MUSH_TARGET_DIR}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"

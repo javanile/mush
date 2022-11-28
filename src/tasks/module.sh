@@ -8,3 +8,4 @@ public legacy_build
 public manifest_lookup
 public compile
 public publish
+public dependencies
