@@ -1334,8 +1334,8 @@ exec_dependencies() {
 
 process_dev_dependencies() {
   echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    package_name=${dependency%=*}
-    package_signature=${dependency#*=}
+    local package_name=${dependency%=*}
+    local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       process_dev_dependency "$package_name" $package_signature
@@ -1353,9 +1353,9 @@ process_dev_dependency() {
 
 process_dev_dependencies_build() {
   echo "${MUSH_DEV_DEPS_BUILD}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    package_name=${dependency%=*}
-    package_script=${dependency#*=}
-    package_dir="${MUSH_DEPS_DIR}/${package_name}"
+    local package_name=${dependency%=*}
+    local package_script=${dependency#*=}
+    local package_dir="${MUSH_DEPS_DIR}/${package_name}"
 
     if [ -d "${package_dir}" ]; then
       local pwd=$PWD

@@ -1335,10 +1335,10 @@ exec_dependencies() {
 process_dev_dependencies() {
   echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
     package_name=${dependency%=*}
-    signature=${dependency#*=}
+    package_signature=${dependency#*=}
 
-    if [ ! -d "${MUSH_DEPS_DIR}/${package_file}" ]; then
-      process_dev_dependency "$package_name" $signature
+    if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+      process_dev_dependency "$package_name" $package_signature
     fi
   done
 }
