@@ -20,6 +20,87 @@ use() {
 embed() {
   embed=$1
 }
+
+legacy lib_getoptions
+
+module api
+module commands
+module console
+module package_managers
+module registry
+module tasks
+
+#use assets::server::test0
+
+VERSION="Mush 0.1.0 (2022-11-29)"
+
+parser_definition() {
+  setup REST help:usage abbr:true -- "Shell's build system" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
+
+  msg   -- 'OPTIONS:'
+  disp  VERSION -V --version                      -- "Print version info and exit"
+  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage  -h --help                         -- "Print help information"
+
+  msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build -- "Compile the current package"
+  cmd   init -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new -- "Create a new Mush package"
+  cmd   run -- "Run a binary or example of the local package"
+  cmd   publish -- "Package and upload this package to the registry"
+}
+
+main() {
+  #echo "ARGS: $@"
+  #chmod +x target/debug/legacy/getoptions
+  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
+
+  if [ $# -eq 0 ]; then
+    eval "set -- --help"
+  fi
+
+  eval "$(getoptions parser_definition parse "$0") exit 1"
+  parse "$@"
+  eval "set -- $REST"
+
+  #echo "V $VERBOSE"
+
+
+  if [ $# -gt 0 ]; then
+    cmd=$1
+    shift
+    case $cmd in
+      build)
+        run_build "$@"
+        ;;
+      init)
+        run_init "$@"
+        ;;
+      install)
+        run_install "$@"
+        ;;
+      legacy)
+        run_legacy "$@"
+        ;;
+      new)
+        run_new "$@"
+        ;;
+      run)
+        run_run "$@"
+        ;;
+      publish)
+        run_publish "$@"
+        ;;
+      --) # no subcommand, arguments only
+    esac
+  fi
+}
+
 # [getoptions] License: Creative Commons Zero v1.0 Universal
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions() {
@@ -319,86 +400,6 @@ getoptions_help() {
 	echo "GETOPTIONSHERE"
 	echo "}"
 }
-
-legacy lib_getoptions
-
-module api
-module commands
-module console
-module registry
-module tasks
-
-#use assets::server::test0
-
-VERSION="Mush 0.1.0 (2022-11-17)"
-
-parser_definition() {
-  setup REST help:usage abbr:true -- "Shell's build system" ''
-
-  msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
-
-  msg   -- 'OPTIONS:'
-  disp  VERSION -V --version                      -- "Print version info and exit"
-  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
-  disp  :usage  -h --help                         -- "Print help information"
-
-  msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build -- "Compile the current package"
-  cmd   init -- "Create a new package in an existing directory"
-  cmd   install -- "Build and install a Mush binary"
-  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new -- "Create a new Mush package"
-  cmd   run -- "Run a binary or example of the local package"
-  cmd   publish -- "Package and upload this package to the registry"
-}
-
-main() {
-  #echo "ARGS: $@"
-  #chmod +x target/debug/legacy/getoptions
-  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
-
-  if [ $# -eq 0 ]; then
-    eval "set -- --help"
-  fi
-
-  eval "$(getoptions parser_definition parse "$0") exit 1"
-  parse "$@"
-  eval "set -- $REST"
-
-  #echo "V $VERBOSE"
-
-
-  if [ $# -gt 0 ]; then
-    cmd=$1
-    shift
-    case $cmd in
-      build)
-        run_build "$@"
-        ;;
-      init)
-        run_init "$@"
-        ;;
-      install)
-        run_install "$@"
-        ;;
-      legacy)
-        run_legacy "$@"
-        ;;
-      new)
-        run_new "$@"
-        ;;
-      run)
-        run_run "$@"
-        ;;
-      publish)
-        run_publish "$@"
-        ;;
-      --) # no subcommand, arguments only
-    esac
-  fi
-}
-
 
 public embed
 
@@ -796,6 +797,25 @@ console_print() {
   fi
 }
 
+public apt
+public basher
+public bpkg
+public pip
+public git
+
+git_dependency() {
+  local pwd=$PWD
+  local package_dir=$1
+  local package_url=$2
+  local package_tag=$3
+
+  cd "${MUSH_DEPS_DIR}" || exit 101
+
+  git clone --depth 1 --branch "$3" "$2" "${package_dir}" > /dev/null 2>&1
+
+  cd "${pwd}" || exit 101
+}
+
 public github
 
 github_get_repository() {
@@ -1031,7 +1051,10 @@ exec_legacy_build() {
 }
 
 exec_manifest_lookup() {
-  pwd=$PWD
+  local pwd=$PWD
+
+  MUSH_MANIFEST_DIR="${PWD}"
+
   if [ ! -f "Manifest.toml" ]; then
     console_error "could not find 'Manifest.toml' in '$pwd' or any parent directory"
     exit 101
@@ -1155,6 +1178,9 @@ compile_scan_legacy() {
     #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
+      if [ -n "${build_file}" ]; then
+        cat "${legacy_file}" >> "${build_file}"
+      fi
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
     else
@@ -1302,18 +1328,41 @@ exec_publish() {
 }
 
 exec_dependencies() {
-
-
   process_dev_dependencies
-
-  echo "DEV"
+  process_dev_dependencies_build
 }
 
 process_dev_dependencies() {
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    package_name=${dependency%=*}
+    signature=${dependency#*=}
 
+    if [ ! -d "${MUSH_DEPS_DIR}/${package_file}" ]; then
+      process_dev_dependency "$package_name" $signature
+    fi
+  done
+}
 
+process_dev_dependency() {
+  case "$2" in
+    git)
+      git_dependency "$1" "$3" "$4"
+      ;;
+  esac
+}
 
+process_dev_dependencies_build() {
+  echo "${MUSH_DEV_DEPS_BUILD}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    package_name=${dependency%=*}
+    package_script=${dependency#*=}
+    package_dir="${MUSH_DEPS_DIR}/${package_name}"
 
-  echo "DEV: ${MUSH_DEV_DEPS}"
+    if [ -d "${package_dir}" ]; then
+      local pwd=$PWD
+      cd "${package_dir}"
+      eval "PATH=${PATH}:${PWD} ${package_script}"
+      cd "$pwd"
+    fi
+  done
 }
 main "$@"
