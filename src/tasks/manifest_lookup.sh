@@ -1,6 +1,9 @@
 
 exec_manifest_lookup() {
-  pwd=$PWD
+  local pwd=$PWD
+
+  MUSH_MANIFEST_DIR="${PWD}"
+
   if [ ! -f "Manifest.toml" ]; then
     console_error "could not find 'Manifest.toml' in '$pwd' or any parent directory"
     exit 101
