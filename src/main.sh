@@ -4,6 +4,7 @@ legacy lib_getoptions
 module api
 module commands
 module console
+module package_managers
 module registry
 module tasks
 
