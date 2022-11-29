@@ -32,6 +32,9 @@ compile_scan_legacy() {
     #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
+      if [ -n "${build_file}" ]; then
+        cat "${legacy_file}" >> "${build_file}"
+      fi
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
     else
