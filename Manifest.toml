@@ -5,18 +5,9 @@ description = "Mush, a build system for shell."
 license = "MIT"
 edition = "2022"
 
-[legacy-fetch]
-getoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
-gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
-
-[legacy-build]
-lib-getoptions = "gengetoptions library > lib_getoptions.sh"
-
-[dev-legacy-fetch]
-pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh"
-
-#[dependencies]
-#pippo = "basher ciaaio/ciao 1.0"
+[dependencies]
+console = "mush javanile/mush/console"
+getoptions = "mush javanile/mush/getoptions"
 
 [dev-dependencies]
 shellcheck = "apt shellcheck"

@@ -1,6 +1,4 @@
 
-legacy lib_getoptions
-
 module api
 module commands
 module console
@@ -8,6 +6,8 @@ module package_managers
 module registry
 module tasks
 
+use mush::console
+use mush::getoptions
 #use assets::server::test0
 
 VERSION="Mush 0.1.0 (2022-11-29)"
@@ -48,7 +48,6 @@ main() {
 
   #echo "V $VERBOSE"
 
-
   if [ $# -gt 0 ]; then
     cmd=$1
     shift
@@ -78,4 +77,3 @@ main() {
     esac
   fi
 }
-
