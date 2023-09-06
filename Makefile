@@ -65,6 +65,9 @@ test-build-debug-basic-app:
 test-api-embed:
 	@bash tests/bare/api/embed-test.sh
 
+test-cross-build:
+	@bash tests/bare/build/cross-test.sh
+
 test-auto-build-debug-debug:
 	@bash tests/bare/build/auto-debug-debug-test.sh
 

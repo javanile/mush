@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
+extern() {
+  extern=$1
+}
+
 legacy() {
   legacy=$1
 }
@@ -21,16 +25,17 @@ embed() {
   embed=$1
 }
 
-legacy lib_getoptions
+
+extern package console
+extern package json
 
 module api
 module commands
-module console
 module package_managers
 module registry
 module tasks
 
-#use assets::server::test0
+legacy getoptions
 
 VERSION="Mush 0.1.0 (2022-11-29)"
 
@@ -70,7 +75,6 @@ main() {
 
   #echo "V $VERBOSE"
 
-
   if [ $# -gt 0 ]; then
     cmd=$1
     shift
@@ -100,7 +104,6 @@ main() {
     esac
   fi
 }
-
 # [getoptions] License: Creative Commons Zero v1.0 Universal
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions() {
@@ -413,11 +416,55 @@ embed_file() {
   echo "$module_name() {"
   echo "  cat <<'EOF'"
   cat "$module_file"
+  echo ""
   echo "EOF"
   echo "}"
 }
 debug_2022() {
   cat <<'EOF'
+
+debug_file() {
+  local previous_debug_file=$MUSH_DEBUG_FILE
+  MUSH_DEBUG_FILE=$1
+  source "$1"
+  MUSH_DEBUG_FILE=$previous_debug_file
+}
+
+extern() {
+  local debug_file=$MUSH_DEBUG_FILE
+
+  if [ "$1" = "package" ]; then
+    local package_name=$MUSH_PACKAGE_NAME
+    local extern_package_name=$2
+    local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+
+    if [ -d "${extern_package_path}" ]; then
+      debug_file "${extern_package_lib_file}"
+    else
+      echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+      echo "error[E0463]: can't find package for '${extern_package_name}'"
+      echo " --> ${debug_file}:8:1"
+      echo "  |"
+      echo "8 | extern crate cavallo;"
+      echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
+      echo ""
+      echo "For more information about this error, try 'mush explain E0463'."
+      echo "error: could not compile '${package_name}' due to previous error"
+      exit 1
+    fi
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error: expected one of 'package' or '{', found '$1'"
+    echo " --> ${debug_file}:8:8"
+    echo "  |"
+    echo "8 | extern cavallo json;"
+    echo "  |        ^^^^^^^ expected one of 'package' or '{'"
+    echo ""
+    echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
+  fi
+}
 
 legacy() {
   local legacy_file="target/debug/legacy/$1.sh"
@@ -432,16 +479,32 @@ legacy() {
 }
 
 module() {
+  local module_name=$1
   local module_file="src/$1.sh"
   local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
   local module_dir_file="src/$1/module.sh"
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+  local debug_file=$MUSH_DEBUG_FILE
+  local package_name=$MUSH_PACKAGE_NAME
 
   if [ -f "${module_file_path}" ]; then
     source "${module_file_path}"
-  else
+  elif [ -f "${module_dir_file_path}" ]; then
     MUSH_RUNTIME_MODULE=$1
     source "${module_dir_file_path}"
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error[E0583]: file not found for module '${module_name}'"
+    echo " --> ${debug_file}:4:1"
+    echo "  |"
+    echo "4 | mod notfound;"
+    echo "  | ^^^^^^^^^^^^^"
+    echo "  |"
+    echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
+    echo ""
+    echo "For more information about this error, try 'mush explain E0583'."
+    echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
   fi
 }
 
@@ -468,10 +531,15 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
+
 EOF
 }
 dist_2022() {
   cat <<'EOF'
+
+extern() {
+  extern=$1
+}
 
 legacy() {
   legacy=$1
@@ -492,6 +560,7 @@ use() {
 embed() {
   embed=$1
 }
+
 EOF
 }
 
@@ -746,57 +815,6 @@ run_publish() {
   exec_publish
 }
 
-# FATAL
-# ERROR
-# WARNING
-# INFO
-# DEBUG
-# TRACE
-# SUCCESS
-
-case "$(uname -s)" in
-  Darwin*)
-    ESCAPE='\x1B'
-    ;;
-  Linux|*)
-    ESCAPE='\e'
-    ;;
-esac
-
-#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
-console_pad() {
-  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
-}
-
-console_log() {
-  console_print "$1" "$2"
-}
-
-console_info() {
-  if [ "${VERBOSE}" -gt "0" ]; then
-    console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-  fi
-}
-
-console_warning() {
-  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-}
-
-console_status() {
-  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
-}
-
-console_error() {
-  echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
-}
-
-console_print() {
-  if [ -z "${QUIET}" ]; then
-    echo -e "$1 $2" >&2
-  fi
-}
-
 public apt
 public basher
 public bpkg
@@ -915,20 +933,25 @@ exec_build_debug() {
 
   compile_file "src/main.sh"
 
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "set -e" >> $build_file
+  echo "#!/usr/bin/env bash" > "${build_file}"
+  echo "set -e" >> "${build_file}"
 
+  echo "## BP002: Package and debug variables " >> "${build_file}"
   MUSH_DEBUG_PATH=${PWD}
-  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> $build_file
+  echo "MUSH_PACKAGE_NAME=${name}" >> "${build_file}"
+  echo "MUSH_TARGET_PATH=${PWD}/target/debug/" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
 
-  debug_2022 >> $build_file
+  echo "## BP003: Embedding debug api" >> "${build_file}"
+  debug_2022 >> "${build_file}"
 
-  echo "source ${MUSH_DEBUG_PATH}/src/main.sh" >> $build_file
-  echo "main \"\$@\"" >> $build_file
+  echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
+  echo "debug_file ${MUSH_DEBUG_PATH}/src/main.sh" >> "${build_file}"
+  echo "main \"\$@\"" >> "${build_file}"
 
-  mv "$build_file" "$final_file"
+  mv "${build_file}" "${final_file}"
 
-  chmod +x "$final_file"
+  chmod +x "${final_file}"
 }
 
 exec_build_dist() {
@@ -1334,8 +1357,8 @@ exec_dependencies() {
 
 process_dev_dependencies() {
   echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    package_name=${dependency%=*}
-    package_signature=${dependency#*=}
+    local package_name=${dependency%=*}
+    local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       process_dev_dependency "$package_name" $package_signature
@@ -1353,9 +1376,9 @@ process_dev_dependency() {
 
 process_dev_dependencies_build() {
   echo "${MUSH_DEV_DEPS_BUILD}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    package_name=${dependency%=*}
-    package_script=${dependency#*=}
-    package_dir="${MUSH_DEPS_DIR}/${package_name}"
+    local package_name=${dependency%=*}
+    local package_script=${dependency#*=}
+    local package_dir="${MUSH_DEPS_DIR}/${package_name}"
 
     if [ -d "${package_dir}" ]; then
       local pwd=$PWD
