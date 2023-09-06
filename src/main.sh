@@ -1,8 +1,9 @@
 
 extern package console
-extern package json
+#extern package json
 
 module api
+module errors
 module commands
 module package_managers
 module registry

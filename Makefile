@@ -71,7 +71,7 @@ test-cross-build:
 test-auto-build-debug-debug:
 	@bash tests/bare/build/auto-debug-debug-test.sh
 
-test-auto-build-debug-dist:
+test-auto-build-debug-dist: test-auto-build-debug-debug
 	@bash tests/bare/build/auto-debug-dist-test.sh
 
 test-auto-build-dist-debug:

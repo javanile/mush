@@ -28,9 +28,10 @@ embed() {
 ## BP004: Compile the entrypoint
 
 extern package console
-extern package json
+#extern package json
 
 module api
+module errors
 module commands
 module package_managers
 module registry
@@ -444,14 +445,7 @@ extern() {
       debug_file "${extern_package_lib_file}"
     else
       echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-      echo "error[E0463]: can't find package for '${extern_package_name}'"
-      echo " --> ${debug_file}:8:1"
-      echo "  |"
-      echo "8 | extern crate cavallo;"
-      echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
-      echo ""
-      echo "For more information about this error, try 'mush explain E0463'."
-      echo "error: could not compile '${package_name}' due to previous error"
+      error_package_not_found "${extern_package_name}" "${debug_file}"
       exit 1
     fi
   else
@@ -564,6 +558,22 @@ embed() {
 
 EOF
 }
+
+error_package_not_found() {
+  local package_name=$MUSH_PACKAGE_NAME
+  local extern_package_name=$1
+  local debug_file=$2
+
+  echo "error[E0463]: can't find package for '${extern_package_name}'"
+  echo " --> ${debug_file}:8:1"
+  echo "  |"
+  echo "8 | extern crate cavallo;"
+  echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
+  echo ""
+  echo "For more information about this error, try 'mush explain E0463'."
+  echo "error: could not compile '${package_name}' due to previous error"
+}
+
 
 public add
 public build
@@ -1185,6 +1195,8 @@ compile_file() {
 
   compile_scan_module "${src_file}" "${build_file}"
 
+  compile_scan_extern_package "${src_file}" "${build_file}"
+
   compile_scan_embed "${src_file}" "${build_file}"
 
   return 0
@@ -1261,6 +1273,31 @@ compile_scan_module() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+compile_scan_extern_package() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+  local extern_package_dir=target/dist
+
+  grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local package_name=$(echo "${line#*package}" | xargs)
+    local package_file="${extern_package_dir}/packages/${package_name}/lib.sh"
+    if [ -e "${package_file}" ]; then
+      console_info "Import" "file '${package_file}' as package file"
+      if [ -n "${build_file}" ]; then
+        cat "${package_file}" >> "${build_file}"
+      fi
+    else
+      error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
+      #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
+      #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
       exit 101
     fi
   done
@@ -1388,6 +1425,57 @@ process_dev_dependencies_build() {
       cd "$pwd"
     fi
   done
+}
+
+# FATAL
+# ERROR
+# WARNING
+# INFO
+# DEBUG
+# TRACE
+# SUCCESS
+
+case "$(uname -s)" in
+  Darwin*)
+    ESCAPE='\x1B'
+    ;;
+  Linux|*)
+    ESCAPE='\e'
+    ;;
+esac
+
+#CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
+
+console_pad() {
+  [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
+}
+
+console_log() {
+  console_print "$1" "$2"
+}
+
+console_info() {
+  if [ "${VERBOSE}" -gt "0" ]; then
+    console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+  fi
+}
+
+console_warning() {
+  console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_status() {
+  console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
+}
+
+console_error() {
+  echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
+}
+
+console_print() {
+  if [ -z "${QUIET}" ]; then
+    echo -e "$1 $2" >&2
+  fi
 }
 ## BP005: Execute the entrypoint
 main "$@"

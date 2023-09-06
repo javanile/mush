@@ -19,14 +19,7 @@ extern() {
       debug_file "${extern_package_lib_file}"
     else
       echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-      echo "error[E0463]: can't find package for '${extern_package_name}'"
-      echo " --> ${debug_file}:8:1"
-      echo "  |"
-      echo "8 | extern crate cavallo;"
-      echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
-      echo ""
-      echo "For more information about this error, try 'mush explain E0463'."
-      echo "error: could not compile '${package_name}' due to previous error"
+      error_package_not_found "${extern_package_name}" "${debug_file}"
       exit 1
     fi
   else
