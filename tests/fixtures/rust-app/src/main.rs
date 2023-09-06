@@ -1,11 +1,11 @@
 
 //mod not_exists;
 
-//mod notfound;
+mod notfound;
 
 //mod mod1;
 
-extern crate json;
+//extern crate json;
 
 
 //use package::mod1::hello;
@@ -14,6 +14,6 @@ extern crate json;
 
 fn main() {
     println!("Hello World!");
-    json::parse("{}").unwrap();
+    //json::parse("{}").unwrap();
     //hello();
 }
