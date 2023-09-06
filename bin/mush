@@ -25,6 +25,7 @@ embed() {
   embed=$1
 }
 
+## BP004: Compile the entrypoint
 
 extern package console
 extern package json
@@ -971,18 +972,18 @@ exec_build_dist() {
 
   dist_2022 >> $build_file
 
+  echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "src/main.sh" "${build_file}"
 
-  echo "main \"\$@\"" >> $build_file
+  echo "## BP005: Execute the entrypoint" >> "${build_file}"
+  echo "main \"\$@\"" >> "${build_file}"
 
+  ## Generate binary file
   mkdir -p bin/
-
-  cp ${build_file} ${final_file}
-  cp ${final_file} ${bin_file}
-
-  chmod +x ${bin_file}
+  chmod +x "${build_file}"
+  cp "${build_file}" "${final_file}"
+  cp "${final_file}" "${bin_file}"
 }
-
 
 exec_init() {
   local package_name=$(basename "$PWD")
@@ -1388,4 +1389,5 @@ process_dev_dependencies_build() {
     fi
   done
 }
+## BP005: Execute the entrypoint
 main "$@"
