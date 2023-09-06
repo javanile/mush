@@ -36,5 +36,5 @@ run_run() {
 
   console_status "Running" "'${bin_file}'"
 
-  exec "$bin_file"
+  exec "$bin_file" "$@"
 }
