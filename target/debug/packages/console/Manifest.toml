@@ -1,0 +1,3 @@
+
+[dev-legacy-fetch]
+pipetest = "https://raw.githubusercontent.com/javanile/pipetest/main/pipetest.sh"

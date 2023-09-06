@@ -5,7 +5,21 @@ MUSH_PACKAGE_NAME=mush
 MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
 
 extern() {
-  local a=1
+  local debug_file=$MUSH_DEBUG_FILE
+  local package_name=$MUSH_PACKAGE_NAME
+
+  if [ "$1" = "package" ]; then
+    echo "package"
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error: expected one of 'package' or '{', found '$1'"
+    echo " --> ${debug_file}:8:8"
+    echo "  |"
+    echo "8 | extern cavallo json;"
+    echo "  |        ^^^^^^^ expected one of 'crate' or '{'"
+    echo ""
+    echo "error: could not compile '${package_name}' due to previous error"
+  fi
 }
 
 legacy() {
