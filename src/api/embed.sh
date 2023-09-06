@@ -5,8 +5,8 @@ embed_file() {
 
   echo "$module_name() {"
   echo "  cat <<'EOF'"
-  cat "$module_file"
-  echo ""
+  #cat "$module_file" | tr -s '\n'
+  sed '/^[[:space:]]*$/d' "${module_file}"
   echo "EOF"
   echo "}"
 }
