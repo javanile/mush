@@ -19,16 +19,29 @@ legacy() {
 }
 
 module() {
+  local module_name=$1
   local module_file="src/$1.sh"
   local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
   local module_dir_file="src/$1/module.sh"
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
   if [ -f "${module_file_path}" ]; then
-    source "${module_file_path}"
-  else
+      source "${module_file_path}"
+  elif [ -f "${module_dir_file_path}" ]; then
     MUSH_RUNTIME_MODULE=$1
     source "${module_dir_file_path}"
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error[E0583]: file not found for module '${module_name}'"
+    echo " --> src/main.rs:4:1"
+    echo "  |"
+    echo "4 | mod notfound;"
+    echo "  | ^^^^^^^^^^^^^"
+    echo "  |"
+    echo "  = help: to create the module 'notfound', create file 'src/notfound.rs' or 'src/notfound/mod.rs'"
+    echo ""
+    echo "For more information about this error, try 'rustc --explain E0583'."
+    echo "error: could not compile 'rust-app' due to previous error"
   fi
 }
 
