@@ -4,7 +4,7 @@ Console is a simple Mush module that print amazing output in Rush-style!
 
 ## Installation
 
-To use MyRustModule, add it as a dependency in your `Manifest.toml`:
+To use Console, add it as a dependency in your `Manifest.toml`:
 
 ```toml
 [dependencies]
@@ -21,7 +21,7 @@ Console is incredibly easy to use. Simply follow these steps to get started:
 Here's a basic example of how to use MyRustModule in your Rust code:
 
 ```shell
-extern package console;
+extern package console
 
 main() {
     console_log "Hello World!"

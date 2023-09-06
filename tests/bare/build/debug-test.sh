@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 echo "==> Build Mush"
 cp target/debug/mush target/debug/mush.sh

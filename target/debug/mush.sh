@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -e
-MUSH_DEBUG_PATH=/Users/francescobianco/Develop/Javanile/mush
+MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
+
+extern() {
+  local a=1
+}
 
 legacy() {
   local legacy_file="target/debug/legacy/$1.sh"
@@ -51,5 +55,5 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
-source /Users/francescobianco/Develop/Javanile/mush/src/main.sh
+source /home/francesco/Develop/Javanile/mush/src/main.sh
 main "$@"

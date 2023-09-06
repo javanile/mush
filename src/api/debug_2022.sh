@@ -1,4 +1,8 @@
 
+extern() {
+  local a=1
+}
+
 legacy() {
   local legacy_file="target/debug/legacy/$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
