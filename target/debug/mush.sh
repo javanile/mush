@@ -1,17 +1,27 @@
 #!/usr/bin/env bash
 set -e
-
 MUSH_PACKAGE_NAME=mush
+MUSH_TARGET_PATH=/home/francesco/Develop/Javanile/mush/target/debug/
 MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
+
+debug_file() {
+  local previous_debug_file=$MUSH_DEBUG_FILE
+  MUSH_DEBUG_FILE=$1
+  source "$1"
+  MUSH_DEBUG_FILE=$previous_debug_file
+}
 
 extern() {
   local debug_file=$MUSH_DEBUG_FILE
-  local package_name=$MUSH_PACKAGE_NAME
-  local extern_package_name=$2
 
   if [ "$1" = "package" ]; then
-    if [ -d "ciccio" ]; then
-      echo "package"
+    local package_name=$MUSH_PACKAGE_NAME
+    local extern_package_name=$2
+    local extern_package_path="${MUSH_DEBUG_PATH}/packages/${extern_package_name}"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+
+    if [ -d "${extern_package_path}" ]; then
+      debug_file "${extern_package_lib_file}"
     else
       echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
       echo "error[E0463]: can't find package for '${extern_package_name}'"
@@ -33,6 +43,7 @@ extern() {
     echo "  |        ^^^^^^^ expected one of 'package' or '{'"
     echo ""
     echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
   fi
 }
 
@@ -74,6 +85,7 @@ module() {
     echo ""
     echo "For more information about this error, try 'mush explain E0583'."
     echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
   fi
 }
 
@@ -100,7 +112,7 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
-
+## BP001: Appending entrypoint to debug build
 MUSH_DEBUG_FILE=src/main.sh
 source /home/francesco/Develop/Javanile/mush/src/main.sh
 main "$@"

@@ -1,4 +1,11 @@
 
+debug_file() {
+  local previous_debug_file=$MUSH_DEBUG_FILE
+  MUSH_DEBUG_FILE=$1
+  source "$1"
+  MUSH_DEBUG_FILE=$previous_debug_file
+}
+
 extern() {
   local debug_file=$MUSH_DEBUG_FILE
 
@@ -6,9 +13,10 @@ extern() {
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
     local extern_package_path="${MUSH_DEBUG_PATH}/packages/${extern_package_name}"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
 
     if [ -d "${extern_package_path}" ]; then
-      echo "package"
+      debug_file "${extern_package_lib_file}"
     else
       echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
       echo "error[E0463]: can't find package for '${extern_package_name}'"
