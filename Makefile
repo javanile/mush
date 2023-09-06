@@ -92,3 +92,6 @@ test-package-manager-git:
 test-basic-app:
 	@bash tests/bare/basic-app-test.sh
 
+test-build-rust-app:
+	@bash tests/bare/build/rust-app-test.sh
+
