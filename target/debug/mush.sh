@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 set -e
+
+MUSH_PACKAGE_NAME=mush
 MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
 
 extern() {
@@ -25,6 +27,7 @@ module() {
   local module_dir_file="src/$1/module.sh"
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
   local debug_file=$MUSH_DEBUG_FILE
+  local package_name=$MUSH_PACKAGE_NAME
 
   if [ -f "${module_file_path}" ]; then
     source "${module_file_path}"
@@ -41,8 +44,8 @@ module() {
     echo "  |"
     echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
     echo ""
-    echo "For more information about this error, try 'rustc --explain E0583'."
-    echo "error: could not compile 'rust-app' due to previous error"
+    echo "For more information about this error, try 'mush explain E0583'."
+    echo "error: could not compile '${package_name}' due to previous error"
   fi
 }
 

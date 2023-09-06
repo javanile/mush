@@ -1,13 +1,13 @@
 
 extern package console
-extern package getoptions
 
 module api
 module commands
-module console
 module package_managers
 module registry
 module tasks
+
+legacy getoptions
 
 VERSION="Mush 0.1.0 (2022-11-29)"
 

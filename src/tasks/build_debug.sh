@@ -12,6 +12,8 @@ exec_build_debug() {
   echo "#!/usr/bin/env bash" > $build_file
   echo "set -e" >> $build_file
 
+  echo "MUSH_PACKAGE_NAME=${name}" >> $build_file
+
   MUSH_DEBUG_PATH=${PWD}
   echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> $build_file
 
