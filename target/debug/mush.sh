@@ -112,6 +112,7 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
+
 ## BP001: Appending entrypoint to debug build
 debug_file /home/francesco/Develop/Javanile/mush/src/main.sh
 main "$@"

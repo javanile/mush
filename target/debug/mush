@@ -1,8 +1,10 @@
 #!/usr/bin/env bash
 set -e
+## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME=mush
 MUSH_TARGET_PATH=/home/francesco/Develop/Javanile/mush/target/debug/
 MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
+## BP003: Embedding debug api
 
 debug_file() {
   local previous_debug_file=$MUSH_DEBUG_FILE
@@ -112,6 +114,7 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
+
 ## BP001: Appending entrypoint to debug build
 debug_file /home/francesco/Develop/Javanile/mush/src/main.sh
 main "$@"
