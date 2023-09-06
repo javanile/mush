@@ -10,6 +10,13 @@ build-dist:
 	@mush build -v --target dist
 
 ## ====
+## Prod
+## ====
+
+install:
+	@install -m 0755 -d target/dist/mush /usr/local/bin/
+
+## ====
 ## Test
 ## ====
 
@@ -81,3 +88,7 @@ test-registry-github:
 
 test-package-manager-git:
 	@bash tests/bare/package_managers/git-test.sh
+
+test-basic-app:
+	@bash tests/bare/basic-app-test.sh
+
