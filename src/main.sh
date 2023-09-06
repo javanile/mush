@@ -1,5 +1,6 @@
 
 extern package console
+extern package json
 
 module api
 module commands

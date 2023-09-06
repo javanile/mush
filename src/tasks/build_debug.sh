@@ -21,8 +21,7 @@ exec_build_debug() {
   debug_2022 >> $build_file
 
   echo "## BP001: Appending entrypoint to debug build" >> $build_file
-  echo "MUSH_DEBUG_FILE=src/main.sh" >> $build_file
-  echo "source ${MUSH_DEBUG_PATH}/src/main.sh" >> $build_file
+  echo "debug_file ${MUSH_DEBUG_PATH}/src/main.sh" >> $build_file
   echo "main \"\$@\"" >> $build_file
 
   mv "$build_file" "$final_file"

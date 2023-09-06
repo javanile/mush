@@ -17,7 +17,7 @@ extern() {
   if [ "$1" = "package" ]; then
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
-    local extern_package_path="${MUSH_DEBUG_PATH}/packages/${extern_package_name}"
+    local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
     local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
 
     if [ -d "${extern_package_path}" ]; then
@@ -113,6 +113,5 @@ embed() {
   eval "$(embed_file "$1" "${module_file_path}")"
 }
 ## BP001: Appending entrypoint to debug build
-MUSH_DEBUG_FILE=src/main.sh
-source /home/francesco/Develop/Javanile/mush/src/main.sh
+debug_file /home/francesco/Develop/Javanile/mush/src/main.sh
 main "$@"
