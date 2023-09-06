@@ -5,7 +5,7 @@
 
 //mod mod1;
 
-extern cavallo json;
+extern crate cavallo;
 
 
 //use package::mod1::hello;

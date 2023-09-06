@@ -1,5 +1,5 @@
 
-extern package1 console
+extern package console
 
 module api
 module commands
