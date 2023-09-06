@@ -15,6 +15,8 @@ compile_file() {
 
   compile_scan_module "${src_file}" "${build_file}"
 
+  compile_scan_extern_package "${src_file}" "${build_file}"
+
   compile_scan_embed "${src_file}" "${build_file}"
 
   return 0
@@ -91,6 +93,31 @@ compile_scan_module() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      exit 101
+    fi
+  done
+
+  return 0
+}
+
+compile_scan_extern_package() {
+  local src_file=$1
+  local build_file=$2
+  local module_dir=$(dirname $src_file)
+  local extern_package_dir=target/dist
+
+  grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    local package_name=$(echo "${line#*package}" | xargs)
+    local package_file="${extern_package_dir}/packages/${package_name}/lib.sh"
+    if [ -e "${package_file}" ]; then
+      console_info "Import" "file '${package_file}' as package file"
+      if [ -n "${build_file}" ]; then
+        cat "${package_file}" >> "${build_file}"
+      fi
+    else
+      error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
+      #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
+      #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
       exit 101
     fi
   done

@@ -6,6 +6,7 @@ embed_file() {
   echo "$module_name() {"
   echo "  cat <<'EOF'"
   cat "$module_file"
+  echo ""
   echo "EOF"
   echo "}"
 }

@@ -10,6 +10,13 @@ build-dist:
 	@mush build -v --target dist
 
 ## ====
+## Prod
+## ====
+
+install:
+	@install -m 0755 -d target/dist/mush /usr/local/bin/
+
+## ====
 ## Test
 ## ====
 
@@ -58,10 +65,13 @@ test-build-debug-basic-app:
 test-api-embed:
 	@bash tests/bare/api/embed-test.sh
 
+test-cross-build:
+	@bash tests/bare/build/cross-test.sh
+
 test-auto-build-debug-debug:
 	@bash tests/bare/build/auto-debug-debug-test.sh
 
-test-auto-build-debug-dist:
+test-auto-build-debug-dist: test-auto-build-debug-debug
 	@bash tests/bare/build/auto-debug-dist-test.sh
 
 test-auto-build-dist-debug:
@@ -81,3 +91,9 @@ test-registry-github:
 
 test-package-manager-git:
 	@bash tests/bare/package_managers/git-test.sh
+
+test-basic-app:
+	@bash tests/bare/basic-app-test.sh
+
+test-build-rust-app:
+	@bash tests/bare/build/rust-app-test.sh

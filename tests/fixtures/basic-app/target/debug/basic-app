@@ -1,6 +1,53 @@
 #!/usr/bin/env bash
 set -e
-MUSH_DEBUG_PATH=/Users/francescobianco/Develop/Javanile/mush/tests/fixtures/basic-app
+## BP002: Package and debug variables 
+MUSH_PACKAGE_NAME=basic-app
+MUSH_TARGET_PATH=/home/francesco/Develop/Javanile/mush/tests/fixtures/basic-app/target/debug/
+MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush/tests/fixtures/basic-app
+## BP003: Embedding debug api
+
+debug_file() {
+  local previous_debug_file=$MUSH_DEBUG_FILE
+  MUSH_DEBUG_FILE=$1
+  source "$1"
+  MUSH_DEBUG_FILE=$previous_debug_file
+}
+
+extern() {
+  local debug_file=$MUSH_DEBUG_FILE
+
+  if [ "$1" = "package" ]; then
+    local package_name=$MUSH_PACKAGE_NAME
+    local extern_package_name=$2
+    local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+
+    if [ -d "${extern_package_path}" ]; then
+      debug_file "${extern_package_lib_file}"
+    else
+      echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+      echo "error[E0463]: can't find package for '${extern_package_name}'"
+      echo " --> ${debug_file}:8:1"
+      echo "  |"
+      echo "8 | extern crate cavallo;"
+      echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
+      echo ""
+      echo "For more information about this error, try 'mush explain E0463'."
+      echo "error: could not compile '${package_name}' due to previous error"
+      exit 1
+    fi
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error: expected one of 'package' or '{', found '$1'"
+    echo " --> ${debug_file}:8:8"
+    echo "  |"
+    echo "8 | extern cavallo json;"
+    echo "  |        ^^^^^^^ expected one of 'package' or '{'"
+    echo ""
+    echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
+  fi
+}
 
 legacy() {
   local legacy_file="target/debug/legacy/$1.sh"
@@ -15,16 +62,32 @@ legacy() {
 }
 
 module() {
+  local module_name=$1
   local module_file="src/$1.sh"
   local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
   local module_dir_file="src/$1/module.sh"
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+  local debug_file=$MUSH_DEBUG_FILE
+  local package_name=$MUSH_PACKAGE_NAME
 
   if [ -f "${module_file_path}" ]; then
     source "${module_file_path}"
-  else
+  elif [ -f "${module_dir_file_path}" ]; then
     MUSH_RUNTIME_MODULE=$1
     source "${module_dir_file_path}"
+  else
+    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+    echo "error[E0583]: file not found for module '${module_name}'"
+    echo " --> ${debug_file}:4:1"
+    echo "  |"
+    echo "4 | mod notfound;"
+    echo "  | ^^^^^^^^^^^^^"
+    echo "  |"
+    echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
+    echo ""
+    echo "For more information about this error, try 'mush explain E0583'."
+    echo "error: could not compile '${package_name}' due to previous error"
+    exit 1
   fi
 }
 
@@ -51,5 +114,7 @@ embed() {
 
   eval "$(embed_file "$1" "${module_file_path}")"
 }
-source /Users/francescobianco/Develop/Javanile/mush/tests/fixtures/basic-app/src/main.sh
+
+## BP001: Appending entrypoint to debug build
+debug_file /home/francesco/Develop/Javanile/mush/tests/fixtures/basic-app/src/main.sh
 main "$@"

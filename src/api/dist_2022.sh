@@ -1,4 +1,8 @@
 
+extern() {
+  extern=$1
+}
+
 legacy() {
   legacy=$1
 }
