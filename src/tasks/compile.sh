@@ -7,6 +7,7 @@ compile_file() {
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
+    #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
 
   compile_scan_legacy "${src_file}" "${build_file}"
@@ -35,7 +36,8 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
-        cat "${legacy_file}" >> "${build_file}"
+        #cat "${legacy_file}" >> "${build_file}"
+        sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
@@ -112,7 +114,8 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
-        cat "${package_file}" >> "${build_file}"
+        #cat "${package_file}" >> "${build_file}"
+        sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"

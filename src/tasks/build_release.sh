@@ -1,5 +1,5 @@
 
-exec_build_dist() {
+exec_build_release() {
   name=$MUSH_PACKAGE_NAME
 
   #echo "NAME: $name"

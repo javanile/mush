@@ -1,6 +1,6 @@
 
 public build_debug
-public build_dist
+public build_release
 public init
 public install
 public legacy_fetch

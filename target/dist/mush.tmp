@@ -106,10 +106,8 @@ getoptions() {
 	_flags='' _nflags='' _opts='' _help='' _abbr='' _cmds='' _init=@empty IFS=' '
 	[ $# -lt 2 ] && set -- "${1:?No parser definition}" -
 	[ "$2" = - ] && _def=getoptions_parse
-
 	i='					'
 	while eval "_${#i}() { echo \"$i\$@\"; }"; [ "$i" ]; do i=${i#?}; done
-
 	quote() {
 		q="$2'" r=''
 		while [ "$q" ]; do r="$r${q%%\'*}'\''" && q=${q#*\'}; done
@@ -123,13 +121,11 @@ getoptions() {
 	sw() { sw="$sw${sw:+|}$1"; }
 	kv() { eval "${2-}${1%%:*}=\${1#*:}"; }
 	loop() { [ $# -gt 1 ] && [ "$2" != -- ]; }
-
 	invoke() { eval '"_$@"'; }
 	prehook() { invoke "$@"; }
 	for i in setup flag param option disp msg; do
 		eval "$i() { prehook $i \"\$@\"; }"
 	done
-
 	args() {
 		on=$_on no=$_no export=$_export init=$_init _hasarg=$1 && shift
 		while loop "$@" && shift; do
@@ -162,17 +158,14 @@ getoptions() {
 	_option() { args 1 "$@"; defvar "$@"; }
 	_disp() { args '' "$@"; }
 	_msg() { args '' _ "$@"; }
-
 	cmd() { _mode=@ _cmds="$_cmds${_cmds:+|}'$1'"; }
 	"$@"
 	cmd() { :; }
 	_0 "${_rest:?}=''"
-
 	_0 "${_def:-$2}() {"
 	_1 'OPTIND=$(($#+1))'
 	_1 'while OPTARG= && [ $# -gt 0 ]; do'
 	[ "$_abbr" ] && getoptions_abbr "$@"
-
 	args() {
 		sw='' validate='' pattern='' counter='' on=$_on no=$_no export=$_export
 		while loop "$@" && shift; do
@@ -232,7 +225,6 @@ getoptions() {
 		_4 'exit 0 ;;'
 	}
 	_msg() { :; }
-
 	[ "$_alt" ] && _2 'case $1 in -[!-]?*) set -- "-$@"; esac'
 	_2 'case $1 in'
 	_wa() { _4 "eval 'set -- $1' \${1+'\"\$@\"'}"; }
@@ -293,7 +285,6 @@ getoptions() {
 	_1 'echo "$1" >&2'
 	_1 'exit 1'
 	_0 '}'
-
 	[ "$_help" ] && eval "shift 2; getoptions_help $1 $_help" ${3+'"$@"'}
 	[ "$_def" ] && _0 "eval $_def \${1+'\"\$@\"'}; eval set -- \"\${$_rest}\""
 	_0 '# Do not execute' # exit 1
@@ -317,7 +308,6 @@ getoptions_abbr() {
 			esac
 		done
 		[ "$abbr" ] || return 0
-
 		for i; do
 			case $i in
 				--) break ;;
@@ -357,11 +347,9 @@ getoptions_abbr() {
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions_help() {
 	_width='30,12' _plus='' _leading='  '
-
 	pad() { p=$2; while [ ${#p} -lt "$3" ]; do p="$p "; done; eval "$1=\$p"; }
 	kv() { eval "${2-}${1%%:*}=\${1#*:}"; }
 	sw() { pad sw "$sw${sw:+, }" "$1"; sw="$sw$2"; }
-
 	args() {
 		_type=$1 var=${2%% *} sw='' label='' hidden='' && shift 2
 		while [ $# -gt 0 ] && i=$1 && shift && [ "$i" != -- ]; do
@@ -373,7 +361,6 @@ getoptions_help() {
 			esac
 		done
 		[ "$hidden" ] && return 0 || len=${_width%,*}
-
 		[ "$label" ] || case $_type in
 			setup | msg) label='' len=0 ;;
 			flag | disp) label="$sw " ;;
@@ -387,11 +374,9 @@ getoptions_help() {
 		pad label '' "$len"
 		for i; do echo "$label$i"; done
 	}
-
 	for i in setup flag param option disp 'msg -' cmd; do
 		eval "${i% *}() { args $i \"\$@\"; }"
 	done
-
 	echo "$2() {"
 	echo "cat<<'GETOPTIONSHERE'"
 	"$@"
@@ -564,10 +549,12 @@ parser_definition_build() {
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
 	msg    -- 'OPTIONS:'
-  flag   VERBOSE      -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET        -q --quiet                        -- "Do not print cargo log messages"
-  param  BUILD_TARGET -t --target                       -- "Build for the specific target"
-	disp   :usage       -h --help                         -- "Print help information"
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_build() {
@@ -575,7 +562,13 @@ run_build() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
+  MUSH_BUILD_MODE=debug
+  MUSH_TARGET_DIR=target/debug
+  if [ -n "${BUILD_RELEASE}" ]; then
+    MUSH_BUILD_MODE=release
+    MUSH_TARGET_DIR=target/release
+  fi
+
   MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
   mkdir -p "${MUSH_DEPS_DIR}"
 
@@ -592,10 +585,14 @@ run_build() {
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
-  if [ "$BUILD_TARGET" = "dist" ]; then
-    exec_build_dist "$@"
+  if [ -n "${BUILD_RELEASE}" ]; then
+    exec_build_release "$@"
   else
-    exec_build_debug "$@"
+    if [ "$BUILD_TARGET" = "dist" ]; then
+      exec_build_release "$@"
+    else
+      exec_build_debug "$@"
+    fi
   fi
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
@@ -895,7 +892,7 @@ github_get_release_id() {
 }
 
 public build_debug
-public build_dist
+public build_release
 public init
 public install
 public legacy_fetch
@@ -938,7 +935,7 @@ exec_build_debug() {
   chmod +x "${final_file}"
 }
 
-exec_build_dist() {
+exec_build_release() {
   name=$MUSH_PACKAGE_NAME
 
   #echo "NAME: $name"
@@ -1160,6 +1157,7 @@ compile_file() {
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
+    #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
 
   compile_scan_legacy "${src_file}" "${build_file}"
@@ -1188,7 +1186,8 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
-        cat "${legacy_file}" >> "${build_file}"
+        #cat "${legacy_file}" >> "${build_file}"
+        sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
     elif [ -e "${legacy_dir_file}" ]; then
       console_info "Legacy" "file '${public_dir_file}' as directory module file"
@@ -1265,7 +1264,8 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
-        cat "${package_file}" >> "${build_file}"
+        #cat "${package_file}" >> "${build_file}"
+        sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
@@ -1399,7 +1399,6 @@ process_dev_dependencies_build() {
     fi
   done
 }
-
 # FATAL
 # ERROR
 # WARNING
@@ -1407,7 +1406,6 @@ process_dev_dependencies_build() {
 # DEBUG
 # TRACE
 # SUCCESS
-
 case "$(uname -s)" in
   Darwin*)
     ESCAPE='\x1B'
@@ -1416,35 +1414,27 @@ case "$(uname -s)" in
     ESCAPE='\e'
     ;;
 esac
-
 #CONSOLE_INDENT="${ESCAPE}[1;33m{Mush}${ESCAPE}[0m"
-
 console_pad() {
   [ "$#" -gt 1 ] && [ -n "$2" ] && printf "%$2.${2#-}s" "$1"
 }
-
 console_log() {
   console_print "$1" "$2"
 }
-
 console_info() {
   if [ "${VERBOSE}" -gt "0" ]; then
     console_print "${ESCAPE}[1;36m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
   fi
 }
-
 console_warning() {
   console_print "${ESCAPE}[1;33m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
 }
-
 console_status() {
   console_print "${ESCAPE}[1;32m$(console_pad "$1" 12)${ESCAPE}[0m" "$2"
 }
-
 console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
 }
-
 console_print() {
   if [ -z "${QUIET}" ]; then
     echo -e "$1 $2" >&2

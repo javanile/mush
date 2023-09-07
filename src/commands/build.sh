@@ -5,10 +5,12 @@ parser_definition_build() {
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
 	msg    -- 'OPTIONS:'
-  flag   VERBOSE      -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET        -q --quiet                        -- "Do not print cargo log messages"
-  param  BUILD_TARGET -t --target                       -- "Build for the specific target"
-	disp   :usage       -h --help                         -- "Print help information"
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_build() {
@@ -16,7 +18,13 @@ run_build() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_TARGET_DIR=target/${BUILD_TARGET:-debug}
+  MUSH_BUILD_MODE=debug
+  MUSH_TARGET_DIR=target/debug
+  if [ -n "${BUILD_RELEASE}" ]; then
+    MUSH_BUILD_MODE=release
+    MUSH_TARGET_DIR=target/release
+  fi
+
   MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
   mkdir -p "${MUSH_DEPS_DIR}"
 
@@ -33,10 +41,14 @@ run_build() {
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
-  if [ "$BUILD_TARGET" = "dist" ]; then
-    exec_build_dist "$@"
+  if [ -n "${BUILD_RELEASE}" ]; then
+    exec_build_release "$@"
   else
-    exec_build_debug "$@"
+    if [ "$BUILD_TARGET" = "dist" ]; then
+      exec_build_release "$@"
+    else
+      exec_build_debug "$@"
+    fi
   fi
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
