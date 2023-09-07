@@ -579,6 +579,7 @@ public legacy
 public new
 public run
 public publish
+public uninstall
 
 test0 () {
   echo "TEST"
@@ -864,6 +865,30 @@ run_publish() {
   exec_publish
 }
 
+parser_definition_uninstall() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_uninstall() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+
+  cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
+}
+
 public apt
 public basher
 public bpkg
@@ -1063,8 +1088,13 @@ exec_init() {
 }
 
 exec_install() {
-  local bin_file=/usr/local/bin/mush
-  local final_file=target/dist/mush
+  local package_name=$MUSH_PACKAGE_NAME
+  local package_version=$MUSH_PACKAGE_VERSION
+  local bin_name=$MUSH_PACKAGE_NAME
+  local pwd=$PWD
+
+  local bin_file=/usr/local/bin/${bin_name}
+  local final_file=target/dist/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -1073,14 +1103,19 @@ exec_install() {
       chmod="sudo ${chmod}"
   fi
 
-  ${cp} ${final_file} ${bin_file}
-  ${chmod} +x ${bin_file}
+  ${cp} "${final_file}" "${bin_file}"
+  ${chmod} +x "${bin_file}"
 
-  echo "Finished release [optimized] target(s) in 0.18s"
-  echo "Installing /home/francesco/.cargo/bin/cask"
-  echo "Installed package 'cask-cli v0.1.0 (/home/francesco/Develop/Javanile/rust-cask)' (executable 'cask')"
+  console_status "Finished" "release [optimized] target(s) in 0.18s"
+
+  if [ -f "${bin_file}" ]; then
+    console_status "Replacing" "${bin_file}"
+    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+  else
+    console_status "Installing" "${bin_file}"
+    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+  fi
 }
-
 
 exec_legacy_fetch() {
   local target_dir=$1

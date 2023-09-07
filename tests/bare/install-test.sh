@@ -7,5 +7,5 @@ bash target/dist/mush.sh -vv build
 
 echo "==> Test: install command"
 cd tests/fixtures/complex-app
-bash -x ../../../target/dist/mush.sh install
+bash ../../../target/dist/mush.sh install
 complex-app --version
