@@ -109,3 +109,6 @@ test-build-rust-lib:
 
 test-build-console-lib: build-dist sudo-install
 	@cd packages/console && mush build --release --lib
+
+test-build-empty-app: build-dist sudo-install
+	@bash tests/bare/build/empty-app-test.sh

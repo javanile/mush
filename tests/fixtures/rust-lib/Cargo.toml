@@ -8,7 +8,6 @@ edition = "2021"
 #[badges]
 #travis-ci = { repository = "https://travis-ci.org/javanile/cask" }
 
-
 #[build-dependencies]
 #build-target = "0.4.0"
 #bindgen = "0.60.1"
@@ -21,4 +20,3 @@ edition = "2021"
 #clap = { version = "4.0.18", features = ["derive"] }
 #serde = { version = "1.0.145", features = ["derive"] }
 #serde_yaml = "0.9.13"
-
