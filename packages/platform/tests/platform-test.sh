@@ -1,3 +1,1 @@
-
-echo "\$SHELL = $SHELL"
-
+echo "\$SHELL = '$SHELL'"
