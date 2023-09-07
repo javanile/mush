@@ -20,5 +20,11 @@ run_check() {
 
   exec_manifest_lookup
 
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Checking" "${package_name} v${package_version} (${pwd})"
+
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }

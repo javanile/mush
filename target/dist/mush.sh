@@ -47,6 +47,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
+  cmd   check -- "Analyze the current package and report errors, but don't build object files"
   cmd   init -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
@@ -76,6 +77,9 @@ main() {
     case $cmd in
       build)
         run_build "$@"
+        ;;
+      check)
+        run_check "$@"
         ;;
       init)
         run_init "$@"
@@ -533,6 +537,7 @@ error_package_not_found() {
 
 public add
 public build
+public check
 public init
 public install
 public legacy
@@ -594,6 +599,36 @@ run_build() {
       exec_build_debug "$@"
     fi
   fi
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
+}
+
+parser_definition_check() {
+	setup   REST help:usage abbr:true -- "Check a local package and all of its dependencies for errors" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} check [OPTIONS]" ''
+
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_check() {
+  eval "$(getoptions parser_definition_check parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Checking" "${package_name} v${package_version} (${pwd})"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
@@ -1068,6 +1103,11 @@ exec_manifest_lookup() {
 
   if [ -z "$MUSH_PACKAGE_VERSION" ]; then
     console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
+    exit 101
+  fi
+
+  if [ ! -f "${MUSH_MANIFEST_DIR}/src/lib.sh" ] && [ ! -f "${MUSH_MANIFEST_DIR}/src/main.sh" ]; then
+    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
 }
