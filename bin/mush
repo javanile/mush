@@ -723,7 +723,7 @@ run_install() {
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  exec_build_dist "$@"
+  exec_build_release "$@"
 
   exec_install
 }
@@ -859,7 +859,7 @@ run_publish() {
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  exec_build_dist "$@"
+  exec_build_release "$@"
 
   exec_publish
 }
@@ -1058,6 +1058,8 @@ exec_init() {
     echo "  echo \"Hello World!\"" >> ${main_file}
     echo "}" >> ${main_file}
   fi
+
+  console_status "Created" "binary (application) package"
 }
 
 exec_install() {
