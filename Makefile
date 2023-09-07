@@ -9,6 +9,9 @@
 build-dist:
 	@mush build -v --target dist
 
+release:
+	@mush build -v --release
+
 ## ====
 ## Prod
 ## ====

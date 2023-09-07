@@ -3,8 +3,8 @@ set -e
 
 ## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME=mush
-MUSH_TARGET_PATH=/Users/francescobianco/Develop/Javanile/mush/target/debug/
-MUSH_DEBUG_PATH=/Users/francescobianco/Develop/Javanile/mush
+MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
+MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
 
 ## BP003: Embedding debug api
 debug_file() {
@@ -97,5 +97,5 @@ embed() {
 }
 
 ## BP001: Appending entrypoint to debug build
-debug_file /Users/francescobianco/Develop/Javanile/mush/src/main.sh
+debug_file "${MUSH_DEBUG_PATH}/src/main.sh"
 main "$@"
