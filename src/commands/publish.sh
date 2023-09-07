@@ -6,7 +6,9 @@ parser_definition_publish() {
 
 	msg     -- 'OPTIONS:'
 	flag    FLAG_C       -c --flag-c
+	flag    ALLOW_DIRTY  --allow-dirty  -- "Build artifacts in release mode, with optimizations"
 	param   MODULE_NAME  -n --name
+
 	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
@@ -17,7 +19,7 @@ run_publish() {
   eval "set -- $REST"
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
+  echo "ALLOW_DIRTY: $ALLOW_DIRTY"
 
   MUSH_TARGET_DIR=target/dist
 

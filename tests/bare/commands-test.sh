@@ -32,4 +32,30 @@ bash ../../../target/debug/mush.sh install
 cd ../../..
 echo ""
 
+echo "==> Test: legacy"
+cd tests/fixtures/zsh-app
+bash ../../../target/debug/mush.sh legacy https://raw.githubusercontent.com/molovo/crash/master/crash
+cd ../../..
+echo ""
+
+echo "==> Test: new"
+rm -fr tests/tmp/new-package && true
+mkdir -p tests/tmp
+cd tests/tmp
+bash ../../target/debug/mush.sh new new-package
+cd ../..
+echo ""
+
+echo "==> Test: run"
+cd tests/fixtures/complex-app
+bash ../../../target/debug/mush.sh run
+cd ../../..
+echo ""
+
+echo "==> Test: publish"
+cd tests/fixtures/complex-app
+bash ../../../target/debug/mush.sh publish --allow-dirty
+cd ../../..
+echo ""
+
 echo "(done)"

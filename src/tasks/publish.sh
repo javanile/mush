@@ -1,7 +1,8 @@
 
 exec_publish() {
-  local bin_file=/usr/local/bin/mush
-  local final_file=target/dist/mush
+  local bin_name=${MUSH_PACKAGE_NAME}
+  local bin_file=/usr/local/bin/${bin_name}
+  local final_file=target/dist/${bin_name}
   local package_name="${MUSH_PACKAGE_NAME}"
   local release_tag="${MUSH_PACKAGE_VERSION}"
 
@@ -13,6 +14,11 @@ exec_publish() {
   ## TODO: add the following message when no stuff
   # warning: manifest has no documentation, homepage or repository.
   # See https://mush.javanile.org/manifest.html#package-metadata for more info.
+
+  if [ -n "${ALLOW_DIRTY}" ]; then
+    git add .
+    git commit -am "Allow dirty"
+  fi
 
   if [ ! -z "$(git status --porcelain)" ]; then
     local changed_files="$(git status -s | cut -c4-)"

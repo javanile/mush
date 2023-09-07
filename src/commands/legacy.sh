@@ -32,8 +32,12 @@ run_legacy() {
 
     if grep -q "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml"; then
         legacy_line=$(grep -n -m 1 "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml" | cut -d: -f1)
+        legacy_tail=$(expr ${legacy_line} + 1)
         echo "The section '[legacy]' exists in the INI file at ${legacy_line}."
-        sed -i "$((legacy_line+1))i${module_name} = \"${module_url}\"" "$MUSH_MANIFEST_DIR/Manifest.toml"
+        head -n ${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml" > "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        tail -n +${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        mv "$MUSH_MANIFEST_DIR/Manifest.toml.tmp" "$MUSH_MANIFEST_DIR/Manifest.toml"
     else
       echo "[legacy]" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
       echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
