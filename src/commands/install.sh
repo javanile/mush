@@ -26,7 +26,7 @@ run_install() {
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  exec_build_dist "$@"
+  exec_build_release "$@"
 
   exec_install
 }

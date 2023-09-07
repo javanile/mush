@@ -22,4 +22,6 @@ exec_init() {
     echo "  echo \"Hello World!\"" >> ${main_file}
     echo "}" >> ${main_file}
   fi
+
+  console_status "Created" "binary (application) package"
 }

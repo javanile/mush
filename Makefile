@@ -118,3 +118,6 @@ test-build-basic-app:
 
 test-command:
 	@bash tests/bare/command-test.sh
+
+test-commands:
+	@bash tests/bare/commands-test.sh
