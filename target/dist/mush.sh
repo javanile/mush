@@ -1,30 +1,23 @@
 #!/usr/bin/env bash
 set -e
-
 extern() {
   extern=$1
 }
-
 legacy() {
   legacy=$1
 }
-
 module() {
   module=$1
 }
-
 public() {
   public=$1
 }
-
 use() {
   use=$1
 }
-
 embed() {
   embed=$1
 }
-
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -39,7 +32,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.0 (2022-11-29)"
+VERSION="Mush 0.1.0 (2023-09-07)"
 
 parser_definition() {
   setup REST help:usage abbr:true -- "Shell's build system" ''
@@ -415,32 +408,28 @@ embed_file() {
   local module_name=$1
   local module_file=$2
 
-  echo "$module_name() {"
+  echo "${module_name}() {"
   echo "  cat <<'EOF'"
-  cat "$module_file"
-  echo ""
+  #cat "$module_file" | tr -s '\n'
+  sed '/^[[:space:]]*$/d' "${module_file}"
   echo "EOF"
   echo "}"
 }
 debug_2022() {
   cat <<'EOF'
-
 debug_file() {
   local previous_debug_file=$MUSH_DEBUG_FILE
   MUSH_DEBUG_FILE=$1
   source "$1"
   MUSH_DEBUG_FILE=$previous_debug_file
 }
-
 extern() {
   local debug_file=$MUSH_DEBUG_FILE
-
   if [ "$1" = "package" ]; then
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
     local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
     local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
-
     if [ -d "${extern_package_path}" ]; then
       debug_file "${extern_package_lib_file}"
     else
@@ -460,19 +449,15 @@ extern() {
     exit 1
   fi
 }
-
 legacy() {
   local legacy_file="target/debug/legacy/$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
-
   if [ ! -f "$legacy_file_path" ]; then
     echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
     exit 101
   fi
-
   source "${legacy_file_path}"
 }
-
 module() {
   local module_name=$1
   local module_file="src/$1.sh"
@@ -481,7 +466,6 @@ module() {
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
   local debug_file=$MUSH_DEBUG_FILE
   local package_name=$MUSH_PACKAGE_NAME
-
   if [ -f "${module_file_path}" ]; then
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
@@ -502,60 +486,47 @@ module() {
     exit 1
   fi
 }
-
 public() {
   local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
   local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
   local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
   local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
-
   if [ -f "${module_file_path}" ]; then
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
   fi
 }
-
 use() {
   source src/assets/server.sh
 }
-
 embed() {
   local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
   local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
-
   eval "$(embed_file "$1" "${module_file_path}")"
 }
-
 EOF
 }
 dist_2022() {
   cat <<'EOF'
-
 extern() {
   extern=$1
 }
-
 legacy() {
   legacy=$1
 }
-
 module() {
   module=$1
 }
-
 public() {
   public=$1
 }
-
 use() {
   use=$1
 }
-
 embed() {
   embed=$1
 }
-
 EOF
 }
 
@@ -791,7 +762,7 @@ run_run() {
 
   console_status "Running" "'${bin_file}'"
 
-  exec "$bin_file"
+  exec "$bin_file" "$@"
 }
 
 parser_definition_publish() {
@@ -946,22 +917,24 @@ exec_build_debug() {
 
   echo "#!/usr/bin/env bash" > "${build_file}"
   echo "set -e" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "## BP002: Package and debug variables " >> "${build_file}"
   MUSH_DEBUG_PATH=${PWD}
+  echo "## BP002: Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=${name}" >> "${build_file}"
   echo "MUSH_TARGET_PATH=${PWD}/target/debug/" >> "${build_file}"
   echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
+  echo "" >> "${build_file}"
 
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
+  echo "" >> "${build_file}"
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug_file ${MUSH_DEBUG_PATH}/src/main.sh" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
-
   chmod +x "${final_file}"
 }
 

@@ -14,7 +14,10 @@ build-dist:
 ## ====
 
 install:
-	@install -m 0755 -d target/dist/mush /usr/local/bin/
+	@install -m 0755 target/dist/mush /usr/local/bin/
+
+sudo-install:
+	@sudo install -m 0755 target/dist/mush /usr/local/bin/
 
 ## ====
 ## Test
@@ -97,3 +100,9 @@ test-basic-app:
 
 test-build-rust-app:
 	@bash tests/bare/build/rust-app-test.sh
+
+test-build-rust-lib:
+	@bash tests/bare/build/rust-lib-test.sh
+
+test-build-console-lib: build-dist sudo-install
+	@cd packages/console && mush build --release --lib

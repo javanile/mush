@@ -1,0 +1,4 @@
+
+fn hello() {
+  println!("Hello")
+}
