@@ -105,4 +105,4 @@ test-build-rust-lib:
 	@bash tests/bare/build/rust-lib-test.sh
 
 test-build-console-lib: build-dist sudo-install
-	@cd packages/console && mush build --lib
+	@cd packages/console && mush build --release --lib
