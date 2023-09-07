@@ -4,6 +4,6 @@
 ##
 ## This file lists all the packages that will be installed or updated during
 
-package console https://github.com/javanile/mush.git packages/console
-
 index https://github.com/francescobianco/mush-packages.git
+
+package console https://github.com/javanile/mush.git packages/console
