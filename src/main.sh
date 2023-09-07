@@ -14,7 +14,7 @@ legacy getoptions
 VERSION="Mush 0.1.0 (2023-09-07)"
 
 parser_definition() {
-  setup REST help:usage abbr:true -- "Shell's build system" ''
+  setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
 
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
@@ -33,6 +33,17 @@ parser_definition() {
   cmd   new -- "Create a new Mush package"
   cmd   run -- "Run a binary or example of the local package"
   cmd   publish -- "Package and upload this package to the registry"
+}
+
+args_error() {
+  case "$2" in
+    notcmd)
+      console_error "no such command: '$3'\n\n\tView all available commands with 'mush --help'"
+      ;;
+    *)
+      echo "ERROR: ($2) $1"
+  esac
+  exit 101
 }
 
 main() {
