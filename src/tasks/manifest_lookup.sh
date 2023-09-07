@@ -15,6 +15,11 @@ exec_manifest_lookup() {
     console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
     exit 101
   fi
+
+  if [ ! -f "${MUSH_MANIFEST_DIR}/src/lib.sh" ] && [ ! -f "${MUSH_MANIFEST_DIR}/src/main.sh" ]; then
+    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
+    exit 101
+  fi
 }
 
 manifest_parse() {
