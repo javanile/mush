@@ -1,0 +1,358 @@
+#!/usr/bin/env zsh
+
+#############################
+# Internal helper functions #
+#############################
+
+###
+# Output help text
+###
+function _crash_usage() {
+  echo "\033[0;33mUsage:\033[0;m"
+  echo "  crash [options] <command>"
+  echo
+  echo "\033[0;33mOptions:\033[0;m"
+  echo "  -h, --help          Output this help text and exit"
+  echo "  -v, --version       Output version information and exit"
+  echo
+  echo "\033[0;33mCommands:\033[0;m"
+  echo "  register            Register the global error handler"
+}
+
+###
+# Map a process exit code to its signal name
+###
+function _crash_map_exit_code() {
+  local sig_name code="$1"
+
+  case $code in
+    # is this a signal name (error code = signal + 128) ?
+    129) sig_name=HUP ;;
+    130) sig_name=INT ;;
+    131) sig_name=QUIT ;;
+    132) sig_name=ILL ;;
+    134) sig_name=ABRT ;;
+    136) sig_name=FPE ;;
+    137) sig_name=KILL ;;
+    139) sig_name=SEGV ;;
+    141) sig_name=PIPE ;;
+    143) sig_name=TERM ;;
+
+    # usual exit codes
+    -1)  sig_name=FATAL ;;
+    # Miscellaneous errors, such as "divide by zero"
+    1)   sig_name=WARN ;;
+    # misuse of shell builtins (pretty rare)
+    2)   sig_name=BUILTINMISUSE ;;
+    # cannot invoke requested command (ex : source script_with_syntax_error)
+    126) sig_name=CCANNOTINVOKE ;;
+    # command not found (ex : source script_not_existing)
+    127) sig_name=CNOTFOUND ;;
+
+    # assuming we are on an x86 system here
+    # this MIGHT get annoying since these are in a range of exit codes
+    # programs sometimes use.... we'll see.
+    19) sig_name=STOP ;;
+    20) sig_name=TSTP ;;
+    21) sig_name=TTIN ;;
+    22) sig_name=TTOU ;;
+
+    # Exit codes used internally by crash
+    72) sig_name=EXCEPTION ;;
+
+    # Catch all - we have no idea what happened
+    *)  sig_name=FATAL ;;
+  esac
+
+  echo $sig_name
+}
+
+###
+# Format and output trace info
+###
+function _crash_format_trace_info() {
+  local tracetype="$1"
+  local -a str; str=("${(s/:/)2}")
+  local node=${str[1]} line=${str[2]} color
+
+  if [[ $tracetype = 'file' ]]; then
+    if builtin type realpath >/dev/null 2>&1; then
+      node=$(realpath $node)
+    fi
+    color='\033[0;35m'
+  fi
+
+  if [[ $tracetype = 'function' ]]; then
+    color='\033[1;33m'
+  fi
+
+  echo "$color$node\033[0;m \033[0;38;5;242m:\033[0;m line $line"
+}
+
+###
+# A function which throws an exception if it hasn't been caught
+###
+function _crash_catch_all_exception() {
+  if [[ ${2:0:5} != 'catch' ]]; then
+    preexec_functions=()
+    throw "$CRASH_THROWN_EXCEPTION" "$CRASH_THROWN_EXCEPTION_MESSAGE"
+  fi
+}
+
+###
+# A handler for catching global uncaught exceptions
+# and other exit codes
+###
+function _crash_global_exception_handler() {
+  # Get the state passed to the handler
+  local state="$1"
+
+  # We only want to report errors
+  [[ $state -eq 0 ]] && exit 0
+
+  # Retrieve exception details stored by crash
+  local exception="$CRASH_THROWN_EXCEPTION"
+  local message="$CRASH_THROWN_EXCEPTION_MESSAGE"
+  local -a trace; trace=($CRASH_FUNCTRACE)
+  local -a files; files=($CRASH_FUNCFILETRACE)
+
+  # If no trace is found, revert to ZSH's builtin $functrace
+  [[ ${#trace} -eq 0 ]] && trace=($functrace)
+  [[ ${#files} -eq 0 ]] && files=($funcfiletrace)
+
+  # Get the signal name for the state
+  sig_name="$(_crash_map_exit_code $state)"
+
+  # Print the signal name as a header
+  echo
+  echo "  \033[1;37;41m $sig_name \033[0;m"
+
+  # If an exception is defined, print it and its message
+  if [[ -n $exception ]]; then
+    echo
+    echo "  \033[1;31m$exception\033[0;m"
+    echo "  \033[0;33m$message\033[0;m"
+  fi
+
+  # Print the function and file/line where the exception was thrown
+  echo
+  echo "  in $(_crash_format_trace_info 'function' ${trace[1]})"
+  echo "  at $(_crash_format_trace_info 'file' ${files[1]})"
+
+  # Loop backwards through the trace, printing the function
+  # and file/line for each step
+  integer i=1
+  while [[ ${#trace} -gt 1 ]]; do
+    shift trace
+    shift files
+
+    echo
+    echo "  \033[0;38;5;242m$i\033[0;m   $(_crash_format_trace_info 'function' ${trace[1]})"
+    echo "      $(_crash_format_trace_info 'file' ${files[1]})"
+
+    i=$(( i + 1 ))
+  done
+
+  # Exit with the same state as reported, to ensure any
+  # programs relying on the exit state receive the right one
+  exit $state
+}
+
+##################################
+# Public facing helper functions #
+##################################
+
+###
+# Execute a command in a subprocess, and record any exceptions
+# which are thrown so that they can be caught later
+###
+function try() {
+  local state
+
+  # Check if an exception is already recorded and clear it
+  # so that we have a blank slate
+  if [[ -n $CRASH_THROWN_EXCEPTION ]]; then
+    CRASH_THROWN_EXCEPTION=''
+    CRASH_THROWN_EXCEPTION_MESSAGE=''
+  fi
+
+  # If the crash global error handler is set, remove it
+  # while we handle anything returned from this function
+  local global_handler_set=0
+  if (( $+functions[zshexit] )); then
+    global_handler_set=1
+    unfunction zshexit
+  fi
+
+  # Run the passed command so that the crash exit state
+  # can be caught
+  output=$($@)
+  state=$?
+
+  # The exit wasn't caused by a crash exception, so unset any saved exception
+  # and message, and call the global error handler directly
+  if [[ $state -ne 72 ]]; then
+    CRASH_THROWN_EXCEPTION=''
+    CRASH_THROWN_EXCEPTION_MESSAGE=''
+
+    # Print the output back to the screen
+    echo $output
+
+    # Call the globa error handler
+    _crash_global_exception_handler $state
+  fi
+
+  # Ensure the crash global error handler is re-registered if necessary
+  [[ -n $global_handler_set ]] && crash register
+
+  # Check for the crash exit state, and parse the output to retrieve
+  # the exception and message so that catch can handle them
+  if [[ $state -eq 72 ]]; then
+    # First separate the output into an array of lines
+    local IFS
+    local -a lines; IFS=$'\n' lines=($(echo "$output"))
+
+    # Get the line count
+    integer line_count=${#lines}
+
+    # Get the last two lines of output
+    # Since throw was used the exeption and message are printed here
+    CRASH_THROWN_EXCEPTION="${lines[-2]}"
+    CRASH_THROWN_EXCEPTION_MESSAGE="${lines[-1]}"
+
+    # The remaining output all came from the subprocess, so we print
+    # that as if it had been run on the main thread
+    echo "${(@F)lines:0:$(( line_count - 2 ))}"
+
+    # Store the functrace and funcfiletrace so that they can be used
+    # if the exception is not caught
+    CRASH_FUNCTRACE=($functrace)
+    CRASH_FUNCFILETRACE=($funcfiletrace)
+
+    # Add a preexec hook, which will execute the error handler for
+    # the exception if it is not caught
+    add-zsh-hook preexec _crash_catch_all_exception
+  fi
+}
+
+###
+# Catch a thrown exception
+###
+function catch() {
+  local exception="$1" handler="$2"
+
+  # If no exception has been thrown, then no further processing is required
+  if [[ $CRASH_THROWN_EXCEPTION != $exception ]]; then
+    return
+  fi
+
+  # Great! We've caught the right exception. Now we can remove the
+  # preexec zsh-hook so that the catch-all handler doesn't kick in
+  preexec_functions=()
+
+  # Check that a handler has been passed to catch
+  if [[ -z $handler ]]; then
+    throw MissingHandlerException "catch must be passed a handler function"
+  fi
+
+  # Check that the handler exists as a function
+  if ! (( $+functions[$handler] )); then
+    throw MissingHandlerException "Handler function '$handler' could not be found"
+  fi
+
+  # Execute the handler, passing it the exception and message
+  $handler $CRASH_THROWN_EXCEPTION $CRASH_THROWN_EXCEPTION_MESSAGE
+
+  CRASH_THROWN_EXCEPTION=''
+  CRASH_THROWN_EXCEPTION_MESSAGE=''
+  CRASH_FUNCTRACE=()
+  CRASH_FUNCFILETRACE=()
+}
+
+###
+# Throw an exception
+###
+function throw() {
+  local exception="$1" message="${(@)@:2}"
+
+  # Store the exception, message and traces in their respective global variables
+  CRASH_THROWN_EXCEPTION="$exception"
+  CRASH_THROWN_EXCEPTION_MESSAGE="$message"
+  CRASH_FUNCTRACE=($functrace)
+  CRASH_FUNCFILETRACE=($funcfiletrace)
+
+  # Check for the global crash error handler. If it is set, then we don't
+  # need to output the exception and message, as they can be read from
+  # the variables we set above. If the global handler is not set, then we
+  # are probably in a try/catch block, so print them here so that they
+  # can be picked up by the subprocess launched by try
+  if ! (( $+functions[zshexit] )); then
+    echo $CRASH_THROWN_EXCEPTION
+    echo $CRASH_THROWN_EXCEPTION_MESSAGE
+  fi
+
+  exit 72
+}
+
+###
+# Register the global variables and exception handler
+###
+function _crash_register() {
+  # Autoload preexec hook
+  autoload -Uz add-zsh-hook
+
+  # Initialise variables used by the exception handler
+  export CRASH_THROWN_EXCEPTION=''
+  export CRASH_THROWN_EXCEPTION_MESSAGE=''
+  export -a CRASH_FUNCTRACE
+  export -a CRASH_FUNCFILETRACE
+
+  # Run the exception hander after any exit signal is received
+  zshexit() {
+    _crash_global_exception_handler $?
+  }
+}
+
+function _crash_unload() {
+  # Remove the catch all exception in case we are
+  # in the middle of a catch block
+  add-zsh-hook -D preexec _crash_catch_all_exception
+
+  # Remove the global exception handler
+  zshexit() {}
+}
+
+###
+# The main process
+###
+function crash() {
+  local help version ctx="$1"
+
+  zparseopts -D \
+    h=help -help=help \
+    v=version -version=version
+
+  if [[ -n $help ]]; then
+    _crash_usage
+    return
+  fi
+
+  if [[ -n $version ]]; then
+    echo 0.1.2
+    return
+  fi
+
+  case $ctx in
+    'register' )
+      _crash_register "${(@)@:2}"
+      ;;
+    'unload' )
+      _crash_unload
+      ;;
+    * )
+      throw UnrecognisedCommandError "The command '$1' is unrecognised"
+      ;;
+  esac
+}
+
+crash "$@"
