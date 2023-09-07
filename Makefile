@@ -116,6 +116,9 @@ test-build-empty-app:
 test-build-basic-app:
 	@bash tests/bare/build/basic-app-test.sh
 
+test-legacy:
+	@bash tests/bare/legacy-test.sh
+
 test-command:
 	@bash tests/bare/command-test.sh
 

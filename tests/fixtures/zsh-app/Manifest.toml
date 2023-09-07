@@ -1,0 +1,17 @@
+[package]
+name = "zsh-app"
+version = "0.1.0"
+edition = "2022"
+
+# See more keys and their definitions at https://mush.javanile.org/manifest.html
+
+[dependencies]
+
+[legacy]
+crash = "https://raw.githubusercontent.com/molovo/crash/master/crash"
+crash = "https://raw.githubusercontent.com/molovo/crash/master/crash"
+
+
+##autoload -Uz crash && crash register
+
+crash = "https://raw.githubusercontent.com/molovo/crash/master/crash"
