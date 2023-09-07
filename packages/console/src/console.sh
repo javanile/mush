@@ -45,7 +45,7 @@ console_error() {
 }
 
 console_error_code() {
-  echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[0m: $2" >&2
+  echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[1;39m: $2${ESCAPE}[0m" >&2
 }
 
 console_print() {
