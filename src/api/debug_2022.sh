@@ -1,3 +1,5 @@
+
+
 debug_file() {
   local previous_debug_file=$MUSH_DEBUG_FILE
   MUSH_DEBUG_FILE=$1
