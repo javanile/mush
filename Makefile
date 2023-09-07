@@ -113,5 +113,8 @@ test-build-console-lib: build-dist sudo-install
 test-build-empty-app:
 	@bash tests/bare/build/empty-app-test.sh
 
+test-build-basic-app:
+	@bash tests/bare/build/basic-app-test.sh
+
 test-command:
 	@bash tests/bare/command-test.sh

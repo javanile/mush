@@ -1,6 +1,8 @@
 
 #legacy lib_helloworld
 
+module notfound
+
 main() {
   echo "Hello World!"
   echo "Arguments: $*"

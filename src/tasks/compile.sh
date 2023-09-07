@@ -95,6 +95,7 @@ compile_scan_module() {
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
+      error_E0583_file_not_found "${module_name}" "${src_file}" "${line%:*}"
       exit 101
     fi
   done

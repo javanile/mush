@@ -44,6 +44,10 @@ console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
 }
 
+console_error_code() {
+  echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[1;39m: $2${ESCAPE}[0m" >&2
+}
+
 console_print() {
   if [ -z "${QUIET}" ]; then
     echo -e "$1 $2" >&2
