@@ -1,6 +1,6 @@
 
 extern package console
-#extern package json
+extern package json
 
 module api
 module errors
