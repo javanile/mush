@@ -1,4 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-curl -s https://raw.githubusercontent.com/javanile/mush/main/bin/mush | bash -s -- new "$@"
+mush=https://raw.githubusercontent.com/javanile/mush/main/bin/mush
+
+curl -s $mush | bash -s -- new "$1"
+
+mkdir -p "$1/bin"
+
+curl -s $mush -o "$1/bin/mush"
+
+chmod +x "$1/bin/mush"

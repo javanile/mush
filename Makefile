@@ -132,4 +132,4 @@ test-commands:
 	@bash tests/bare/commands-test.sh
 
 test-demo:
-	@bash docs/demo
+	@bash tests/bare/demo-test.sh
