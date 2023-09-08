@@ -1,8 +1,0 @@
-
-
-[legacy-fetch]
-getoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
-gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
-
-[legacy-build]
-lib-getoptions = "gengetoptions library > lib_getoptions.sh"

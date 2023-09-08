@@ -22,6 +22,12 @@ install:
 sudo-install:
 	@sudo install -m 0755 target/dist/mush /usr/local/bin/
 
+publish:
+	@git add .
+	@git commit -am "Nightly Release"
+	@git push
+	@mush publish
+
 ## ====
 ## Test
 ## ====

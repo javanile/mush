@@ -32,7 +32,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.0 (2023-09-07)"
+VERSION="Mush 0.1.1 (2023-09-07)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -762,8 +762,12 @@ run_legacy() {
 
     if grep -q "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml"; then
         legacy_line=$(grep -n -m 1 "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml" | cut -d: -f1)
+        legacy_tail=$(expr ${legacy_line} + 1)
         echo "The section '[legacy]' exists in the INI file at ${legacy_line}."
-        sed -i "$((legacy_line+1))i${module_name} = \"${module_url}\"" "$MUSH_MANIFEST_DIR/Manifest.toml"
+        head -n ${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml" > "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        tail -n +${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        mv "$MUSH_MANIFEST_DIR/Manifest.toml.tmp" "$MUSH_MANIFEST_DIR/Manifest.toml"
     else
       echo "[legacy]" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
       echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
@@ -856,7 +860,9 @@ parser_definition_publish() {
 
 	msg     -- 'OPTIONS:'
 	flag    FLAG_C       -c --flag-c
+	flag    ALLOW_DIRTY  --allow-dirty  -- "Build artifacts in release mode, with optimizations"
 	param   MODULE_NAME  -n --name
+
 	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
@@ -867,7 +873,7 @@ run_publish() {
   eval "set -- $REST"
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
+  echo "ALLOW_DIRTY: $ALLOW_DIRTY"
 
   MUSH_TARGET_DIR=target/dist
 
@@ -1433,8 +1439,9 @@ compile_scan_embed() {
 }
 
 exec_publish() {
-  local bin_file=/usr/local/bin/mush
-  local final_file=target/dist/mush
+  local bin_name=${MUSH_PACKAGE_NAME}
+  local bin_file=/usr/local/bin/${bin_name}
+  local final_file=target/dist/${bin_name}
   local package_name="${MUSH_PACKAGE_NAME}"
   local release_tag="${MUSH_PACKAGE_VERSION}"
 
@@ -1446,6 +1453,11 @@ exec_publish() {
   ## TODO: add the following message when no stuff
   # warning: manifest has no documentation, homepage or repository.
   # See https://mush.javanile.org/manifest.html#package-metadata for more info.
+
+  if [ -n "${ALLOW_DIRTY}" ]; then
+    git add .
+    git commit -am "Allow dirty"
+  fi
 
   if [ ! -z "$(git status --porcelain)" ]; then
     local changed_files="$(git status -s | cut -c4-)"
