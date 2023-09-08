@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -e
+
+curl -s https://raw.githubusercontent.com/javanile/mush/main/bin/mush | bash -s -- new "$@"

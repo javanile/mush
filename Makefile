@@ -130,3 +130,6 @@ test-command:
 
 test-commands:
 	@bash tests/bare/commands-test.sh
+
+test-demo:
+	@bash docs/demo

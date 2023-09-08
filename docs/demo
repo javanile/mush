@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -e
+
+## Create a new 'demo' project (equivalent to 'mush new demo')
+curl -s https://mush.javanile.org/new | bash -s -- demo
+
+## Adding demo snippets
+
+
+./bin/mush build
+
+./bin/mush run
+
+
+
