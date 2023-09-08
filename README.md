@@ -43,7 +43,7 @@ Add your custom code to `src/main.sh` or `src/utils/module.sh` files and run it 
 cd demo && ./bin/mush run 
 ```
 
-In case you are ready for release your package, run
+In case you are ready to release your package, run
 
 ```shell
 cd demo && ./bin/mush build --release
