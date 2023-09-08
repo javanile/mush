@@ -25,6 +25,34 @@ We try to do everything possible to ensure maximum compatibility with these plat
 
 To start using Mush, learn more at the [Mush website](https://mush.javanile.org).
 
+## Demo
+
+[![mush](https://asciinema.org/a/401463.svg)](https://asciinema.org/a/401463)
+
+## Try it now
+
+Create a new demo package on your system with the following command
+
+```shell
+curl https://mush.javanile.org/demo | bash
+```
+
+Add your custom code to `src/main.sh` or `src/utils/module.sh` files and run it with
+
+```shell
+cd demo && ./bin/mush run 
+```
+
+In case you are ready for release your package, run
+
+```shell
+cd demo && ./bin/mush build --release
+```
+
+## Cheat Sheet
+
+... TODO
+
 ## Contributing
 
 See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CONTRIBUTING.md), obviously pull-request are welcome.
