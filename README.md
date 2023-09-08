@@ -1,3 +1,27 @@
+<div align="center">
+
+# 🎉 **Special Announcement - Release 0.2.0 on March 14th!** 🥧
+
+</div>
+
+---
+
+Dear users and enthusiasts of our project,
+
+We are thrilled to announce that the release 0.2.0 of our project is on its way, and there's a special reason to celebrate it! 🚀
+
+✨ **Release Date:** March 14th, on **Pi Day** (3.14) 🥳
+
+This update will bring a slew of new features, improvements, and bug fixes, and we can't wait to share it with you.
+
+Keep an eye on this repository for further details on the new features and upgrade instructions.
+
+Thank you for your ongoing support and for being a part of our community. We look forward to celebrating with you on Pi Day! 🎈
+
+Stay tuned!
+
+</div>
+
 # 🍄 Mush
 
 [![Build Status](https://travis-ci.com/javanile/pipetest.svg?branch=main)](https://travis-ci.com/javanile/pipetest)
