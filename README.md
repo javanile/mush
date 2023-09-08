@@ -27,7 +27,7 @@ To start using Mush, learn more at the [Mush website](https://mush.javanile.org)
 
 ## Demo
 
-[![mush](https://asciinema.org/a/401463.svg)](https://asciinema.org/a/401463)
+[![mush](https://raw.githubusercontent.com/francescobianco/ghostplay-demos/main/demos/mush/demo.gif)](https://raw.githubusercontent.com/francescobianco/ghostplay-demos/main/demos/mush/demo.gif)
 
 ## Try it now
 
