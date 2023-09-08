@@ -7,7 +7,7 @@ Mush is the shell package builder. Mush downloads your shell package’s depende
 
 > This project is mostly inspired by Rust and Cargo!
 
-## Suppoerted Shells
+## Supported Shells
 
 We try to do everything possible to ensure maximum compatibility with these platforms
 
