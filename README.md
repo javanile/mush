@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎉 **Exciting News - Release 0.2.0 on March 14, 2024!** 🥧
+# 🎉 **Exciting News - Release 0.2.0 on March 14, 2024!** 🎉
 
 </div>
 
