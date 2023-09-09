@@ -73,7 +73,7 @@ cd demo && ./bin/mush build --release
 
 ## Cheat Sheet
 
-... TODO
+TODO...
 
 ## Contributing
 
