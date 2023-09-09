@@ -51,7 +51,7 @@ To start using Mush, learn more at the [Mush website](https://mush.javanile.org)
 
 [![mush](https://raw.githubusercontent.com/francescobianco/ghostplay-demos/main/demos/mush/demo.gif)](https://raw.githubusercontent.com/francescobianco/ghostplay-demos/main/demos/mush/demo.gif)
 
-## Try it now
+## Local Demo
 
 Create a new demo package on your system with the following command
 
@@ -59,13 +59,13 @@ Create a new demo package on your system with the following command
 curl https://mush.javanile.org/demo | bash
 ```
 
-Add your custom code to `src/main.sh` or `src/utils/module.sh` files and run it with
+Add your custom code to `src/main.sh` or `src/utils/module.sh` files then run it with
 
 ```shell
 cd demo && ./bin/mush run 
 ```
 
-In case you are ready to release your package, run
+In case you are ready to release your package, type the following command
 
 ```shell
 cd demo && ./bin/mush build --release
