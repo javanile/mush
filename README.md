@@ -1,10 +1,8 @@
 <div align="center">
 
-# 🎉 **Special Announcement - Release 0.2.0 on March 14th!** 🥧
+# 🎉 **Announcement - Release 0.2.0 on March 14th!** 🥧
 
 </div>
-
----
 
 Dear users and enthusiasts of our project,
 
@@ -20,7 +18,7 @@ Thank you for your ongoing support and for being a part of our community. We loo
 
 Stay tuned!
 
-</div>
+---
 
 # 🍄 Mush
 
