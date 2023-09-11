@@ -1,3 +1,10 @@
+---
+layout: default
+title: mush-check
+parent: CLI Commands
+nav_order: 2
+---
+
 # mush check(1)
 
 ## NAME

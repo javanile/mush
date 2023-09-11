@@ -1,3 +1,10 @@
+---
+layout: default
+title: mush
+parent: CLI Commands
+nav_order: 2
+---
+
 # mush(1)
 
 ## NAME

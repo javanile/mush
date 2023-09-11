@@ -1,11 +1,11 @@
 ---
 layout: default
-title: mush-build
+title: mush-install
 parent: CLI Commands
 nav_order: 2
 ---
 
-# mush-build
+# mush install
 
 ## NAME
 cargo-init - Create a new Cargo package in an existing directory
