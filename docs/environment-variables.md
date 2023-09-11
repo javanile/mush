@@ -1,3 +1,9 @@
+---
+layout: default
+title: Environment Variables
+nav_order: 4
+---
+
 # Environment Variables
 
 Mush sets and reads a number of environment variables which your code can detect
