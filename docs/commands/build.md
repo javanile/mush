@@ -5,15 +5,18 @@ parent: CLI Commands
 nav_order: 2
 ---
 
-# mush-build
+# mush build
 
 ## NAME
-cargo-init - Create a new Cargo package in an existing directory
+
+cargo build - Create a new Cargo package in an existing directory
 
 ## SYNOPSIS
+
 cargo init [options] [path]
 
 ## DESCRIPTION
+
 This command will create a new Cargo manifest in the current directory. Give a path as an argument to create in the given directory.
 
 If there are typically-named Rust source files already in the directory, those will be used. If not, then a sample src/main.rs file will be created, or src/lib.rs if --lib is passed.
@@ -67,12 +70,17 @@ Unstable (nightly-only) flags to Cargo. Run cargo -Z help for details.
 See the reference for details on environment variables that Cargo reads.
 
 ## EXIT STATUS
-0: Cargo succeeded.
-101: Cargo failed to complete.
-EXAMPLES
+0: Mush succeeded.
+101: Mush failed to complete.
+
+## EXAMPLES
+
 Create a binary Cargo package in the current directory:
 
+```shell
 cargo init
+```
 
 ## SEE ALSO
-cargo(1), cargo-new(1)
+
+[mush(1)](), [mush-new(1)]()
