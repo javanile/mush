@@ -2,7 +2,7 @@
 layout: default
 title: mush publish
 parent: CLI Commands
-nav_order: 2
+nav_order: 40
 ---
 
 # cargo-publish(1)

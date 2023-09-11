@@ -1,8 +1,8 @@
 ---
 layout: default
-title: mush-build
+title: mush build
 parent: CLI Commands
-nav_order: 2
+nav_order: 10
 ---
 
 # mush build

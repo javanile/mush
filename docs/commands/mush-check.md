@@ -1,8 +1,8 @@
 ---
 layout: default
-title: mush-check
+title: mush check
 parent: CLI Commands
-nav_order: 2
+nav_order: 11
 ---
 
 # mush check(1)

@@ -1,8 +1,8 @@
 ---
 layout: default
-title: mush-install
+title: mush install
 parent: CLI Commands
-nav_order: 2
+nav_order: 31
 ---
 
 # mush install

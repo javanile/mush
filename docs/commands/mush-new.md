@@ -2,7 +2,7 @@
 layout: default
 title: mush new
 parent: CLI Commands
-nav_order: 2
+nav_order: 32
 ---
 
 # mush new(1)

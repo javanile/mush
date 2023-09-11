@@ -1,8 +1,8 @@
 ---
 layout: default
-title: mush
+title: mush init
 parent: CLI Commands
-nav_order: 2
+nav_order: 30
 ---
 
 # mush init(1)
