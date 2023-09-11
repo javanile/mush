@@ -9,7 +9,7 @@ bash target/dist/mush.sh -vv build
 bash target/dist/mush --help | grep -A5000 "See" | tail -n+2 | while read line; do
   command=$(echo "$line" | awk '{print $1}')
   echo "==> Test: docs/$command"
-  [ ! -f "docs/commands/${command}.md" ] && echo "Error: docs/commands/${command}.md not found" && exit 1
+  [ ! -f "docs/commands/mush-${command}.md" ] && echo "Error: docs/commands/mush-${command}.md not found" && exit 1
 done
 
 
