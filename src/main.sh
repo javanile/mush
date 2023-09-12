@@ -26,7 +26,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
-  cmd   check -- "Analyze the current package and report errors, but don't build object files"
+  cmd   check -- "Analyze the current package and report errors, but don't build it"
   cmd   init -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
