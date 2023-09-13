@@ -26,10 +26,12 @@ exec_build_release() {
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
-  ## Generate binary file
-  mkdir -p bin/
-  chmod +x "${build_file}"
+  ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+
+  ## Generate binary on root
+  mkdir -p bin/
   cp "${final_file}" "${bin_file}"
+  chmod +x "${bin_file}"
 }
