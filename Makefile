@@ -136,3 +136,6 @@ test-demo:
 
 test-docs:
 	@bash tests/bare/docs-test.sh
+
+test-sysinfo:
+	@bash tests/bare/sysinfo-test.sh

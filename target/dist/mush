@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+## BP010: Release metadata
+## @build_date: 2023-09-13T15:52:53Z
 set -e
 extern() {
   extern=$1
@@ -47,7 +49,7 @@ parser_definition() {
 
   msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build -- "Compile the current package"
-  cmd   check -- "Analyze the current package and report errors, but don't build object files"
+  cmd   check -- "Analyze the current package and report errors, but don't build it"
   cmd   init -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
@@ -1059,12 +1061,16 @@ exec_build_release() {
 
   local bin_file=bin/${name}
 
+  local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   local build_file=target/dist/${name}.tmp
   local final_file=target/dist/${name}
 
   mkdir -p target/dist/
 
   echo "#!/usr/bin/env bash" > $build_file
+  echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_date: ${build_date}" >> "${build_file}"
+
   echo "set -e" >> $build_file
 
   dist_2022 >> $build_file
@@ -1079,6 +1085,7 @@ exec_build_release() {
   mkdir -p bin/
   chmod +x "${build_file}"
   cp "${build_file}" "${final_file}"
+  chmod +x "${final_file}"
   cp "${final_file}" "${bin_file}"
 }
 
