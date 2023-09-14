@@ -139,3 +139,6 @@ test-docs:
 
 test-sysinfo:
 	@bash tests/bare/sysinfo-test.sh
+
+test-install-help:
+	@bash tests/bare/help/install-test.sh

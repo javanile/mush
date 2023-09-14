@@ -5,7 +5,7 @@ exec_install() {
   local bin_name=$MUSH_PACKAGE_NAME
   local pwd=$PWD
 
-  local bin_file=/usr/local/bin/${bin_name}
+  local bin_file=$HOME/.mush/bin/${bin_name}
   local final_file=target/dist/${bin_name}
 
   local cp=cp

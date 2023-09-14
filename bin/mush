@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-09-13T15:52:53Z
+## @build_date: 2023-09-14T15:51:59Z
 set -e
 extern() {
   extern=$1
@@ -700,15 +700,18 @@ run_init() {
 }
 
 parser_definition_install() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+	setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_install() {
@@ -718,6 +721,8 @@ run_install() {
   #echo "FLAG_C: $FLAG_C"
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
+
+
 
   exec_manifest_lookup
 
@@ -1081,12 +1086,14 @@ exec_build_release() {
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
-  ## Generate binary file
-  mkdir -p bin/
-  chmod +x "${build_file}"
+  ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+
+  ## Generate binary on root
+  mkdir -p bin/
   cp "${final_file}" "${bin_file}"
+  chmod +x "${bin_file}"
 }
 
 exec_init() {
@@ -1122,7 +1129,7 @@ exec_install() {
   local bin_name=$MUSH_PACKAGE_NAME
   local pwd=$PWD
 
-  local bin_file=/usr/local/bin/${bin_name}
+  local bin_file=$HOME/.mush/bin/${bin_name}
   local final_file=target/dist/${bin_name}
 
   local cp=cp
