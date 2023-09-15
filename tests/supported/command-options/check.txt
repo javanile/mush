@@ -1,0 +1,2 @@
+-r --release Check artifacts in release mode with optimizations
+-t --target BUILD_TARGET Check for the specific target

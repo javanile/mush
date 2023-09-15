@@ -6,8 +6,7 @@ parser_definition_install() {
 
 	msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
-  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
 
   param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"

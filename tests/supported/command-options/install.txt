@@ -1,5 +1,2 @@
-
--r --release release Release version to use
-
-
-
+--path PACKAGE_PATH Filesystem path to local package to install
+-t --target BUILD_TARGET Build for the specific target

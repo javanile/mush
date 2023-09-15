@@ -1,14 +1,13 @@
 
 parser_definition_init() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} init [OPTIONS] [path]" ''
 
 	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_init() {
