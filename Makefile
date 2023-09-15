@@ -142,3 +142,6 @@ test-sysinfo:
 
 test-install-help:
 	@bash tests/bare/help/install-test.sh
+
+test-command-options:
+	@bash tests/bare/command-options-test.sh

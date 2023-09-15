@@ -1,5 +1,2 @@
-
--r --release release Release version to use
-
-
-
+-r --release Build artifacts in release mode with optimizations
+-t --target BUILD_TARGET Build for the specific target

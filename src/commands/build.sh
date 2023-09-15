@@ -6,7 +6,7 @@ parser_definition_build() {
 
 	msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
 
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
