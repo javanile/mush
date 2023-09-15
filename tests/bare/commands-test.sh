@@ -6,6 +6,30 @@ cp target/debug/mush target/debug/mush.sh
 bash target/debug/mush.sh build
 echo ""
 
+echo "==> Build: command options"
+
+command_options=tests/tmp/command-options.txt
+> "$command_options"
+bash target/debug/mush --help | grep -A5000 "See" | tail -n+2 | while read line; do
+  if [ -s "$command_options" ]; then
+    echo "[ERROR] Problem with the following option of command '$command':"
+    echo "------------------------------------------------------------------------------------------"
+    cat "$command_options"
+    echo "------------------------------------------------------------------------------------------"
+    exit 1
+  fi
+  command=$(echo "$line" | awk '{print $1}')
+  echo "==> Test: $command options"
+  bash target/debug/mush "$command" --help | grep -i -A5000 "Options:" | tail +2 > "$command_options"
+  supported_options=tests/supported/command-options/${command}.txt
+  if [ ! -f "$supported_options" ]; then
+    echo "[ERROR] The command '$command' seems no longer supported. Please update the test."
+    exit 1
+  fi
+done
+
+exit
+
 echo "==> Test: build"
 cd tests/fixtures/complex-app
 bash ../../../target/debug/mush.sh build

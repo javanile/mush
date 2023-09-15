@@ -1,0 +1,3 @@
+-v --verbose Use verbose output -vv or -vvv to increase level
+-q --quiet Do not print cargo log messages
+-h --help Print help information
