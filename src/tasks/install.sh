@@ -46,9 +46,11 @@ exec_install_from_index() {
   local package_path=$(echo "${package_search}" | awk '{print $3}')
   local package_version=$(echo "${package_search}" | awk '{print $4}')
 
-  if [ ! -d "$package_src" ]; then
-    git clone --branch main --single-branch "${package_url}" "${package_src}"
+  if [ -d "${package_src}" ]; then
+    rm -fr "${package_src}"
   fi
+
+  git clone --branch main --single-branch "${package_url}" "${package_src}"
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
