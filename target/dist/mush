@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-09-14T15:51:59Z
+## @build_date: 2023-09-18T16:29:59Z
 set -e
 extern() {
   extern=$1
@@ -593,7 +593,7 @@ parser_definition_build() {
 
 	msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
 
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
@@ -648,10 +648,10 @@ parser_definition_check() {
 
 	msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
-  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Check artifacts in release mode, with optimizations"
 
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+  param  BUILD_TARGET   -t --target                       -- "Check for the specific target"
 	disp   :usage         -h --help                         -- "Print help information"
 }
 
@@ -672,15 +672,14 @@ run_check() {
 }
 
 parser_definition_init() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg   -- 'USAGE:' "  ${2##*/} init [OPTIONS] [path]" ''
 
 	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_init() {
@@ -706,8 +705,7 @@ parser_definition_install() {
 
 	msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print cargo log messages"
-  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
 
   param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
@@ -718,22 +716,22 @@ run_install() {
   eval "$(getoptions parser_definition_install parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  if [ -z "$PACKAGE_PATH" ]; then
+    exec_index_update
+    exec_install_from_index "$1"
+  else
+    exec_manifest_lookup
 
+    MUSH_TARGET_DIR=target/dist
 
-  exec_manifest_lookup
+    exec_legacy_fetch "${MUSH_TARGET_DIR}"
+    exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  MUSH_TARGET_DIR=target/dist
+    exec_build_release "$@"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
-
-  exec_build_release "$@"
-
-  exec_install
+    exec_install
+  fi
 }
 
 parser_definition_legacy() {
@@ -1017,6 +1015,7 @@ github_get_release_id() {
 
 public build_debug
 public build_release
+public index
 public init
 public install
 public legacy_fetch
@@ -1096,6 +1095,71 @@ exec_build_release() {
   chmod +x "${bin_file}"
 }
 
+
+exec_index_update()
+{
+  MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
+  MUSH_REGISTRY_URL=https://github.com/javanile/mush
+  MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
+  MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
+
+  console_status "Updating" "mush packages index"
+
+  mkdir -p "${MUSH_HOME}/registry/index"
+  > "${MUSH_REGISTRY_INDEX}"
+
+  exec_index_parse "${MUSH_REGISTRY_URL}/raw/main/.packages"
+
+  #  Downloaded syn v2.0.37
+  #  Downloaded 1 crate (243.2 KB) in 0.46s
+  #   Compiling proc-macro2 v1.0.67
+  #   Compiling unicode-ident v1.0.12
+  #   Compiling serde v1.0.188
+  #   Compiling quote v1.0.33
+  #   Compiling syn v2.0.37
+  #   Compiling serde_derive v1.0.188
+  #   Compiling rust-lib v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-lib)
+  #    Finished dev [unoptimized + debuginfo] target(s) in 4.65s
+
+
+
+}
+
+exec_index_parse() {
+  local packages_file=$1
+  local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  curl -s -L "${packages_file}" > "${packages_local_file}"
+  if [ ! -s "${packages_local_file}" ]; then
+    console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
+  fi
+
+  while read line; do
+    echo "Entry: ${line}"
+    [ -z "${line}" ] && continue
+    [ "${line:0:1}" = "#" ] && continue
+
+    local entry_type=$(echo "${line}" | awk '{print $1}')
+    case "${entry_type}" in
+      "index")
+        local entry_url=$(echo "${line}" | awk '{print $2}')
+        exec_index_parse "${entry_url}/raw/main/.packages"
+        ;;
+      "package")
+        local package_name=$(echo "${line}" | awk '{print $2}')
+        local package_url=$(echo "${line}" | awk '{print $3}')
+        local package_path=$(echo "${line}" | awk '{print $4}')
+        local package_version=$(echo "${line}" | awk '{print $5}')
+        echo "${package_name} ${package_url} ${package_path} ${package_version}" >> "${MUSH_REGISTRY_INDEX}"
+        ;;
+      *)
+        console_error "not supported entry type at '${packages_file}'"
+        ;;
+    esac
+  done < "${packages_local_file}"
+}
+
 exec_init() {
   local package_name=$(basename "$PWD")
   local manifest_file=Manifest.toml
@@ -1152,6 +1216,34 @@ exec_install() {
     console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
   fi
 }
+
+exec_install_from_index() {
+  local package_name=$1
+
+  local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+
+  if [ -z "${package_search}" ]; then
+    console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '*'"
+    exit 101
+  fi
+
+  local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
+
+  local package_name=$(echo "${package_search}" | awk '{print $1}')
+  local package_url=$(echo "${package_search}" | awk '{print $2}')
+  local package_path=$(echo "${package_search}" | awk '{print $3}')
+  local package_version=$(echo "${package_search}" | awk '{print $4}')
+
+  if [ ! -d "$package_src" ]; then
+    git clone --branch main --single-branch "${package_url}" "${package_src}"
+  fi
+
+  local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+
+  echo "${package_src}/Manifest.toml"
+  cat "${package_src}/Manifest.toml"
+}
+
 
 exec_legacy_fetch() {
   local target_dir=$1

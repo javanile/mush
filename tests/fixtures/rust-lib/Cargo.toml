@@ -16,7 +16,7 @@ edition = "2021"
 #assert_cmd = "2.0.4"
 #itertools = "0.10.5"
 
-#[dependencies]
+[dependencies]
 #clap = { version = "4.0.18", features = ["derive"] }
-#serde = { version = "1.0.145", features = ["derive"] }
+serde = { version = "1.0.145", features = ["derive"] }
 #serde_yaml = "0.9.13"

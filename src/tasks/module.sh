@@ -1,6 +1,7 @@
 
 public build_debug
 public build_release
+public index
 public init
 public install
 public legacy_fetch

@@ -17,20 +17,20 @@ run_install() {
   eval "$(getoptions parser_definition_install parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  if [ -z "$PACKAGE_PATH" ]; then
+    exec_index_update
+    exec_install_from_index "$1"
+  else
+    exec_manifest_lookup
 
+    MUSH_TARGET_DIR=target/dist
 
-  exec_manifest_lookup
+    exec_legacy_fetch "${MUSH_TARGET_DIR}"
+    exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  MUSH_TARGET_DIR=target/dist
+    exec_build_release "$@"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
-
-  exec_build_release "$@"
-
-  exec_install
+    exec_install
+  fi
 }
