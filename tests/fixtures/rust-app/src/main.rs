@@ -16,8 +16,8 @@
 
 
 
-mod mod1;
-mod notfound;
+//mod mod1;
+//mod notfound;
 
 //mod mod1;
 
@@ -30,6 +30,15 @@ mod notfound;
 
 fn main() {
     println!("Hello World!");
+
     //json::parse("{}").unwrap();
     //hello();
+}
+
+if 6 < 7 {
+    println!("Hello World!");
+}
+
+if 6 < 7 {
+    println!("Hello World!");
 }
