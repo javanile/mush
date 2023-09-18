@@ -145,3 +145,6 @@ test-install-help:
 
 test-command-options:
 	@bash tests/bare/command-options-test.sh
+
+test-syntax-build:
+	@bash tests/bare/syntax/build-test.sh
