@@ -19,7 +19,7 @@ run_run() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   MUSH_TARGET_DIR=target/debug
 

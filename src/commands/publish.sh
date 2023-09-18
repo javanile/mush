@@ -23,7 +23,7 @@ run_publish() {
 
   MUSH_TARGET_DIR=target/dist
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"

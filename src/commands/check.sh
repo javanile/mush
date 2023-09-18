@@ -18,7 +18,7 @@ run_check() {
   parse "$@"
   eval "set -- $REST"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"

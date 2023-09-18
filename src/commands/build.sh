@@ -28,7 +28,7 @@ run_build() {
   MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
   mkdir -p "${MUSH_DEPS_DIR}"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"

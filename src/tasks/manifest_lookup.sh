@@ -1,28 +1,30 @@
 
 exec_manifest_lookup() {
-  local pwd=$PWD
+  local manifest_dir=$1
 
-  MUSH_MANIFEST_DIR="${PWD}"
-
-  if [ ! -f "Manifest.toml" ]; then
-    console_error "could not find 'Manifest.toml' in '$pwd' or any parent directory"
+  if [ ! -f "${manifest_dir}/Manifest.toml" ]; then
+    console_error "could not find 'Manifest.toml' in '${manifest_dir}' or any parent directory"
     exit 101
   fi
 
-  manifest_parse
+  MUSH_MANIFEST_DIR="${manifest_dir}"
+
+  manifest_parse "${manifest_dir}/Manifest.toml"
 
   if [ -z "$MUSH_PACKAGE_VERSION" ]; then
-    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
+    console_error "failed to parse manifest at '$manifest_dir/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
     exit 101
   fi
 
-  if [ ! -f "${MUSH_MANIFEST_DIR}/src/lib.sh" ] && [ ! -f "${MUSH_MANIFEST_DIR}/src/main.sh" ]; then
-    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
+  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ]; then
+    console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
 }
 
 manifest_parse() {
+  local manifest_file=$1
+
     #echo "S:"
     newline=$'\n'
     section=MUSH_USTABLE
@@ -95,6 +97,6 @@ manifest_parse() {
           ;;
       esac
       #echo "L: $line"
-    done < "Manifest.toml"
+    done < "${manifest_file}"
     #echo "E."
 }

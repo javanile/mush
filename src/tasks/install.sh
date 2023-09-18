@@ -61,20 +61,23 @@ exec_install_from_index() {
 exec_install_from_src() {
   local package_src=$1
 
+  exec_manifest_lookup "${package_src}"
+  exec_build_from_src "${package_src}"
+
   local package_name=$MUSH_PACKAGE_NAME
   local package_version=$MUSH_PACKAGE_VERSION
   local bin_name=$MUSH_PACKAGE_NAME
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/dist/${bin_name}
+  local final_file=${package_src}/target/dist/${bin_name}
 
   local cp=cp
   local chmod=chmod
-  if [[ $EUID -ne 0 ]]; then
-      cp="sudo ${cp}"
-      chmod="sudo ${chmod}"
-  fi
+  #if [[ $EUID -ne 0 ]]; then
+  #    cp="sudo ${cp}"
+  #    chmod="sudo ${chmod}"
+  #fi
 
   ${cp} "${final_file}" "${bin_file}"
   ${chmod} +x "${bin_file}"

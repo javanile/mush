@@ -22,7 +22,7 @@ run_install() {
     exec_index_update
     exec_install_from_index "$1"
   else
-    exec_manifest_lookup
+    exec_manifest_lookup "${PWD}"
 
     MUSH_TARGET_DIR=target/dist
 

@@ -16,7 +16,7 @@ run_legacy() {
   echo "FLAG_C: $FLAG_C"
   echo "MODULE_NAME: $MODULE_NAME"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   echo "GLOBAL: $GLOBAL"
   echo "MANIFEST: $MUSH_MANIFEST_DIR"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-09-18T16:29:59Z
+## @build_date: 2023-09-18T16:59:35Z
 set -e
 extern() {
   extern=$1
@@ -615,7 +615,7 @@ run_build() {
   MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
   mkdir -p "${MUSH_DEPS_DIR}"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
@@ -660,7 +660,7 @@ run_check() {
   parse "$@"
   eval "set -- $REST"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
@@ -721,7 +721,7 @@ run_install() {
     exec_index_update
     exec_install_from_index "$1"
   else
-    exec_manifest_lookup
+    exec_manifest_lookup "${PWD}"
 
     MUSH_TARGET_DIR=target/dist
 
@@ -751,7 +751,7 @@ run_legacy() {
   echo "FLAG_C: $FLAG_C"
   echo "MODULE_NAME: $MODULE_NAME"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   echo "GLOBAL: $GLOBAL"
   echo "MANIFEST: $MUSH_MANIFEST_DIR"
@@ -838,7 +838,7 @@ run_run() {
   #echo "MODULE_NAME: $MODULE_NAME"
   #echo "BUILD_TARGET: $BUILD_TARGET"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   MUSH_TARGET_DIR=target/debug
 
@@ -882,7 +882,7 @@ run_publish() {
 
   MUSH_TARGET_DIR=target/dist
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
@@ -1095,6 +1095,46 @@ exec_build_release() {
   chmod +x "${bin_file}"
 }
 
+exec_build_from_src() {
+  local package_src=$1
+
+  local package_name=$MUSH_PACKAGE_NAME
+
+
+  #echo "NAME: $name"
+
+  local bin_file=${package_src}/bin/${package_name}
+
+  local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  local build_file=${package_src}/target/dist/${package_name}.tmp
+  local final_file=${package_src}/target/dist/${package_name}
+
+  mkdir -p "${package_src}/target/dist/"
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_date: ${build_date}" >> "${build_file}"
+
+  echo "set -e" >> $build_file
+
+  dist_2022 >> $build_file
+
+  echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  compile_file "${package_src}/src/main.sh" "${build_file}"
+
+  echo "## BP005: Execute the entrypoint" >> "${build_file}"
+  echo "main \"\$@\"" >> "${build_file}"
+
+  ## Generate binary on target
+  cp "${build_file}" "${final_file}"
+  chmod +x "${final_file}"
+
+  ## Generate binary on root
+  mkdir -p "${package_src}/bin/"
+  cp "${final_file}" "${bin_file}"
+  chmod +x "${bin_file}"
+}
+
 
 exec_index_update()
 {
@@ -1240,10 +1280,46 @@ exec_install_from_index() {
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  echo "${package_src}/Manifest.toml"
-  cat "${package_src}/Manifest.toml"
+  #echo "${package_src}/Manifest.toml"
+  #cat "${package_src}/Manifest.toml"
+
+  exec_install_from_src "${package_src}"
 }
 
+exec_install_from_src() {
+  local package_src=$1
+
+  exec_manifest_lookup "${package_src}"
+  exec_build_from_src "${package_src}"
+
+  local package_name=$MUSH_PACKAGE_NAME
+  local package_version=$MUSH_PACKAGE_VERSION
+  local bin_name=$MUSH_PACKAGE_NAME
+  local pwd=$PWD
+
+  local bin_file=$HOME/.mush/bin/${bin_name}
+  local final_file=${package_src}/target/dist/${bin_name}
+
+  local cp=cp
+  local chmod=chmod
+  #if [[ $EUID -ne 0 ]]; then
+  #    cp="sudo ${cp}"
+  #    chmod="sudo ${chmod}"
+  #fi
+
+  ${cp} "${final_file}" "${bin_file}"
+  ${chmod} +x "${bin_file}"
+
+  console_status "Finished" "release [optimized] target(s) in 0.18s"
+
+  if [ -f "${bin_file}" ]; then
+    console_status "Replacing" "${bin_file}"
+    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+  else
+    console_status "Installing" "${bin_file}"
+    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+  fi
+}
 
 exec_legacy_fetch() {
   local target_dir=$1
@@ -1290,29 +1366,31 @@ exec_legacy_build() {
 }
 
 exec_manifest_lookup() {
-  local pwd=$PWD
+  local manifest_dir=$1
 
-  MUSH_MANIFEST_DIR="${PWD}"
-
-  if [ ! -f "Manifest.toml" ]; then
-    console_error "could not find 'Manifest.toml' in '$pwd' or any parent directory"
+  if [ ! -f "${manifest_dir}/Manifest.toml" ]; then
+    console_error "could not find 'Manifest.toml' in '${manifest_dir}' or any parent directory"
     exit 101
   fi
 
-  manifest_parse
+  MUSH_MANIFEST_DIR="${manifest_dir}"
+
+  manifest_parse "${manifest_dir}/Manifest.toml"
 
   if [ -z "$MUSH_PACKAGE_VERSION" ]; then
-    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
+    console_error "failed to parse manifest at '$manifest_dir/Manifest.toml'\n\nCaused by:\n  missing field 'version' for key 'package'"
     exit 101
   fi
 
-  if [ ! -f "${MUSH_MANIFEST_DIR}/src/lib.sh" ] && [ ! -f "${MUSH_MANIFEST_DIR}/src/main.sh" ]; then
-    console_error "failed to parse manifest at '$pwd/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
+  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ]; then
+    console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
 }
 
 manifest_parse() {
+  local manifest_file=$1
+
     #echo "S:"
     newline=$'\n'
     section=MUSH_USTABLE
@@ -1385,7 +1463,7 @@ manifest_parse() {
           ;;
       esac
       #echo "L: $line"
-    done < "Manifest.toml"
+    done < "${manifest_file}"
     #echo "E."
 }
 
