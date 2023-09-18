@@ -4,6 +4,6 @@
 ##
 ## This file lists all the packages that will be installed or updated during
 
-index https://github.com/francescobianco/mush-packages.git
+index https://github.com/francescobianco/mush-packages
 
 package console https://github.com/javanile/mush.git packages/console
