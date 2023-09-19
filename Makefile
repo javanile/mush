@@ -151,3 +151,6 @@ test-syntax-build:
 
 test-syntax-command-not-found:
 	@bash tests/bare/syntax/command-not-found-test.sh
+
+test-test:
+	@bash tests/bare/test-test.sh

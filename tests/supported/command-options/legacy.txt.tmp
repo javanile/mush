@@ -1,0 +1,3 @@
+-c --flag-c
+-n --name MODULE_NAME
+-h --help

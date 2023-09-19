@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-09-18T17:08:33Z
+## @build_date: 2023-09-19T08:16:59Z
 set -e
 extern() {
   extern=$1
@@ -34,7 +34,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-09-07)"
+VERSION="Mush 0.1.1 (2023-09-19)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -55,6 +55,7 @@ parser_definition() {
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
   cmd   run -- "Run a binary or example of the local package"
+  cmd   test -- "Run the tests"
   cmd   publish -- "Package and upload this package to the registry"
 }
 
@@ -108,6 +109,9 @@ main() {
         ;;
       run)
         run_run "$@"
+        ;;
+      test)
+        run_test "$@"
         ;;
       publish)
         run_publish "$@"
@@ -405,6 +409,7 @@ public embed
 
 embed debug_2022
 embed dist_2022
+embed test_2022
 
 embed_file() {
   local module_name=$1
@@ -531,6 +536,18 @@ embed() {
 }
 EOF
 }
+test_2022() {
+  cat <<'EOF'
+mush_api_test_2022 () {
+  echo "Filter: $1"
+  echo "Functions:"
+  declare -F | awk '{print $3}' | grep "test_$1" | while read unit_test; do
+    echo "Testing: $unit_test"
+    eval "$unit_test"
+  done
+}
+EOF
+}
 
 error_dump_code() {
   local file=$1
@@ -581,6 +598,7 @@ public legacy
 public new
 public run
 public publish
+public test
 public uninstall
 
 test0 () {
@@ -892,6 +910,61 @@ run_publish() {
   exec_publish
 }
 
+parser_definition_test() {
+	setup   REST help:usage abbr:true -- "Execute all unit and integration tests and build examples of a local package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} test [OPTIONS] [TESTNAME] [-- [args]...]" ''
+
+  # Arguments:
+  #   [TESTNAME]  If specified, only run tests containing this string in their names
+  #   [args]...   Arguments for the test binary
+
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_test() {
+  eval "$(getoptions parser_definition_test parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  MUSH_BUILD_MODE=debug
+  MUSH_TARGET_DIR=target/debug
+  if [ -n "${BUILD_RELEASE}" ]; then
+    MUSH_BUILD_MODE=release
+    MUSH_TARGET_DIR=target/release
+  fi
+
+  MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
+  mkdir -p "${MUSH_DEPS_DIR}"
+
+  exec_manifest_lookup "${PWD}"
+
+  exec_legacy_fetch "${MUSH_TARGET_DIR}"
+  exec_legacy_build "${MUSH_TARGET_DIR}"
+
+  exec_dependencies "${MUSH_TARGET_DIR}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+
+  exec_build_test
+
+  bin_file=target/debug/bin/test/$MUSH_PACKAGE_NAME
+
+  console_status "Compiling" "'${bin_file}'"
+
+  exec "$bin_file" "$@"
+}
+
 parser_definition_uninstall() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
@@ -1015,6 +1088,7 @@ github_get_release_id() {
 
 public build_debug
 public build_release
+public build_test
 public index
 public init
 public install
@@ -1133,6 +1207,43 @@ exec_build_from_src() {
   mkdir -p "${package_src}/bin/"
   cp "${final_file}" "${bin_file}"
   chmod +x "${bin_file}"
+}
+
+exec_build_test() {
+  local name=$MUSH_PACKAGE_NAME
+
+  local build_file=target/debug/bin/test/${name}.tmp
+  local final_file=target/debug/bin/test/${name}
+
+  mkdir -p target/debug/bin/test
+
+  compile_file "src/main.sh"
+
+  echo "#!/usr/bin/env bash" > "${build_file}"
+  echo "set -e" >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  MUSH_DEBUG_PATH=${PWD}
+  echo "## BP002: Package and debug variables " >> "${build_file}"
+  echo "MUSH_PACKAGE_NAME=${name}" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
+  echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  echo "## BP003: Embedding debug api" >> "${build_file}"
+  debug_2022 >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  echo "## BP012: Embedding test api" >> "${build_file}"
+  test_2022 >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
+  echo "debug_file \"\${MUSH_DEBUG_PATH}/src/main.sh\"" >> "${build_file}"
+  echo "mush_api_test_2022 \"\$@\"" >> "${build_file}"
+
+  mv "${build_file}" "${final_file}"
+  chmod +x "${final_file}"
 }
 
 

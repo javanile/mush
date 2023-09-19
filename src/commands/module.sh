@@ -8,4 +8,5 @@ public legacy
 public new
 public run
 public publish
+public test
 public uninstall

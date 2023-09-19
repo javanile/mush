@@ -11,7 +11,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-09-07)"
+VERSION="Mush 0.1.1 (2023-09-19)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -32,6 +32,7 @@ parser_definition() {
   cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
   cmd   new -- "Create a new Mush package"
   cmd   run -- "Run a binary or example of the local package"
+  cmd   test -- "Run the tests"
   cmd   publish -- "Package and upload this package to the registry"
 }
 
@@ -85,6 +86,9 @@ main() {
         ;;
       run)
         run_run "$@"
+        ;;
+      test)
+        run_test "$@"
         ;;
       publish)
         run_publish "$@"
