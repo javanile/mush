@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-09-19T08:16:59Z
+## @build_date: 2023-09-19T08:29:28Z
 set -e
 extern() {
   extern=$1
@@ -542,6 +542,8 @@ mush_api_test_2022 () {
   echo "Filter: $1"
   echo "Functions:"
   declare -F | awk '{print $3}' | grep "test_$1" | while read unit_test; do
+    [ "${unit_test}" = "test_2022" ] && continue
+    [ "${unit_test}" = "mush_api_test_2022" ] && continue
     echo "Testing: $unit_test"
     eval "$unit_test"
   done
@@ -1349,10 +1351,10 @@ exec_install() {
 
   local cp=cp
   local chmod=chmod
-  if [[ $EUID -ne 0 ]]; then
-      cp="sudo ${cp}"
-      chmod="sudo ${chmod}"
-  fi
+  #if [[ $EUID -ne 0 ]]; then
+  #    cp="sudo ${cp}"
+  #    chmod="sudo ${chmod}"
+  #fi
 
   ${cp} "${final_file}" "${bin_file}"
   ${chmod} +x "${bin_file}"

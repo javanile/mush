@@ -10,10 +10,10 @@ exec_install() {
 
   local cp=cp
   local chmod=chmod
-  if [[ $EUID -ne 0 ]]; then
-      cp="sudo ${cp}"
-      chmod="sudo ${chmod}"
-  fi
+  #if [[ $EUID -ne 0 ]]; then
+  #    cp="sudo ${cp}"
+  #    chmod="sudo ${chmod}"
+  #fi
 
   ${cp} "${final_file}" "${bin_file}"
   ${chmod} +x "${bin_file}"
