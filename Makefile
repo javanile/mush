@@ -24,7 +24,7 @@ sudo-install:
 
 publish:
 	@git add .
-	@git commit -am "Nightly Release"
+	@git commit -am "Nightly Release" || true
 	@git push
 	@mush publish
 
