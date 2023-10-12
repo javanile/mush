@@ -3,6 +3,7 @@ layout: default
 title: Get Started
 permalink: /
 nav_order: 01
+compliance: 1
 ---
 
 # Mush
@@ -65,7 +66,7 @@ edition = "2022"
 [dependencies]
 ```
 
-This is called a [**manifest**](manifest), and it contains all of the
+This is called a [**manifest**](/manifest/), and it contains all of the
 metadata that Cargo needs to compile your package.
 
 Here’s what’s in `src/main.sh`:
@@ -102,4 +103,4 @@ Hello, world!
 
 ### Going further
 
-For more details on using Mush, check out the [CLI Commands](commands.md)
+For more details on using Mush, check out the [CLI Commands](/commands/)
