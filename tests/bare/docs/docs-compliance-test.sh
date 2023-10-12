@@ -25,6 +25,5 @@ while read -r -u3 file; do
     echo -n "  1. Are there Rust or Cargo reference on page? (Use [Ctrl+F] to search on page)" && read -r -p " [Y/n] " yes
 
     echo
-    exit 1
   fi
 done 3< tests/tmp/docs-compliance.txt

@@ -3,6 +3,7 @@ layout: default
 title: Manifest File
 permalink: /manifest/
 nav_order: 03
+compliance: 1
 ---
 
 # The Manifest Format
