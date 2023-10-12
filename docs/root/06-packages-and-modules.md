@@ -2,6 +2,7 @@
 layout: default
 title: Packages and modules
 nav_order: 06
+compliance: 1
 ---
 
 The npm registry contains packages, many of which are also Node modules, or contain Node modules. Read on to understand how they differ and how they interact.

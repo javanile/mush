@@ -9,7 +9,7 @@ nav_order: 03
 
 The `Manifest.toml` file for each package is called its *manifest*. It is written
 in the [TOML] format. It contains metadata that is needed to compile the package. Checkout
-the `mush locate-project` section for more detail on how cargo finds the manifest file.
+the `mush locate-project` section for more detail on how mush finds the manifest file.
 
 Every manifest file consists of the following sections:
 
@@ -36,20 +36,20 @@ Every manifest file consists of the following sections:
     * [`include`](#the-exclude-and-include-fields) — Files to include when publishing.
     * [`publish`](#the-publish-field) — Can be used to prevent publishing the package.
     * [`metadata`](#the-metadata-table) — Extra settings for external tools.
-    * [`default-run`](#the-default-run-field) — The default binary to run by [`cargo run`].
-    * [`autobins`](cargo-targets.md#target-auto-discovery) — Disables binary auto discovery.
-    * [`autoexamples`](cargo-targets.md#target-auto-discovery) — Disables example auto discovery.
-    * [`autotests`](cargo-targets.md#target-auto-discovery) — Disables test auto discovery.
-    * [`autobenches`](cargo-targets.md#target-auto-discovery) — Disables bench auto discovery.
+    * [`default-run`](#the-default-run-field) — The default binary to run by [`mush run`].
+    * [`autobins`](mush-targets.md#target-auto-discovery) — Disables binary auto discovery.
+    * [`autoexamples`](mush-targets.md#target-auto-discovery) — Disables example auto discovery.
+    * [`autotests`](mush-targets.md#target-auto-discovery) — Disables test auto discovery.
+    * [`autobenches`](mush-targets.md#target-auto-discovery) — Disables bench auto discovery.
     * [`resolver`](resolver.md#resolver-versions) — Sets the dependency resolver to use. 
 -->
 
-* Target tables: (see [configuration](cargo-targets.md#configuring-a-target) for settings)
-    * [`[lib]`](cargo-targets.md#library) — Library target settings.
-    * [`[[bin]]`](cargo-targets.md#binaries) — Binary target settings.
-    * [`[[example]]`](cargo-targets.md#examples) — Example target settings.
-    * [`[[test]]`](cargo-targets.md#tests) — Test target settings.
-    * [`[[bench]]`](cargo-targets.md#benchmarks) — Benchmark target settings.
+* Target tables: (see [configuration](mush-targets.md#configuring-a-target) for settings)
+    * [`[lib]`](mush-targets.md#library) — Library target settings.
+    * [`[[bin]]`](mush-targets.md#binaries) — Binary target settings.
+    * [`[[example]]`](mush-targets.md#examples) — Example target settings.
+    * [`[[test]]`](mush-targets.md#tests) — Test target settings.
+    * [`[[bench]]`](mush-targets.md#benchmarks) — Benchmark target settings.
 
 <!--- --->
     
@@ -71,7 +71,7 @@ Every manifest file consists of the following sections:
 
 ## The package section
 
-The first section in a `Cargo.toml` is `[package]`.
+The first section in a `Manifest.toml` is `[package]`.
 
 ```toml
 [package]
@@ -80,7 +80,7 @@ version = "0.1.0"    # the current version, obeying semver
 authors = ["Alice <a@example.com>", "Bob <b@example.com>"]
 ```
 
-The only fields required by Cargo are [`name`](#the-name-field) and
+The only fields required by Mush are [`name`](#the-name-field) and
 [`version`](#the-version-field). If publishing to a registry, the registry may
 require additional fields. See the notes below and [the publishing
 chapter][publishing] for requirements for publishing to [crates.io].
@@ -93,8 +93,8 @@ inferred lib and bin targets.
 
 The name must use only [alphanumeric] characters or `-` or `_`, and cannot be empty.
 
-Note that [`cargo new`] and [`cargo init`] impose some additional restrictions on
-the package name, such as enforcing that it is a valid Rust identifier and not
+Note that [`mush new`] and [`mush init`] impose some additional restrictions on
+the package name, such as enforcing that it is a valid Mush identifier and not
 a keyword. [crates.io] imposes even more restrictions, such as:
 
 - Only ASCII characters are allowed.
@@ -106,11 +106,10 @@ a keyword. [crates.io] imposes even more restrictions, such as:
 
 #### The version field
 
-Cargo bakes in the concept of [Semantic
-Versioning](https://semver.org/), so make sure you follow some basic rules:
+Mush bakes in the concept of [Semantic Versioning](https://semver.org/), so make sure you follow some basic rules:
 
 * Before you reach 1.0.0, anything goes, but if you make breaking changes,
-  increment the minor version. In Rust, breaking changes include adding fields to
+  increment the minor version. In Mush, breaking changes include adding fields to
   structs or variants to enums.
 * After 1.0.0, only make breaking changes when you increment the major version.
   Don’t break the build.
@@ -119,7 +118,7 @@ Versioning](https://semver.org/), so make sure you follow some basic rules:
   traits, fields, types, functions, methods or anything else.
 * Use version numbers with three numeric parts such as 1.0.0 rather than 1.0.
 
-See the [Resolver] chapter for more information on how Cargo uses versions to
+See the [Resolver] chapter for more information on how Mush uses versions to
 resolve dependencies, and for guidelines on setting your own version. See the
 [SemVer compatibility] chapter for more details on exactly what constitutes a
 breaking change.
@@ -138,7 +137,7 @@ the end of each author entry.
 ```toml
 [package]
 # ...
-authors = ["Graydon Hoare", "Fnu Lnu <no-reply@rust-lang.org>"]
+authors = ["Sam Sunset", "Mr. Bianco <bianco@javanile.org>"]
 ```
 
 This field is only surfaced in package metadata and in the `CARGO_PKG_AUTHORS`
@@ -152,7 +151,7 @@ user interface.
 
 ### The edition field
 
-The `edition` key is an optional key that affects which [Rust Edition] your package
+The `edition` key is an optional key that affects which [Mush Edition] your package
 is compiled with. Setting the `edition` key in `[package]` will affect all
 targets/crates in the package, including test suites, benchmarks, binaries,
 examples, etc.
@@ -163,41 +162,41 @@ examples, etc.
 edition = '2021'
 ```
 
-Most manifests have the `edition` field filled in automatically by [`cargo new`]
-with the latest stable edition. By default `cargo new` creates a manifest with
+Most manifests have the `edition` field filled in automatically by [`mush new`]
+with the latest stable edition. By default `mush new` creates a manifest with
 the 2021 edition currently.
 
-If the `edition` field is not present in `Cargo.toml`, then the 2015 edition is
+If the `edition` field is not present in `Manifest.toml`, then the 2015 edition is
 assumed for backwards compatibility. Note that all manifests
-created with [`cargo new`] will not use this historical fallback because they
+created with [`mush new`] will not use this historical fallback because they
 will have `edition` explicitly specified to a newer value.
 
 <!---
-#### The `rust-version` field
+#### The `mush-version` field
 
-The `rust-version` field is an optional key that tells cargo what version of the
-Rust language and compiler your package can be compiled with. If the currently
-selected version of the Rust compiler is older than the stated version, cargo
+The `mush-version` field is an optional key that tells mush what version of the
+Mush language and compiler your package can be compiled with. If the currently
+selected version of the Mush compiler is older than the stated version, mush
 will exit with an error, telling the user what version is required.
 
-The first version of Cargo that supports this field was released with Rust 1.56.0.
-In older releases, the field will be ignored, and Cargo will display a warning.
+The first version of Mush that supports this field was released with Mush 1.56.0.
+In older releases, the field will be ignored, and Mush will display a warning.
 
 ```toml
 [package]
 # ...
-rust-version = "1.56"
+mush-version = "1.56"
 ```
 
-The Rust version must be a bare version number with two or three components; it
+The Mush version must be a bare version number with two or three components; it
 cannot include semver operators or pre-release identifiers. Compiler pre-release
-identifiers such as -nightly will be ignored while checking the Rust version.
-The `rust-version` must be equal to or newer than the version that first
+identifiers such as -nightly will be ignored while checking the Mush version.
+The `mush-version` must be equal to or newer than the version that first
 introduced the configured `edition`.
 
-The `rust-version` may be ignored using the `--ignore-rust-version` option.
+The `mush-version` may be ignored using the `--ignore-mush-version` option.
 
-Setting the `rust-version` key in `[package]` will affect all targets/crates in
+Setting the `mush-version` key in `[package]` will affect all targets/crates in
 the package, including test suites, benchmarks, binaries, examples, etc.
 
 #### The `description` field
@@ -229,7 +228,7 @@ documentation = "https://docs.rs/bitflags"
 #### The `readme` field
 
 The `readme` field should be the path to a file in the package root (relative
-to this `Cargo.toml`) that contains general information about the package.
+to this `Manifest.toml`) that contains general information about the package.
 This file will be transferred to the registry when you publish. [crates.io]
 will interpret it as Markdown and render it on the crate's page.
 
@@ -264,14 +263,14 @@ package.
 ```toml
 [package]
 # ...
-repository = "https://github.com/rust-lang/cargo/"
+repository = "https://github.com/javanile/mush/"
 ```
 
 #### The `license` and `license-file` fields
 
 The `license` field contains the name of the software license that the package
 is released under. The `license-file` field contains the path to a file
-containing the text of the license (relative to this `Cargo.toml`).
+containing the text of the license (relative to this `Manifest.toml`).
 
 [crates.io] interprets the `license` field as an [SPDX 2.1 license
 expression][spdx-2.1-license-expressions]. The name must be a known license
@@ -331,7 +330,7 @@ The `categories` field is an array of strings of the categories this package
 belongs to.
 
 ```toml
-categories = ["command-line-utilities", "development-tools::cargo-plugins"]
+categories = ["command-line-utilities", "development-tools::mush-plugins"]
 ```
 
 > **Note**: [crates.io] has a maximum of 5 categories. Each category should
@@ -343,7 +342,7 @@ categories = ["command-line-utilities", "development-tools::cargo-plugins"]
 
 The `workspace` field can be used to configure the workspace that this package
 will be a member of. If not specified this will be inferred as the first
-Cargo.toml with `[workspace]` upwards in the filesystem. Setting this is
+Manifest.toml with `[workspace]` upwards in the filesystem. Setting this is
 useful if the member is not inside a subdirectory of the workspace root.
 
 ```toml
@@ -407,7 +406,7 @@ and certain kinds of change tracking (described below).
 The patterns specified in the `exclude` field identify a set of files that are
 not included, and the patterns in `include` specify files that are explicitly
 included.
-You may run [`cargo package --list`][`cargo package`] to verify which files will
+You may run [`mush package --list`][`mush package`] to verify which files will
 be included in the package.
 
 ```toml
@@ -437,15 +436,15 @@ Regardless of whether `exclude` or `include` is specified, the following files
 are always excluded:
 
 * Any sub-packages will be skipped (any subdirectory that contains a
-  `Cargo.toml` file).
+  `Manifest.toml` file).
 * A directory named `target` in the root of the package will be skipped.
 
 The following files are always included:
 
-* The `Cargo.toml` file of the package itself is always included, it does not
+* The `Manifest.toml` file of the package itself is always included, it does not
   need to be listed in `include`.
-* A minimized `Cargo.lock` is automatically included if the package contains a
-  binary or example target, see [`cargo package`] for more information.
+* A minimized `Manifest.lock` is automatically included if the package contains a
+  binary or example target, see [`mush package`] for more information.
 * If a [`license-file`](#the-license-and-license-file-fields) is specified, it
   is always included.
 
@@ -480,7 +479,7 @@ The patterns should be [gitignore]-style patterns. Briefly:
   directory, except for any file named `foo.rs`.
 
 The include/exclude list is also used for change tracking in some situations.
-For targets built with `rustdoc`, it is used to determine the list of files to
+For targets built with `mushdoc`, it is used to determine the list of files to
 track to determine if the target should be rebuilt. If the package has a
 [build script] that does not emit any `rerun-if-*` directives, then the
 include/exclude list is used for tracking if the build script should be re-run
@@ -510,16 +509,16 @@ allowed to be published to.
 publish = ["some-registry-name"]
 ```
 
-If publish array contains a single registry, `cargo publish` command will use
+If publish array contains a single registry, `mush publish` command will use
 it when `--registry` flag is not specified.
 
 <a id="the-metadata-table-optional"></a>
 #### The `metadata` table
 
-Cargo by default will warn about unused keys in `Cargo.toml` to assist in
+Mush by default will warn about unused keys in `Manifest.toml` to assist in
 detecting typos and such. The `package.metadata` table, however, is completely
-ignored by Cargo and will not be warned about. This section can be used for
-tools which would like to store package configuration in `Cargo.toml`. For
+ignored by Mush and will not be warned about. This section can be used for
+tools which would like to store package configuration in `Manifest.toml`. For
 example:
 
 ```toml
@@ -534,7 +533,7 @@ assets = "path/to/static"
 ```
 
 There is a similar table at the workspace level at
-[`workspace.metadata`][workspace-metadata]. While cargo does not specify a
+[`workspace.metadata`][workspace-metadata]. While mush does not specify a
 format for the content of either of these tables, it is suggested that
 external tools may wish to use them in a consistent fashion, such as referring
 to the data in `workspace.metadata` if data is missing from `package.metadata`,
@@ -545,7 +544,7 @@ if that makes sense for the tool in question.
 #### The `default-run` field
 
 The `default-run` field in the `[package]` section of the manifest can be used
-to specify a default binary picked by [`cargo run`]. For example, when there is
+to specify a default binary picked by [`mush run`]. For example, when there is
 both `src/bin/a.rs` and `src/bin/b.rs`:
 
 ```toml
@@ -567,8 +566,8 @@ on a registry website when the package is published.
 [badges]
 # The `maintenance` table indicates the status of the maintenance of
 # the crate. This may be used by a registry, but is currently not
-# used by crates.io. See https://github.com/rust-lang/crates.io/issues/2437
-# and https://github.com/rust-lang/crates.io/issues/2438 for more details.
+# used by crates.io. See https://github.com/mush-lang/crates.io/issues/2437
+# and https://github.com/mush-lang/crates.io/issues/2438 for more details.
 #
 # The `status` field is required. Available options are:
 # - `actively-developed`: New features are being added and bugs are being fixed.

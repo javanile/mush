@@ -7,3 +7,11 @@
 .main-content #toctitle {
   margin-bottom: 0.5em;
 }
+
+.main-content .options-table td {
+  vertical-align: top;
+}
+
+.main-content .options-table th {
+  display: none;
+}

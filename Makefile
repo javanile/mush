@@ -41,11 +41,13 @@ serve-docs:
 	@echo 'repository: "javanile/mush"' >> docs/_config_dev.yml
 	@mkdir -p "docs/.bundles_cache"
 	@docker run --rm -it \
-		-v "$$PWD/docs:/srv/jekyll" \
-		-e BUNDLE_PATH="/srv/jekyll/.bundles_cache" \
+		-v $$PWD/docs:/srv/jekyll \
+		-v $$PWD/.bundles_cache:/tmp/.bundles_cache \
+		-e BUNDLE_PATH=/tmp/.bundles_cache \
 		-p 4000:4000 \
-		jekyll/builder:3.8 \
-		bash -c "gem install bundler && bundle install && bundle exec jekyll serve --host 0.0.0.0 --verbose --config _config.yml,_config_dev.yml"
+		jekyll/builder:3.8 bash -c "\
+			gem install bundler && bundle install && \
+			bundle exec jekyll serve --host 0.0.0.0 --verbose --config _config.yml,_config_dev.yml"
 
 ## ====
 ## Test
@@ -154,7 +156,10 @@ test-demo:
 	@bash tests/bare/demo-test.sh
 
 test-docs:
-	@bash tests/bare/docs-test.sh
+	@bash tests/bare/docs/docs-test.sh
+
+test-docs-compliance:
+	@bash tests/bare/docs/docs-compliance-test.sh
 
 test-sysinfo:
 	@bash tests/bare/sysinfo-test.sh

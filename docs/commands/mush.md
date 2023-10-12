@@ -141,128 +141,29 @@ available at <https://rust-lang.org>.
 
 ### Special Options
 
-<dl>
-
-<dt class="option-term" id="option-cargo--V"><a class="option-anchor" href="#option-cargo--V"></a><code>-V</code></dt>
-<dt class="option-term" id="option-cargo---version"><a class="option-anchor" href="#option-cargo---version"></a><code>--version</code></dt>
-<dd class="option-desc">Print version info and exit. If used with <code>--verbose</code>, prints extra
-information.</dd>
-
-
-<dt class="option-term" id="option-cargo---list"><a class="option-anchor" href="#option-cargo---list"></a><code>--list</code></dt>
-<dd class="option-desc">List all installed Cargo subcommands. If used with <code>--verbose</code>, prints extra
-information.</dd>
-
-
-<dt class="option-term" id="option-cargo---explain"><a class="option-anchor" href="#option-cargo---explain"></a><code>--explain</code> <em>code</em></dt>
-<dd class="option-desc">Run <code>rustc --explain CODE</code> which will print out a detailed explanation of an
-error message (for example, <code>E0004</code>).</dd>
-
-
-</dl>
+|                    |                                                                                                                    |
+|-------------------:|--------------------------------------------------------------------------------------------------------------------|
+|  `-V`, `--version` | Print version info and exit. If used with `--verbose`, prints extra information.                                   |
+|           `--list` | List all installed Cargo subcommands. If used with `--verbose`, prints extra information.                          |
+| `--explain` *code* | Run `rustc --explain CODE` which will print out a detailed explanation of an error message (for example, `E0004`). |
+{: .options-table }
 
 ### Display Options
 
-<dl>
-
-<dt class="option-term" id="option-cargo--v"><a class="option-anchor" href="#option-cargo--v"></a><code>-v</code></dt>
-<dt class="option-term" id="option-cargo---verbose"><a class="option-anchor" href="#option-cargo---verbose"></a><code>--verbose</code></dt>
-<dd class="option-desc">Use verbose output. May be specified twice for “very verbose” output which
-includes extra output such as dependency warnings and build script output.
-May also be specified with the <code>term.verbose</code>
-<a href="../reference/config.html">config value</a>.</dd>
-
-
-<dt class="option-term" id="option-cargo--q"><a class="option-anchor" href="#option-cargo--q"></a><code>-q</code></dt>
-<dt class="option-term" id="option-cargo---quiet"><a class="option-anchor" href="#option-cargo---quiet"></a><code>--quiet</code></dt>
-<dd class="option-desc">Do not print cargo log messages.
-May also be specified with the <code>term.quiet</code>
-<a href="../reference/config.html">config value</a>.</dd>
-
-
-<dt class="option-term" id="option-cargo---color"><a class="option-anchor" href="#option-cargo---color"></a><code>--color</code> <em>when</em></dt>
-<dd class="option-desc">Control when colored output is used. Valid values:</p>
-<ul>
-<li><code>auto</code> (default): Automatically detect if color support is available on the
-terminal.</li>
-<li><code>always</code>: Always display colors.</li>
-<li><code>never</code>: Never display colors.</li>
-</ul>
-<p>May also be specified with the <code>term.color</code>
-<a href="../reference/config.html">config value</a>.</dd>
-
-
-
-</dl>
-
-### Manifest Options
-
-<dl>
-<dt class="option-term" id="option-cargo---frozen"><a class="option-anchor" href="#option-cargo---frozen"></a><code>--frozen</code></dt>
-<dt class="option-term" id="option-cargo---locked"><a class="option-anchor" href="#option-cargo---locked"></a><code>--locked</code></dt>
-<dd class="option-desc">Either of these flags requires that the <code>Cargo.lock</code> file is
-up-to-date. If the lock file is missing, or it needs to be updated, Cargo will
-exit with an error. The <code>--frozen</code> flag also prevents Cargo from
-attempting to access the network to determine if it is out-of-date.</p>
-<p>These may be used in environments where you want to assert that the
-<code>Cargo.lock</code> file is up-to-date (such as a CI build) or want to avoid network
-access.</dd>
-
-
-<dt class="option-term" id="option-cargo---offline"><a class="option-anchor" href="#option-cargo---offline"></a><code>--offline</code></dt>
-<dd class="option-desc">Prevents Cargo from accessing the network for any reason. Without this
-flag, Cargo will stop with an error if it needs to access the network and
-the network is not available. With this flag, Cargo will attempt to
-proceed without the network if possible.</p>
-<p>Beware that this may result in different dependency resolution than online
-mode. Cargo will restrict itself to crates that are downloaded locally, even
-if there might be a newer version as indicated in the local copy of the index.
-See the <a href="cargo-fetch.html">cargo-fetch(1)</a> command to download dependencies before going
-offline.</p>
-<p>May also be specified with the <code>net.offline</code> <a href="../reference/config.html">config value</a>.</dd>
-
-
-</dl>
-
-### Common Options
-
-<dl>
-
-<dt class="option-term" id="option-cargo-+toolchain"><a class="option-anchor" href="#option-cargo-+toolchain"></a><code>+</code><em>toolchain</em></dt>
-<dd class="option-desc">If Cargo has been installed with rustup, and the first argument to <code>cargo</code>
-begins with <code>+</code>, it will be interpreted as a rustup toolchain name (such
-as <code>+stable</code> or <code>+nightly</code>).
-See the <a href="https://rust-lang.github.io/rustup/overrides.html">rustup documentation</a>
-for more information about how toolchain overrides work.</dd>
-
-
-<dt class="option-term" id="option-cargo---config"><a class="option-anchor" href="#option-cargo---config"></a><code>--config</code> <em>KEY=VALUE</em> or <em>PATH</em></dt>
-<dd class="option-desc">Overrides a Cargo configuration value. The argument should be in TOML syntax of <code>KEY=VALUE</code>,
-or provided as a path to an extra configuration file. This flag may be specified multiple times.
-See the <a href="../reference/config.html#command-line-overrides">command-line overrides section</a> for more information.</dd>
-
-
-<dt class="option-term" id="option-cargo--C"><a class="option-anchor" href="#option-cargo--C"></a><code>-C</code> <em>PATH</em></dt>
-<dd class="option-desc">Changes the current working directory before executing any specified operations. This affects
-things like where cargo looks by default for the project manifest (<code>Cargo.toml</code>), as well as
-the directories searched for discovering <code>.cargo/config.toml</code>, for example. This option must
-appear before the command name, for example <code>cargo -C path/to/my-project build</code>.</p>
-<p>This option is only available on the <a href="https://doc.rust-lang.org/book/appendix-07-nightly-rust.html">nightly
-channel</a> and
-requires the <code>-Z unstable-options</code> flag to enable (see
-<a href="https://github.com/rust-lang/cargo/issues/10098">#10098</a>).</dd>
-
-
-<dt class="option-term" id="option-cargo--h"><a class="option-anchor" href="#option-cargo--h"></a><code>-h</code></dt>
-<dt class="option-term" id="option-cargo---help"><a class="option-anchor" href="#option-cargo---help"></a><code>--help</code></dt>
-<dd class="option-desc">Prints help information.</dd>
-
-
-<dt class="option-term" id="option-cargo--Z"><a class="option-anchor" href="#option-cargo--Z"></a><code>-Z</code> <em>flag</em></dt>
-<dd class="option-desc">Unstable (nightly-only) flags to Cargo. Run <code>cargo -Z help</code> for details.</dd>
-
-
-</dl>
+|                                  |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|---------------------------------:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                `-v`. `--verbose` | Use verbose output. May be specified twice for “very verbose” output which includes extra output such as dependency warnings and build script output. May also be specified with the `term.verbose` [config value](../reference/config.html).                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+|                  `-q`, `--quiet` | Do not print cargo log messages. May also be specified with the `term.quiet` [config value](../reference/config.html).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+|                 `--color` *when* | Control when colored output is used. Valid values: - `auto` (default): Automatically detect if color support is available on the terminal. - `always`: Always display colors. - `never`: Never display colors. May also be specified with the `term.color` [config value](../reference/config.html).                                                                                                                                                                                                                                                                                                                                                                                        |
+|                       `--frozen` | Either of these flags requires that the `Cargo.lock` file is up-to-date. If the lock file is missing, or it needs to be updated, Cargo will exit with an error. The `--frozen` flag also prevents Cargo from attempting to access the network to determine if it is out-of-date. These may be used in environments where you want to assert that the `Cargo.lock` file is up-to-date (such as a CI build) or want to avoid network access.                                                                                                                                                                                                                                                  |
+|                       `--locked` | Either of these flags requires that the `Cargo.lock` file is up-to-date. If the lock file is missing, or it needs to be updated, Cargo will exit with an error. The `--frozen` flag also prevents Cargo from attempting to access the network to determine if it is out-of-date. These may be used in environments where you want to assert that the `Cargo.lock` file is up-to-date (such as a CI build) or want to avoid network access.                                                                                                                                                                                                                                                  |
+|                      `--offline` | Prevents Cargo from accessing the network for any reason. Without this flag, Cargo will stop with an error if it needs to access the network and the network is not available. With this flag, Cargo will attempt to proceed without the network if possible. Beware that this may result in different dependency resolution than online mode. Cargo will restrict itself to crates that are downloaded locally, even if there might be a newer version as indicated in the local copy of the index. See the [cargo-fetch(1)](cargo-fetch(1)) command to download dependencies before going offline. May also be specified with the `net.offline` [config value](../reference/config.html). |
+|                     `+toolchain` | If Cargo has been installed with rustup, and the first argument to `cargo` begins with `+`, it will be interpreted as a rustup toolchain name (such as +stable or +nightly). See the [rustup documentation](https://rust-lang.github.io/rustup/overrides.html) for more information about how toolchain overrides work.                                                                                                                                                                                                                                                                                                                                                                     |
+| `--config` *KEY=VALUE* or *PATH* | Overrides a Cargo configuration value. The argument should be in TOML syntax of *KEY=VALUE*, or provided as a path to an extra configuration file. This flag may be specified multiple times. See the [command-line overrides section](../reference/config.html#command-line-overrides) for more information.                                                                                                                                                                                                                                                                                                                                                                               |
+|                      `-C` *PATH* | Changes the current working directory before executing any specified operations. This affects things like where cargo looks by default for the project manifest (Cargo.toml), as well as the directories searched for discovering .cargo/config.toml, for example. This option must appear before the command name, for example cargo -C path/to/my-project build. This option is only available on the [nightly channel](https://doc.rust-lang.org/book/appendix-07-nightly-rust.html) and requires the -Z unstable-options flag to enable (see #10098).                                                                                                                                   |
+|                   `-h`, `--help` | Prints help information.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+|                      `-Z` *flag* | Unstable (nightly-only) flags to Cargo. Run cargo -Z help for details.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+{: .options-table }
 
 
 ## ENVIRONMENT
@@ -273,8 +174,8 @@ details on environment variables that Cargo reads.
 
 ## EXIT STATUS
 
-* `0`: Cargo succeeded.
-* `101`: Cargo failed to complete.
+* `0`: Mush succeeded.
+* `101`: Mush failed to complete.
 
 
 ## FILES
