@@ -9,15 +9,15 @@ nav_order: 0
 
 ## NAME
 
-mush --- The Rust package manager
+mush --- The shell package manager
 
 ## SYNOPSIS
 
-`cargo` [_options_] _command_ [_args_]\
-`cargo` [_options_] `--version`\
-`cargo` [_options_] `--list`\
-`cargo` [_options_] `--help`\
-`cargo` [_options_] `--explain` _code_
+`mush` [_options_] _command_ [_args_]\
+`mush` [_options_] `--version`\
+`mush` [_options_] `--list`\
+`mush` [_options_] `--help`\
+`mush` [_options_] `--explain` _code_
 
 ## DESCRIPTION
 

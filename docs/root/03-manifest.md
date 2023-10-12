@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Manifest File
+permalink: /manifest/
 nav_order: 03
 ---
 
@@ -12,13 +13,13 @@ the `mush locate-project` section for more detail on how cargo finds the manifes
 
 Every manifest file consists of the following sections:
 
-* [`cargo-features`](unstable.md) — Unstable, nightly-only features.
 * [`[package]`](#the-package-section) — Defines a package.
     * [`name`](#the-name-field) — The name of the package.
     * [`version`](#the-version-field) — The version of the package.
     * [`authors`](#the-authors-field) — The authors of the package.
-    * [`edition`](#the-edition-field) — The Rust edition.
-    * [`rust-version`](#the-rust-version-field) — The minimal supported Rust version.
+    * [`edition`](#the-edition-field) — The Mush edition.
+
+<!--
     * [`description`](#the-description-field) — A description of the package.
     * [`documentation`](#the-documentation-field) — URL of the package documentation.
     * [`readme`](#the-readme-field) — Path to the package's README file.
@@ -40,27 +41,35 @@ Every manifest file consists of the following sections:
     * [`autoexamples`](cargo-targets.md#target-auto-discovery) — Disables example auto discovery.
     * [`autotests`](cargo-targets.md#target-auto-discovery) — Disables test auto discovery.
     * [`autobenches`](cargo-targets.md#target-auto-discovery) — Disables bench auto discovery.
-    * [`resolver`](resolver.md#resolver-versions) — Sets the dependency resolver to use.
+    * [`resolver`](resolver.md#resolver-versions) — Sets the dependency resolver to use. 
+-->
+
 * Target tables: (see [configuration](cargo-targets.md#configuring-a-target) for settings)
     * [`[lib]`](cargo-targets.md#library) — Library target settings.
     * [`[[bin]]`](cargo-targets.md#binaries) — Binary target settings.
     * [`[[example]]`](cargo-targets.md#examples) — Example target settings.
     * [`[[test]]`](cargo-targets.md#tests) — Test target settings.
     * [`[[bench]]`](cargo-targets.md#benchmarks) — Benchmark target settings.
+
+<!--- --->
+    
 * Dependency tables:
     * [`[dependencies]`](specifying-dependencies.md) — Package library dependencies.
     * [`[dev-dependencies]`](specifying-dependencies.md#development-dependencies) — Dependencies for examples, tests, and benchmarks.
     * [`[build-dependencies]`](specifying-dependencies.md#build-dependencies) — Dependencies for build scripts.
     * [`[target]`](specifying-dependencies.md#platform-specific-dependencies) — Platform-specific dependencies.
+
+<!---
 * [`[badges]`](#the-badges-section) — Badges to display on a registry.
 * [`[features]`](features.md) — Conditional compilation features.
 * [`[patch]`](overriding-dependencies.md#the-patch-section) — Override dependencies.
 * [`[replace]`](overriding-dependencies.md#the-replace-section) — Override dependencies (deprecated).
 * [`[profile]`](profiles.md) — Compiler settings and optimizations.
 * [`[workspace]`](workspaces.md) — The workspace definition.
+* [`[features]`](unstable.md) — Unstable, nightly-only features.
+--->
 
-<a id="package-metadata"></a>
-### The `[package]` section
+## The package section
 
 The first section in a `Cargo.toml` is `[package]`.
 
@@ -76,7 +85,7 @@ The only fields required by Cargo are [`name`](#the-name-field) and
 require additional fields. See the notes below and [the publishing
 chapter][publishing] for requirements for publishing to [crates.io].
 
-#### The `name` field
+### The name field
 
 The package name is an identifier used to refer to the package. It is used
 when listed as a dependency in another package, and as the default name of
@@ -95,7 +104,7 @@ a keyword. [crates.io] imposes even more restrictions, such as:
 
 [alphanumeric]: ../../std/primitive.char.html#method.is_alphanumeric
 
-#### The `version` field
+#### The version field
 
 Cargo bakes in the concept of [Semantic
 Versioning](https://semver.org/), so make sure you follow some basic rules:
@@ -118,8 +127,7 @@ breaking change.
 [Resolver]: resolver.md
 [SemVer compatibility]: semver.md
 
-<a id="the-authors-field-optional"></a>
-#### The `authors` field
+### The authors field
 
 The optional `authors` field lists in an array the people or organizations that are considered
 the "authors" of the package. The exact meaning is open to interpretation — it
@@ -141,8 +149,8 @@ user interface.
 > field cannot be changed or removed in already-published versions of a
 > package.
 
-<a id="the-edition-field-optional"></a>
-#### The `edition` field
+
+### The edition field
 
 The `edition` key is an optional key that affects which [Rust Edition] your package
 is compiled with. Setting the `edition` key in `[package]` will affect all
@@ -164,6 +172,7 @@ assumed for backwards compatibility. Note that all manifests
 created with [`cargo new`] will not use this historical fallback because they
 will have `edition` explicitly specified to a newer value.
 
+<!---
 #### The `rust-version` field
 
 The `rust-version` field is an optional key that tells cargo what version of the
@@ -590,3 +599,4 @@ information on the `[dependencies]`, `[dev-dependencies]`,
 The `[profile]` tables provide a way to customize compiler settings such as
 optimizations and debug settings. See [the Profiles chapter](profiles.md) for
 more detail.
+--->

@@ -65,7 +65,7 @@ edition = "2022"
 [dependencies]
 ```
 
-This is called a [***manifest***][manifest], and it contains all of the
+This is called a [**manifest**](manifest), and it contains all of the
 metadata that Cargo needs to compile your package.
 
 Here’s what’s in `src/main.sh`:
