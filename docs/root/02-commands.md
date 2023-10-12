@@ -5,6 +5,7 @@ permalink: /commands/
 nav_order: 02
 has_children: true
 has_toc: false
+compliance: 1
 ---
 
 # Commands
