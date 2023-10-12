@@ -1,7 +1,8 @@
 ---
 layout: default
 title: Get Started
-nav_order: 1
+permalink: /
+nav_order: 01
 ---
 
 # Mush

@@ -2,4 +2,9 @@
 .vscode/
 tests/temp/
 tests/tmp/
+docs/_site/
+docs/.bundles_cache/
+docs/Gemfile
+docs/Gemfile.lock
+docs/_config_dev.yml
 .env

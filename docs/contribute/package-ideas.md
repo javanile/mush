@@ -1,3 +1,10 @@
+---
+layout: default
+title: Package Ideas
+parent: Contribute
+nav_order: 12
+---
+
 # Package Ideas
 
 - A tool that convert from TSV to CSV

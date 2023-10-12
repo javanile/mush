@@ -1,7 +1,8 @@
 ---
 layout: default
 title: CLI Commands
-nav_order: 2
+permalink: /commands/
+nav_order: 02
 has_children: true
 has_toc: false
 ---

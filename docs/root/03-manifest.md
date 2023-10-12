@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Manifest File
-nav_order: 3
+nav_order: 03
 ---
 
 # The Manifest Format

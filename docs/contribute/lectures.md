@@ -1,7 +1,8 @@
 ---
 layout: default
 title: Lectures
-nav_order: 100
+parent: Contribute
+nav_order: 14
 ---
 
 # Lectures

@@ -29,6 +29,25 @@ publish:
 	@mush publish
 
 ## ====
+## Docs
+## ====
+
+serve-docs:
+	@echo 'source "https://rubygems.org"' > docs/Gemfile
+	@echo 'gem "github-pages", "~> 219", group: :jekyll_plugins' >> docs/Gemfile
+	@echo 'gem "kramdown-parser-gfm"' >> docs/Gemfile
+	@echo 'gem "jekyll-include-cache"' >> docs/Gemfile
+	@echo 'baseurl: ""' > docs/_config_dev.yml
+	@echo 'repository: "javanile/mush"' >> docs/_config_dev.yml
+	@mkdir -p "docs/.bundles_cache"
+	@docker run --rm -it \
+		-v "$$PWD/docs:/srv/jekyll" \
+		-e BUNDLE_PATH="/srv/jekyll/.bundles_cache" \
+		-p 4000:4000 \
+		jekyll/builder:3.8 \
+		bash -c "gem install bundler && bundle install && bundle exec jekyll serve --host 0.0.0.0 --verbose --config _config.yml,_config_dev.yml"
+
+## ====
 ## Test
 ## ====
 
