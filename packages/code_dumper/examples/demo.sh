@@ -2,5 +2,5 @@
 
 
 main() {
-  code_dumper "$(mush_debug file)" "$(mush_debug line)"
+  code_dumper "$(mush_debug_file)" "$(mush_debug_line)"
 }
