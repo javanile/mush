@@ -38,7 +38,7 @@ github_upload_release_asset() {
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
-    --data-binary @"$asset_file" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
+    --data-binary @"$asset_file"
 }
 
 github_delete_release_asset() {
