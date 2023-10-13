@@ -1,45 +1,28 @@
-
-trap 'ERRO_LINENO=$LINENO' ERR
-trap '_failure' EXIT
-
-_failure() {
-  printenv
-  ERR_CODE=$? # capture last command exit code
-  set +xv # turns off debug logging, just in case
-  if [[  $- =~ e && ${ERR_CODE} != 0 ]]
+function errexit() {
+  local err=$?
+  set +o xtrace
+  local code="${1:-1}"
+  echo "Error in ${BASH_SOURCE[1]}:${BASH_LINENO[0]}. '${BASH_COMMAND}' exited with status $err"
+  # Print out the stack trace described by $function_stack
+  if [ ${#FUNCNAME[@]} -gt 2 ]
   then
-    echo -e "\b\b"
-      # only log stack trace if requested (set -e)
-      # and last command failed
-      echo "!========= CATASTROPHIC COMMAND FAIL ========="
-      echo
-      echo "SCRIPT EXITED ON ERROR CODE: ${ERR_CODE}"
-      echo
-      LEN=${#BASH_LINENO[@]}
-      for (( INDEX=0; INDEX<$LEN-1; INDEX++ ))
-      do
-          echo '---'
-          echo "FILE: $(basename ${BASH_SOURCE[${INDEX}+1]})"
-          echo "  FUNCTION: ${FUNCNAME[${INDEX}+1]}"
-          if [[ ${INDEX} > 0 ]]
-          then
-           # commands in stack trace
-              echo "  COMMAND: ${FUNCNAME[${INDEX}]}"
-              echo "  LINE: ${BASH_LINENO[${INDEX}]}"
-          else
-              # command that failed
-              echo "  COMMAND: ${BASH_COMMAND}"
-              echo "  LINE: ${ERRO_LINENO}"
-          fi
-      done
-      echo
-      echo "======= END CATASTROPHIC COMMAND FAIL ======="
-      echo
+    echo "Call tree:"
+    for ((i=1;i<${#FUNCNAME[@]}-1;i++))
+    do
+      echo " $i: ${BASH_SOURCE[$i+1]}:${BASH_LINENO[$i]} ${FUNCNAME[$i]}(...)"
+    done
   fi
+  echo "Exiting with status ${code}"
+  exit "${code}"
 }
 
+# trap ERR to provide an error handler whenever a command exits nonzero
+#  this is a more verbose version of set -o errexit
+trap 'errexit' ERR
+# setting errtrace allows our ERR trap handler to be propagated to functions,
+#  expansions and subshells
+set -e -o errtrace
 
 main() {
-  cavallo
   code_dumper_error "examples/demo.sh" "3"
 }
