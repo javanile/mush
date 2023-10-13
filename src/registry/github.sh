@@ -37,7 +37,7 @@ github_upload_release_asset() {
     -H "Content-Type: application/octet-stream" \
     --data-binary @"$asset_file")
 
-  echo "${upload_result}" >2
+  echo "${upload_result}" >&2
 
   echo "${upload_result}" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
