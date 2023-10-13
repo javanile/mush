@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T12:18:09Z
+## @build_date: 2023-10-13T12:23:26Z
 set -e
 extern() {
   extern=$1
@@ -1754,11 +1754,12 @@ exec_publish() {
   console_status "Updating" Mush packages index
 
   if [ -z "${GITHUB_TOKEN}" ]; then
-    console_error "no token found, please type here or use environment variable GITHUB_TOKEN"
+    console_error "no token found, input it manually or use environment variable GITHUB_TOKEN"
     echo
     echo "please paste the token found on https://github.com/settings/tokens below"
     read -r GITHUB_TOKEN
     [ -z "${GITHUB_TOKEN}" ] && exit 101
+    export GITHUB_TOKEN="${GITHUB_TOKEN}"
   fi
 
   ## TODO: add the following message when no stuff
@@ -1817,6 +1818,11 @@ exec_publish() {
   fi
 
   asset_id="$(github_get_release_asset_id "${release_id}")"
+
+# error: failed to publish to registry at https://crates.io
+#
+# Caused by:
+#   the remote server responded with an error: crate version `0.1.0` is already uploaded
 
   if [ -n "${asset_id}" ]; then
     github_delete_release_asset "${asset_id}"

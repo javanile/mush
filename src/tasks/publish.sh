@@ -79,6 +79,11 @@ exec_publish() {
 
   asset_id="$(github_get_release_asset_id "${release_id}")"
 
+# error: failed to publish to registry at https://crates.io
+#
+# Caused by:
+#   the remote server responded with an error: crate version `0.1.0` is already uploaded
+
   if [ -n "${asset_id}" ]; then
     github_delete_release_asset "${asset_id}"
   fi
