@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T12:44:44Z
+## @build_date: 2023-10-13T12:54:05Z
 set -e
 extern() {
   extern=$1
@@ -1041,8 +1041,8 @@ github_create_release() {
 github_upload_release_asset() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
-  local asset_file=target/dist/mush
+  local asset_file="$2"
+  local asset_name=$(basename "$asset_file")
   local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
 
   local upload_result=$(curl -s -X POST "${upload_url}" \
@@ -1069,7 +1069,7 @@ github_delete_release_asset() {
 github_get_release_asset_id() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
+  local asset_name="$(basename "$2")"
 
   curl \
     -s -X GET \
@@ -1818,7 +1818,7 @@ exec_publish() {
     release_id=$(github_create_release "${release_tag}")
   fi
 
-  asset_id="$(github_get_release_asset_id "${release_id}")"
+  asset_id="$(github_get_release_asset_id "${release_id}" "${final_file}")"
 
 # error: failed to publish to registry at https://crates.io
 #
@@ -1831,7 +1831,7 @@ exec_publish() {
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
 
-  download_url="$(github_upload_release_asset "${release_id}")"
+  download_url="$(github_upload_release_asset "${release_id}" "${final_file}")"
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }

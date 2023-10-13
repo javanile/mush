@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T12:43:26Z
+## @build_date: 2023-10-13T12:44:44Z
 set -e
 extern() {
   extern=$1
@@ -1050,7 +1050,7 @@ github_upload_release_asset() {
     -H "Content-Type: application/octet-stream" \
     --data-binary @"$asset_file")
 
-  echo "${upload_result}" >2
+  echo "${upload_result}" >&2
 
   echo "${upload_result}" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
