@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T12:14:24Z
+## @build_date: 2023-10-13T12:18:07Z
 set -e
 extern() {
   extern=$1
@@ -1755,7 +1755,10 @@ exec_publish() {
 
   if [ -z "${GITHUB_TOKEN}" ]; then
     console_error "no token found, please type here or use environment variable GITHUB_TOKEN"
-    exit 101
+    echo
+    echo "please paste the token found on https://github.com/settings/tokens below"
+    read -r GITHUB_TOKEN
+    [ -z "${GITHUB_TOKEN}" ] && exit 101
   fi
 
   ## TODO: add the following message when no stuff
