@@ -31,7 +31,7 @@ github_upload_release_asset() {
   local asset_name=mush
   local asset_file=target/dist/mush
 
-  echo "${repository}"
+  echo "${repository} ${GITHUB_TOKEN}"
 
   curl \
     -s -X POST \

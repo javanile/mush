@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:45:59Z
+## @build_date: 2023-10-13T10:46:19Z
 set -e
 extern() {
   extern=$1
@@ -1044,7 +1044,7 @@ github_upload_release_asset() {
   local asset_name=mush
   local asset_file=target/dist/mush
 
-  echo "${repository}"
+  echo "${repository} ${GITHUB_TOKEN}"
 
   curl \
     -s -X POST \
