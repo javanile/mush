@@ -1,4 +1,4 @@
 
 main() {
-  mylib "$@"
+  my_custom_utils "$@"
 }

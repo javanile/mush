@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T16:19:53Z
+## @build_date: 2023-10-13T16:24:51Z
 set -e
 extern() {
   extern=$1
@@ -1147,6 +1147,7 @@ public dependencies
 exec_build_debug() {
   local src_file=$1
   local bin_file=$2
+  local lib_file=$3
 
   mkdir -p "$(dirname "${bin_file}")"
 
@@ -1174,8 +1175,12 @@ exec_build_debug() {
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"
 
+  if [ -n "${lib_file}" ]; then
+    echo "## BP015: Appending library" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+  fi
+
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 

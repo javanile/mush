@@ -1,7 +1,5 @@
 
-#legacy lib_helloworld
-
-#module notfound
+module utils
 
 mylib() {
   echo "Hello World!"
