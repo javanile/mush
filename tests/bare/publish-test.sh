@@ -11,4 +11,4 @@ git commit -am "Minor changes"
 git push
 
 echo "==> Publish Mush"
-bash target/dist/mush.sh publish
+bash target/dist/mush.sh publish --allow-dirty
