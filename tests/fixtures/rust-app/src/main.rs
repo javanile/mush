@@ -35,6 +35,7 @@ fn main() {
     //hello();
 }
 
+/*
 if 6 < 7 {
     println!("Hello World!");
 }
@@ -42,3 +43,4 @@ if 6 < 7 {
 if 6 < 7 {
     println!("Hello World!");
 }
+*/

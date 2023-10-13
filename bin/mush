@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:46:21Z
+## @build_date: 2023-10-13T12:13:33Z
 set -e
 extern() {
   extern=$1
@@ -1751,6 +1751,13 @@ exec_publish() {
   ## TODO: add the following message when an index will be implemented
   # Updating crates.io index
 
+  console_status "Updating" Mush packages index
+
+  if [ -z "${GITHUB_TOKEN}" ]; then
+    console_error "no token found, please type here or use environment variable GITHUB_TOKEN"
+    exit 101
+  fi
+
   ## TODO: add the following message when no stuff
   # warning: manifest has no documentation, homepage or repository.
   # See https://mush.javanile.org/manifest.html#package-metadata for more info.
@@ -1779,6 +1786,20 @@ exec_publish() {
   #   Compiling cask-cli v0.2.0 (/Users/francescobianco/Develop/Javanile/rust-cask/target/package/cask-cli-0.2.0)
   #    Finished dev [unoptimized + debuginfo] target(s) in 13.89s
   #   Uploading cask-cli v0.2.0 (/Users/francescobian
+
+#    Updating crates.io index
+#warning: manifest has no documentation, homepage or repository.
+#See https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info.
+#   Packaging rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)
+#   Verifying rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)
+#   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app/target/package/rust-app-0.1.0)
+#    Finished dev [unoptimized + debuginfo] target(s) in 1.77s
+#    Packaged 37 files, 12.0MiB (2.9MiB compressed)
+#   Uploading rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)
+#    Uploaded rust-app v0.1.0 to registry `crates-io`
+#note: Waiting for `rust-app v0.1.0` to be available at registry `crates-io`.
+#You may press ctrl-c to skip waiting; the crate should be available shortly.
+#   Published rust-app v0.1.0 at registry `crates-io`
 
   [ -f .env ] && source .env
 
