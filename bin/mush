@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:39:20Z
+## @build_date: 2023-10-13T10:39:41Z
 set -e
 extern() {
   extern=$1
@@ -1797,6 +1797,8 @@ exec_publish() {
   fi
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
+
+github_upload_release_asset "${release_id}"
 
   download_url="$(github_upload_release_asset "${release_id}")"
 
