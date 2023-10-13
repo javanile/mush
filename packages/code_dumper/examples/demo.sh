@@ -3,6 +3,7 @@ trap 'ERRO_LINENO=$LINENO' ERR
 trap '_failure' EXIT
 
 _failure() {
+  printenv
   ERR_CODE=$? # capture last command exit code
   set +xv # turns off debug logging, just in case
   if [[  $- =~ e && ${ERR_CODE} != 0 ]]
