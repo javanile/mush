@@ -31,14 +31,12 @@ github_upload_release_asset() {
   local asset_name=mush
   local asset_file=target/dist/mush
 
-  echo "${repository} ${GITHUB_TOKEN}"
-
   curl \
     -s -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
-    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}1 \
-    --data-binary @"$asset_file"
+    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
+    --data-binary @"$asset_file" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
 
 github_delete_release_asset() {
