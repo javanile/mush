@@ -60,5 +60,7 @@ exec_publish() {
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
 
-  download_url="$(github_upload_release_asset "${release_id}")"
+github_upload_release_asset "${release_id}"
+
+  #download_url="$(github_upload_release_asset "${release_id}")"
 }
