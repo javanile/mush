@@ -77,7 +77,7 @@ exec_publish() {
     release_id=$(github_create_release "${release_tag}")
   fi
 
-  asset_id="$(github_get_release_asset_id "${release_id}")"
+  asset_id="$(github_get_release_asset_id "${release_id}" "${final_file}")"
 
 # error: failed to publish to registry at https://crates.io
 #
@@ -90,7 +90,7 @@ exec_publish() {
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
 
-  download_url="$(github_upload_release_asset "${release_id}")"
+  download_url="$(github_upload_release_asset "${release_id}" "${final_file}")"
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }

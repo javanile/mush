@@ -28,8 +28,8 @@ github_create_release() {
 github_upload_release_asset() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
-  local asset_file=target/dist/mush
+  local asset_file="$2"
+  local asset_name=$(basename "$asset_file")
   local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
 
   local upload_result=$(curl -s -X POST "${upload_url}" \
@@ -56,7 +56,7 @@ github_delete_release_asset() {
 github_get_release_asset_id() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
+  local asset_name="$(basename "$2")"
 
   curl \
     -s -X GET \
