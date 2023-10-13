@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:35:26Z
+## @build_date: 2023-10-13T10:36:34Z
 set -e
 extern() {
   extern=$1
@@ -1049,7 +1049,7 @@ github_upload_release_asset() {
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
-    --data-binary @"$asset_file"
+    --data-binary @"$asset_file" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
 
 github_delete_release_asset() {
@@ -1797,8 +1797,6 @@ exec_publish() {
   fi
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
-
-github_upload_release_asset "${release_id}"
 
   download_url="$(github_upload_release_asset "${release_id}")"
 
