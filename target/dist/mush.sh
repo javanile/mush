@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T12:44:44Z
+## @build_date: 2023-10-13T14:32:43Z
 set -e
 extern() {
   extern=$1
@@ -839,7 +839,7 @@ run_new() {
 }
 
 parser_definition_run() {
-	setup   REST help:usage abbr:true -- "Run a binary or example of the local package" ''
+	setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
@@ -849,6 +849,27 @@ parser_definition_run() {
 	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
+
+run_args_error() {
+  case "$2" in
+    unknown)
+      echo -e "\e[1m\e[31merror:\e[0m unexpected argument '\e[33m-${3}\e[0m' found"
+      echo -e ""
+      echo -e "\e[32mtip:\e[0m to pass '\e[33m${3}\e[0m' as a value, use '\e[32m-- ${3}\e[0m'"
+      echo -e ""
+      echo -e "\e[1m\e[4mUsage:\e[0m \e[1mmush run\e[0m [OPTIONS] [args]..."
+      echo -e ""
+      echo -e "For more information, try '\e[1m--help\e[0m'."
+      ;;
+    *)
+      echo "ERROR: ($2,$3) $1"
+      ;;
+  esac
+  exit 101
+}
+
+
+
 
 run_run() {
   eval "$(getoptions parser_definition_run parse "$0")"
@@ -1041,8 +1062,8 @@ github_create_release() {
 github_upload_release_asset() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
-  local asset_file=target/dist/mush
+  local asset_file="$2"
+  local asset_name=$(basename "$asset_file")
   local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
 
   local upload_result=$(curl -s -X POST "${upload_url}" \
@@ -1069,7 +1090,7 @@ github_delete_release_asset() {
 github_get_release_asset_id() {
   local repository="${MUSH_GITHUB_REPOSITORY}"
   local release_id="$1"
-  local asset_name=mush
+  local asset_name="$(basename "$2")"
 
   curl \
     -s -X GET \
@@ -1818,7 +1839,7 @@ exec_publish() {
     release_id=$(github_create_release "${release_tag}")
   fi
 
-  asset_id="$(github_get_release_asset_id "${release_id}")"
+  asset_id="$(github_get_release_asset_id "${release_id}" "${final_file}")"
 
 # error: failed to publish to registry at https://crates.io
 #
@@ -1831,7 +1852,7 @@ exec_publish() {
 
   console_status "Uploading" "${package_name} v${release_tag} ($PWD)"
 
-  download_url="$(github_upload_release_asset "${release_id}")"
+  download_url="$(github_upload_release_asset "${release_id}" "${final_file}")"
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }

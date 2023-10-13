@@ -1,6 +1,6 @@
 
 parser_definition_run() {
-	setup   REST help:usage abbr:true -- "Run a binary or example of the local package" ''
+	setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
@@ -10,6 +10,27 @@ parser_definition_run() {
 	param   BUILD_TARGET -t --target
 	disp    :usage       -h --help
 }
+
+run_args_error() {
+  case "$2" in
+    unknown)
+      echo -e "\e[1m\e[31merror:\e[0m unexpected argument '\e[33m-${3}\e[0m' found"
+      echo -e ""
+      echo -e "\e[32mtip:\e[0m to pass '\e[33m${3}\e[0m' as a value, use '\e[32m-- ${3}\e[0m'"
+      echo -e ""
+      echo -e "\e[1m\e[4mUsage:\e[0m \e[1mmush run\e[0m [OPTIONS] [args]..."
+      echo -e ""
+      echo -e "For more information, try '\e[1m--help\e[0m'."
+      ;;
+    *)
+      echo "ERROR: ($2,$3) $1"
+      ;;
+  esac
+  exit 101
+}
+
+
+
 
 run_run() {
   eval "$(getoptions parser_definition_run parse "$0")"
