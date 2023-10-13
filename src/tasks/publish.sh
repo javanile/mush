@@ -14,11 +14,12 @@ exec_publish() {
   console_status "Updating" Mush packages index
 
   if [ -z "${GITHUB_TOKEN}" ]; then
-    console_error "no token found, please type here or use environment variable GITHUB_TOKEN"
+    console_error "no token found, input it manually or use environment variable GITHUB_TOKEN"
     echo
     echo "please paste the token found on https://github.com/settings/tokens below"
     read -r GITHUB_TOKEN
     [ -z "${GITHUB_TOKEN}" ] && exit 101
+    export GITHUB_TOKEN="${GITHUB_TOKEN}"
   fi
 
   ## TODO: add the following message when no stuff
