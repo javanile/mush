@@ -60,7 +60,7 @@ github_get_release_asset_id() {
     -H "Accept: application/vnd.github+json" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     https://api.github.com/repos/${repository}/releases/${release_id}/assets \
-    | grep '^    "id"\|"name"' | paste - - | grep "\"${asset_name}\"" | cut -d, -f1 | cut -d: -f2 | xargs
+    | grep '^    "id"\|"name"' | paste - - | grep "\"${asset_name}1\"" | cut -d, -f1 | cut -d: -f2 | xargs
 }
 
 github_get_release_id() {
