@@ -5,7 +5,7 @@ exec_build_debug() {
 
   mkdir -p "$(dirname "${bin_file}")"
 
-  echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
+  #echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
 
   local name=$MUSH_PACKAGE_NAME
 
