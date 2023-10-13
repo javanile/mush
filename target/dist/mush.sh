@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T15:41:52Z
+## @build_date: 2023-10-13T15:46:59Z
 set -e
 extern() {
   extern=$1
@@ -1144,7 +1144,7 @@ exec_build_debug() {
 
   mkdir -p "$(dirname "${bin_file}")"
 
-  echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
+  #echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
 
   local name=$MUSH_PACKAGE_NAME
 
@@ -1169,7 +1169,7 @@ exec_build_debug() {
   echo "" >> "${build_file}"
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug_file \"\${MUSH_DEBUG_PATH}/src/main.sh\"" >> "${build_file}"
+  echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
@@ -1625,7 +1625,7 @@ manifest_parse() {
 }
 
 compile_file() {
-  echo "COMPILE: $1 -> $2 ($PWD)"
+  #echo "COMPILE: $1 -> $2 ($PWD)"
 
   local src_file=$1
   local build_file=$2

@@ -1,6 +1,6 @@
 
 compile_file() {
-  echo "COMPILE: $1 -> $2 ($PWD)"
+  #echo "COMPILE: $1 -> $2 ($PWD)"
 
   local src_file=$1
   local build_file=$2

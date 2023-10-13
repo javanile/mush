@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T15:45:08Z
+## @build_date: 2023-10-13T15:47:33Z
 set -e
 extern() {
   extern=$1
@@ -1144,7 +1144,7 @@ exec_build_debug() {
 
   mkdir -p "$(dirname "${bin_file}")"
 
-  echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
+  #echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
 
   local name=$MUSH_PACKAGE_NAME
 
@@ -1625,7 +1625,7 @@ manifest_parse() {
 }
 
 compile_file() {
-  echo "COMPILE: $1 -> $2 ($PWD)"
+  #echo "COMPILE: $1 -> $2 ($PWD)"
 
   local src_file=$1
   local build_file=$2
