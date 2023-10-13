@@ -62,5 +62,7 @@ exec_publish() {
 
 github_upload_release_asset "${release_id}"
 
-  #download_url="$(github_upload_release_asset "${release_id}")"
+  download_url="$(github_upload_release_asset "${release_id}")"
+
+
 }

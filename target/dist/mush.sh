@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:34:49Z
+## @build_date: 2023-10-13T10:35:26Z
 set -e
 extern() {
   extern=$1
@@ -1800,7 +1800,9 @@ exec_publish() {
 
 github_upload_release_asset "${release_id}"
 
-  #download_url="$(github_upload_release_asset "${release_id}")"
+  download_url="$(github_upload_release_asset "${release_id}")"
+
+
 }
 
 exec_dependencies() {
