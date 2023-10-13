@@ -34,7 +34,7 @@ github_upload_release_asset() {
   echo "UPLOAD"
 
   curl \
-    -X POST \
+    -s -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \

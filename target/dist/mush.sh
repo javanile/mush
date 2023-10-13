@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T10:42:11Z
+## @build_date: 2023-10-13T10:42:42Z
 set -e
 extern() {
   extern=$1
@@ -1047,7 +1047,7 @@ github_upload_release_asset() {
   echo "UPLOAD"
 
   curl \
-    -s -X POST \
+    -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
