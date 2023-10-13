@@ -1,4 +1,4 @@
 
 main() {
-  echo "Hello World!"
+  echo "Example: hello-world.sh"
 }

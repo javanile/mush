@@ -1,6 +1,6 @@
 
 compile_file() {
-  #echo "COMPILE: $1 ($PWD)"
+  echo "COMPILE: $1 -> $2 ($PWD)"
 
   local src_file=$1
   local build_file=$2
@@ -80,7 +80,7 @@ compile_scan_public() {
 compile_scan_module() {
   local src_file=$1
   local build_file=$2
-  local module_dir=$(dirname $src_file)
+  local module_dir=$(dirname "$src_file")
 
   grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local module_name=$(echo "${line#*module}" | xargs)

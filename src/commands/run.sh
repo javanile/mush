@@ -45,8 +45,6 @@ run_run() {
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  exec_build_debug "$@"
-
   if [ -z "${EXAMPLE_NAME}" ]; then
     local src_file=src/main.sh
     local bin_file=target/debug/$MUSH_PACKAGE_NAME
@@ -64,11 +62,13 @@ run_run() {
     fi
   fi
 
+  exec_build_debug "${src_file}" "${bin_file}"
+
   console_status "Compiling" "'${bin_file}'"
 
-  compile_file "${src_file}" "${bin_file}"
+  compile_file "${src_file}"
 
   console_status "Running" "'${bin_file}'"
 
-  exec "$bin_file" "$@"
+  exec "${bin_file}" "$@"
 }

@@ -47,7 +47,7 @@ run_build() {
     if [ "$BUILD_TARGET" = "dist" ]; then
       exec_build_release "$@"
     else
-      exec_build_debug "$@"
+      exec_build_debug "src/main.sh" "${MUSH_TARGET_DIR}/${package_name}"
     fi
   fi
 

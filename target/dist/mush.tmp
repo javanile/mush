@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T15:22:07Z
+## @build_date: 2023-10-13T15:45:08Z
 set -e
 extern() {
   extern=$1
@@ -654,7 +654,7 @@ run_build() {
     if [ "$BUILD_TARGET" = "dist" ]; then
       exec_build_release "$@"
     else
-      exec_build_debug "$@"
+      exec_build_debug "src/main.sh" "${MUSH_TARGET_DIR}/${package_name}"
     fi
   fi
 
@@ -884,8 +884,6 @@ run_run() {
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
-  exec_build_debug "$@"
-
   if [ -z "${EXAMPLE_NAME}" ]; then
     local src_file=src/main.sh
     local bin_file=target/debug/$MUSH_PACKAGE_NAME
@@ -903,13 +901,15 @@ run_run() {
     fi
   fi
 
+  exec_build_debug "${src_file}" "${bin_file}"
+
   console_status "Compiling" "'${bin_file}'"
 
-  compile_file "${src_file}" "${bin_file}"
+  compile_file "${src_file}"
 
   console_status "Running" "'${bin_file}'"
 
-  exec "$bin_file" "$@"
+  exec "${bin_file}" "$@"
 }
 
 parser_definition_publish() {
@@ -1139,14 +1139,19 @@ public publish
 public dependencies
 
 exec_build_debug() {
+  local src_file=$1
+  local bin_file=$2
+
+  mkdir -p "$(dirname "${bin_file}")"
+
+  echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
+
   local name=$MUSH_PACKAGE_NAME
 
-  local build_file=target/debug/${name}.tmp
-  local final_file=target/debug/${name}
+  local build_file="${bin_file}.tmp"
+  local final_file="${bin_file}"
 
-  mkdir -p target/debug/
-
-  compile_file "src/main.sh"
+  compile_file "${src_file}"
 
   echo "#!/usr/bin/env bash" > "${build_file}"
   echo "set -e" >> "${build_file}"
@@ -1154,7 +1159,7 @@ exec_build_debug() {
 
   MUSH_DEBUG_PATH=${PWD}
   echo "## BP002: Package and debug variables " >> "${build_file}"
-  echo "MUSH_PACKAGE_NAME=${name}" >> "${build_file}"
+  echo "MUSH_PACKAGE_NAME=${MUSH_PACKAGE_NAME}" >> "${build_file}"
   echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
@@ -1164,7 +1169,7 @@ exec_build_debug() {
   echo "" >> "${build_file}"
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug_file \"\${MUSH_DEBUG_PATH}/src/main.sh\"" >> "${build_file}"
+  echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
@@ -1620,7 +1625,7 @@ manifest_parse() {
 }
 
 compile_file() {
-  #echo "COMPILE: $1 ($PWD)"
+  echo "COMPILE: $1 -> $2 ($PWD)"
 
   local src_file=$1
   local build_file=$2
@@ -1700,7 +1705,7 @@ compile_scan_public() {
 compile_scan_module() {
   local src_file=$1
   local build_file=$2
-  local module_dir=$(dirname $src_file)
+  local module_dir=$(dirname "$src_file")
 
   grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local module_name=$(echo "${line#*module}" | xargs)
