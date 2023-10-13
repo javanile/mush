@@ -30,13 +30,16 @@ github_upload_release_asset() {
   local release_id="$1"
   local asset_name=mush
   local asset_file=target/dist/mush
+  local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
 
-  curl \
-    -s -X POST \
+  local upload_result=$(curl -s -X POST "${upload_url}" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
-    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
-    --data-binary @"$asset_file" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
+    --data-binary @"$asset_file")
+
+  echo "${upload_result}" >2
+
+  echo "${upload_result}" | sed 's/.*"browser_download_url"//g' | cut -d'"' -f2
 }
 
 github_delete_release_asset() {
