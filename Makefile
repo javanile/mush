@@ -17,7 +17,7 @@ release:
 ## ====
 
 install:
-	@install -m 0755 target/dist/mush /usr/local/bin/
+	@install -m 0755 target/dist/mush $(HOME)/.mush/bin/
 
 sudo-install:
 	@sudo install -m 0755 target/dist/mush /usr/local/bin/
