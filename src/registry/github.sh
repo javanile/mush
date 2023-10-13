@@ -31,13 +31,11 @@ github_upload_release_asset() {
   local asset_name=mush
   local asset_file=target/dist/mush
 
-  echo "UPLOAD"
-
   curl \
     -s -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
-    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name} \
+    https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}1 \
     --data-binary @"$asset_file"
 }
 
