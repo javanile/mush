@@ -31,6 +31,8 @@ github_upload_release_asset() {
   local asset_name=mush
   local asset_file=target/dist/mush
 
+  echo "${repository}"
+
   curl \
     -s -X POST \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
