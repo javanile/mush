@@ -97,6 +97,5 @@ embed() {
 }
 
 ## BP001: Appending entrypoint to debug build
-debug_file "${MUSH_DEBUG_PATH}/examples/demo.sh"
-debug_file "${MUSH_DEBUG_PATH}/examples/demo.sh"
+debug_file "${MUSH_DEBUG_PATH}/src/main.sh"
 main "$@"

@@ -2,6 +2,7 @@
 exec_build_debug() {
   local src_file=$1
   local bin_file=$2
+  local lib_file=$3
 
   mkdir -p "$(dirname "${bin_file}")"
 
@@ -28,6 +29,11 @@ exec_build_debug() {
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"
+
+  if [ -n "${lib_file}" ]; then
+    echo "## BP015: Appending library" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+  fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"

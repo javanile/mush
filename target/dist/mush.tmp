@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T15:47:33Z
+## @build_date: 2023-10-13T16:22:15Z
 set -e
 extern() {
   extern=$1
@@ -888,7 +888,6 @@ run_run() {
     local src_file=src/main.sh
     local bin_file=target/debug/$MUSH_PACKAGE_NAME
   else
-    mkdir -p target/debug/examples/
     local src_file=examples/$EXAMPLE_NAME.sh
     local bin_file=target/debug/examples/$EXAMPLE_NAME
 
@@ -901,9 +900,16 @@ run_run() {
     fi
   fi
 
-  exec_build_debug "${src_file}" "${bin_file}"
-
   console_status "Compiling" "'${bin_file}'"
+
+  local lib_file=src/lib.sh
+  if [ -f "${lib_file}" ]; then
+    compile_file "${lib_file}"
+  else
+    local lib_file=
+  fi
+
+  exec_build_debug "${src_file}" "${bin_file}" "${lib_file}"
 
   compile_file "${src_file}"
 
@@ -1141,6 +1147,7 @@ public dependencies
 exec_build_debug() {
   local src_file=$1
   local bin_file=$2
+  local lib_file=$3
 
   mkdir -p "$(dirname "${bin_file}")"
 
@@ -1167,6 +1174,11 @@ exec_build_debug() {
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"
+
+  if [ -n "${lib_file}" ]; then
+    echo "## BP015: Appending library" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+  fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"

@@ -49,7 +49,6 @@ run_run() {
     local src_file=src/main.sh
     local bin_file=target/debug/$MUSH_PACKAGE_NAME
   else
-    mkdir -p target/debug/examples/
     local src_file=examples/$EXAMPLE_NAME.sh
     local bin_file=target/debug/examples/$EXAMPLE_NAME
 
@@ -62,9 +61,16 @@ run_run() {
     fi
   fi
 
-  exec_build_debug "${src_file}" "${bin_file}"
-
   console_status "Compiling" "'${bin_file}'"
+
+  local lib_file=src/lib.sh
+  if [ -f "${lib_file}" ]; then
+    compile_file "${lib_file}"
+  else
+    local lib_file=
+  fi
+
+  exec_build_debug "${src_file}" "${bin_file}" "${lib_file}"
 
   compile_file "${src_file}"
 

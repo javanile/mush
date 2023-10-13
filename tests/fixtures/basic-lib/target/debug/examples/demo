@@ -2,8 +2,8 @@
 set -e
 
 ## BP002: Package and debug variables 
-MUSH_PACKAGE_NAME=basic-app
-MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush/tests/fixtures/basic-app
+MUSH_PACKAGE_NAME=basic-lib
+MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush/tests/fixtures/basic-lib
 MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
 
 ## BP003: Embedding debug api
@@ -96,7 +96,8 @@ embed() {
   eval "$(embed_file "$1" "${module_file_path}")"
 }
 
+## BP015: Appending library
+debug_file "${MUSH_DEBUG_PATH}/src/lib.sh"
 ## BP001: Appending entrypoint to debug build
-debug_file "${MUSH_DEBUG_PATH}/examples/demo.sh"
 debug_file "${MUSH_DEBUG_PATH}/examples/demo.sh"
 main "$@"
