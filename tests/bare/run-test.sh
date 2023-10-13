@@ -7,4 +7,4 @@ bash target/dist/mush.sh --quiet build --target dist
 
 cd tests/fixtures/basic-app
 
-bash ../../../target/dist/mush run --cavallo1
+bash ../../../target/dist/mush run --example demo

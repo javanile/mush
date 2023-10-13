@@ -5,10 +5,11 @@ parser_definition_run() {
   msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
 	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+
+	disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_args_error() {
@@ -29,9 +30,6 @@ run_args_error() {
   exit 101
 }
 
-
-
-
 run_run() {
   eval "$(getoptions parser_definition_run parse "$0")"
   parse "$@"
@@ -49,11 +47,26 @@ run_run() {
 
   exec_build_debug "$@"
 
-  bin_file=target/debug/$MUSH_PACKAGE_NAME
+  if [ -z "${EXAMPLE_NAME}" ]; then
+    local src_file=src/main.sh
+    local bin_file=target/debug/$MUSH_PACKAGE_NAME
+  else
+    mkdir -p target/debug/examples/
+    local src_file=examples/$EXAMPLE_NAME.sh
+    local bin_file=target/debug/examples/$EXAMPLE_NAME
+
+    if [ ! -f "${src_file}" ]; then
+      console_error "no example target named '${EXAMPLE_NAME}'."
+      echo ""
+      local examples=$(find examples/ -type f -name '*.sh' -exec basename {} .sh \; 2>/dev/null | sed 's/^/    /')
+      [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
+      exit 101
+    fi
+  fi
 
   console_status "Compiling" "'${bin_file}'"
 
-  compile_file "src/main.sh"
+  compile_file "${src_file}" "${bin_file}"
 
   console_status "Running" "'${bin_file}'"
 

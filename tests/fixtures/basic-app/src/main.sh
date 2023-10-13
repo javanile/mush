@@ -1,7 +1,7 @@
 
 #legacy lib_helloworld
 
-module notfound
+#module notfound
 
 main() {
   echo "Hello World!"
