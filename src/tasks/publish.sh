@@ -92,5 +92,5 @@ exec_publish() {
 
   download_url="$(github_upload_release_asset "${release_id}")"
 
-  echo "DOWNLOAD URL: $download_url"
+  console_status "Uploaded" "${package_name} v${release_tag} to registry at '$download_url'"
 }
