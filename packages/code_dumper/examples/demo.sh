@@ -1,6 +1,4 @@
 
-
-
 main() {
-  code_dumper "$(mush_debug_file)" "$(mush_debug_line)"
+  code_dumper_error "$(mush_debug_file)" "$(mush_debug_line)"
 }
