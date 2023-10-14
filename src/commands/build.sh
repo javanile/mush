@@ -1,16 +1,16 @@
 
 parser_definition_build() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+  setup   REST help:usage abbr:true -- "Compile the current package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-	msg    -- 'OPTIONS:'
+  msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
 
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-	disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_build() {
@@ -39,6 +39,10 @@ run_build() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
+  local src_file=src/main.sh
+  local bin_file=${MUSH_TARGET_DIR}/${package_name}
+  local lib_file=src/lib.sh
+
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ -n "${BUILD_RELEASE}" ]; then
@@ -47,7 +51,14 @@ run_build() {
     if [ "$BUILD_TARGET" = "dist" ]; then
       exec_build_release "$@"
     else
-      exec_build_debug "src/main.sh" "${MUSH_TARGET_DIR}/${package_name}"
+      if [ -f "${lib_file}" ]; then
+        compile_file "${lib_file}"
+      else
+        local lib_file=
+      fi
+      if [ -f "${src_file}" ]; then
+        exec_build_debug "src/main.sh" "${bin_file}" "${lib_file}"
+      fi
     fi
   fi
 

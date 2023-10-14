@@ -1,15 +1,15 @@
 
 parser_definition_run() {
-	setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
+  setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
-	msg -- 'OPTIONS:'
+  msg -- 'OPTIONS:'
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
 
-	disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_args_error() {

@@ -9,3 +9,6 @@ bashunit = "mush test_with_bashunit *"
 
 #[dev-dependencies-build]
 #bats = "exec install.sh $MUSH_MANIFEST_DIR"
+
+[features]
+test_with_bashunit = true
