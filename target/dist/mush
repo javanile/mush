@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-14T21:47:32Z
+## @build_date: 2023-10-14T21:51:03Z
 set -e
 extern() {
   extern=$1
@@ -1353,6 +1353,9 @@ exec_index_update()
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
   console_status "Updating" "mush packages index"
+
+  ## Rest index at moment just because it is too small
+  rm -fr "${MUSH_HOME}/registry/index"
 
   mkdir -p "${MUSH_HOME}/registry/index"
   > "${MUSH_REGISTRY_INDEX}"
