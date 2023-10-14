@@ -6,3 +6,4 @@ edition = "2022"
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [dependencies]
+bashunit = "git https://github.com/TypedDevs/bashunit/ main"

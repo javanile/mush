@@ -14,6 +14,7 @@ exec_build_release() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_type: bin" >> "${build_file}"
   echo "## @build_date: ${build_date}" >> "${build_file}"
 
   echo "set -e" >> $build_file
@@ -63,6 +64,7 @@ exec_build_bin_from_src() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_type: bin" >> "${build_file}"
   echo "## @build_date: ${build_date}" >> "${build_file}"
 
   echo "set -e" >> $build_file
@@ -98,6 +100,7 @@ exec_build_lib_from_src() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_type: lib" >> "${build_file}"
   echo "## @build_date: ${build_date}" >> "${build_file}"
 
   echo "set -e" >> $build_file
@@ -106,9 +109,6 @@ exec_build_lib_from_src() {
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "${package_src}/src/lib.sh" "${build_file}"
-
-  echo "## BP005: Execute the entrypoint" >> "${build_file}"
-  echo "main \"\$@\"" >> "${build_file}"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

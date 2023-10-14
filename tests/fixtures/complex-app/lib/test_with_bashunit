@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+## BP010: Release metadata
+## @build_date: 2023-10-14T22:36:47Z
+set -e
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
+## BP004: Compile the entrypoint
+## BP005: Execute the entrypoint
+main "$@"
