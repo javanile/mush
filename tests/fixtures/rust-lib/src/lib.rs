@@ -12,6 +12,6 @@
 
 //use mod1::hello;
 
-pub fn rust_lib() {
+pub fn rust_lib_test() {
     println!("Hello World!");
 }

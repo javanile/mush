@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-14T21:49:37Z
+## @build_date: 2023-10-14T22:27:08Z
 set -e
 extern() {
   extern=$1
@@ -1269,13 +1269,22 @@ exec_build_release() {
 exec_build_from_src() {
   local package_src=$1
 
+  if [ -f "${package_src}/src/lib.sh" ]; then
+    exec_build_lib_from_src "${package_src}"
+  fi
+
+  echo "PROCESS BIN ${package_src}"
+
+  if [ -f "${package_src}/src/main.sh" ]; then
+    exec_build_bin_from_src "${package_src}"
+  fi
+}
+
+exec_build_bin_from_src() {
+  local package_src=$1
   local package_name=$MUSH_PACKAGE_NAME
-
-
   #echo "NAME: $name"
-
   local bin_file=${package_src}/bin/${package_name}
-
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
   local build_file=${package_src}/target/dist/${package_name}.tmp
   local final_file=${package_src}/target/dist/${package_name}
@@ -1304,6 +1313,41 @@ exec_build_from_src() {
   mkdir -p "${package_src}/bin/"
   cp "${final_file}" "${bin_file}"
   chmod +x "${bin_file}"
+}
+
+exec_build_lib_from_src() {
+  local package_src=$1
+  local package_name=$MUSH_PACKAGE_NAME
+  #echo "NAME: $name"
+  local lib_file=${package_src}/lib/${package_name}
+  local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+  local build_file=${package_src}/target/dist/lib.sh.tmp
+  local final_file=${package_src}/target/dist/lib.sh
+
+  mkdir -p "${package_src}/target/dist/"
+
+  echo "#!/usr/bin/env bash" > $build_file
+  echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @build_date: ${build_date}" >> "${build_file}"
+
+  echo "set -e" >> $build_file
+
+  dist_2022 >> $build_file
+
+  echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  compile_file "${package_src}/src/lib.sh" "${build_file}"
+
+  echo "## BP005: Execute the entrypoint" >> "${build_file}"
+  echo "main \"\$@\"" >> "${build_file}"
+
+  ## Generate binary on target
+  cp "${build_file}" "${final_file}"
+  chmod +x "${final_file}"
+
+  ## Generate binary on root
+  mkdir -p "${package_src}/lib/"
+  cp "${final_file}" "${lib_file}"
+  chmod +x "${lib_file}"
 }
 
 exec_build_test() {
@@ -1354,6 +1398,9 @@ exec_index_update()
 
   console_status "Updating" "mush packages index"
 
+  ## Rest index at moment just because it is too small
+  rm -fr "${MUSH_HOME}/registry/index"
+
   mkdir -p "${MUSH_HOME}/registry/index"
   > "${MUSH_REGISTRY_INDEX}"
 
@@ -1384,7 +1431,7 @@ exec_index_parse() {
   fi
 
   while read line; do
-    echo "Entry: ${line}"
+    #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
     [ "${line:0:1}" = "#" ] && continue
 
@@ -1486,7 +1533,7 @@ exec_install_from_index() {
     rm -fr "${package_src}"
   fi
 
-  git clone --branch main --single-branch "${package_url}" "${package_src}"
+  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
@@ -1929,7 +1976,9 @@ exec_publish() {
 }
 
 exec_dependencies() {
+  echo "DEV DEP"
   process_dev_dependencies
+  echo "BUILD DEV DEP"
   process_dev_dependencies_build
 }
 

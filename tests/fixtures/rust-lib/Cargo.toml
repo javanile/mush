@@ -20,4 +20,3 @@ edition = "2021"
 #clap = { version = "4.0.18", features = ["derive"] }
 #serde = { version = "1.0.145", features = ["derive"] }
 #serde_yaml = "0.9.13"
-cavallo = "1"

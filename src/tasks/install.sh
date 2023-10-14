@@ -66,6 +66,17 @@ exec_install_from_src() {
   exec_manifest_lookup "${package_src}"
   exec_build_from_src "${package_src}"
 
+  if [ -f "${package_src}/src/lib.sh" ]; then
+    exec_install_lib_from_src "${package_src}"
+  fi
+
+  if [ -f "${package_src}/src/main.sh" ]; then
+    exec_install_bin_from_src "${package_src}"
+  fi
+}
+
+exec_install_bin_from_src() {
+  local package_src=$1
   local package_name=$MUSH_PACKAGE_NAME
   local package_version=$MUSH_PACKAGE_VERSION
   local bin_name=$MUSH_PACKAGE_NAME
@@ -92,5 +103,37 @@ exec_install_from_src() {
   else
     console_status "Installing" "${bin_file}"
     console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+  fi
+}
+
+exec_install_lib_from_src() {
+  local package_src=$1
+  local package_name=$MUSH_PACKAGE_NAME
+  local package_version=$MUSH_PACKAGE_VERSION
+  local lib_name=$MUSH_PACKAGE_NAME
+  local pwd=$PWD
+
+  local lib_file=${pwd}/lib/${lib_name}
+  local final_file=${package_src}/target/dist/lib.sh
+
+  local cp=cp
+  local chmod=chmod
+  #if [[ $EUID -ne 0 ]]; then
+  #    cp="sudo ${cp}"
+  #    chmod="sudo ${chmod}"
+  #fi
+
+  mkdir -p ${pwd}/lib
+  ${cp} "${final_file}" "${lib_file}"
+  ${chmod} +x "${lib_file}"
+
+  console_status "Finished" "release [optimized] target(s) in 0.18s"
+
+  if [ -f "${lib_file}" ]; then
+    console_status "Replacing" "${lib_file}"
+    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
+  else
+    console_status "Installing" "${lib_file}"
+    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
   fi
 }

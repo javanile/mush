@@ -1,6 +1,8 @@
 
 exec_dependencies() {
+  echo "DEV DEP"
   process_dev_dependencies
+  echo "BUILD DEV DEP"
   process_dev_dependencies_build
 }
 
