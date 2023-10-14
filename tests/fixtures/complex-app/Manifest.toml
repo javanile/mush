@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2022"
 
 [dev-dependencies]
-bats = "git https://github.com/sstephenson/bats.git v0.4.0"
+#bats = "git https://github.com/sstephenson/bats.git v0.4.0"
+bashunit = "mush test_with_bashunit *"
 
-[dev-dependencies-build]
-bats = "exec install.sh $MUSH_MANIFEST_DIR"
+#[dev-dependencies-build]
+#bats = "exec install.sh $MUSH_MANIFEST_DIR"

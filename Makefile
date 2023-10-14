@@ -178,3 +178,6 @@ test-syntax-command-not-found:
 
 test-test:
 	@bash tests/bare/test-test.sh
+
+test-bashunit:
+	@bash tests/bare/testing/bashunit-test.sh

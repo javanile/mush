@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
-## @build_date: 2023-10-13T16:34:03Z
+## @build_date: 2023-10-14T21:46:24Z
 set -e
 extern() {
   extern=$1
@@ -47,15 +47,16 @@ parser_definition() {
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
 
-  msg   -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build -- "Compile the current package"
-  cmd   check -- "Analyze the current package and report errors, but don't build it"
-  cmd   init -- "Create a new package in an existing directory"
+  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build   -- "Compile the current package"
+  cmd   check   -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch   -- "Fetch dependencies of a package from the network"
+  cmd   init    -- "Create a new package in an existing directory"
   cmd   install -- "Build and install a Mush binary"
-  cmd   legacy -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new -- "Create a new Mush package"
-  cmd   run -- "Run a binary or example of the local package"
-  cmd   test -- "Run the tests"
+  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new     -- "Create a new Mush package"
+  cmd   run     -- "Run a binary or example of the local package"
+  cmd   test    -- "Run the tests"
   cmd   publish -- "Package and upload this package to the registry"
 }
 
@@ -94,6 +95,9 @@ main() {
         ;;
       check)
         run_check "$@"
+        ;;
+      fetch)
+        run_fetch "$@"
         ;;
       init)
         run_init "$@"
@@ -594,6 +598,7 @@ error_E0583_file_not_found() {
 public add
 public build
 public check
+public fetch
 public init
 public install
 public legacy
@@ -689,6 +694,35 @@ run_check() {
   console_status "Checking" "${package_name} v${package_version} (${pwd})"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
+}
+
+parser_definition_fetch() {
+  setup   REST help:usage abbr:true -- "Fetch dependencies of a package from the network" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} fetch [OPTIONS]" ''
+
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+
+  param  BUILD_TARGET   -t --target                       -- "Check for the specific target"
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_fetch() {
+  eval "$(getoptions parser_definition_fetch parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup "${PWD}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  exec_index_update
+
+  exec_dependencies
 }
 
 parser_definition_init() {
@@ -1034,8 +1068,9 @@ run_uninstall() {
 public apt
 public basher
 public bpkg
-public pip
 public git
+public mush
+public pip
 
 git_dependency() {
   local pwd=$PWD
@@ -1048,6 +1083,12 @@ git_dependency() {
   git clone --depth 1 --branch "$3" "$2" "${package_dir}" > /dev/null 2>&1
 
   cd "${pwd}" || exit 101
+}
+
+mush_dependency() {
+    echo "MUST DEP: $1 $2 $3"
+
+    exec_install_from_index "$2"
 }
 
 public github
@@ -1907,6 +1948,13 @@ process_dev_dependency() {
   case "$2" in
     git)
       git_dependency "$1" "$3" "$4"
+      ;;
+    mush)
+      mush_dependency "$1" "$3" "$4"
+      ;;
+    *)
+      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      exit 101
       ;;
   esac
 }

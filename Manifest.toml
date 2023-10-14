@@ -10,4 +10,4 @@ console = "mush javanile/mush/console"
 getoptions = "mush javanile/mush/getoptions"
 
 [dev-dependencies]
-shellcheck = "apt shellcheck"
+#shellcheck = "apt shellcheck"

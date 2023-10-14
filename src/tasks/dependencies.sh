@@ -20,6 +20,13 @@ process_dev_dependency() {
     git)
       git_dependency "$1" "$3" "$4"
       ;;
+    mush)
+      mush_dependency "$1" "$3" "$4"
+      ;;
+    *)
+      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      exit 101
+      ;;
   esac
 }
 

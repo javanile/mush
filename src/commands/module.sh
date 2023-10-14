@@ -2,6 +2,7 @@
 public add
 public build
 public check
+public fetch
 public init
 public install
 public legacy
