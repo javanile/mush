@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-14T23:15:42Z
+## @build_date: 2023-10-14T23:44:21Z
 set -e
 extern() {
   extern=$1
@@ -613,17 +613,17 @@ test0 () {
   echo "TEST"
 }
 parser_definition_build() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+  setup   REST help:usage abbr:true -- "Compile the current package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-	msg    -- 'OPTIONS:'
+  msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
 
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-	disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_build() {
@@ -652,6 +652,10 @@ run_build() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
+  local src_file=src/main.sh
+  local bin_file=${MUSH_TARGET_DIR}/${package_name}
+  local lib_file=src/lib.sh
+
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ -n "${BUILD_RELEASE}" ]; then
@@ -660,7 +664,14 @@ run_build() {
     if [ "$BUILD_TARGET" = "dist" ]; then
       exec_build_release "$@"
     else
-      exec_build_debug "src/main.sh" "${MUSH_TARGET_DIR}/${package_name}"
+      if [ -f "${lib_file}" ]; then
+        compile_file "${lib_file}"
+      else
+        local lib_file=
+      fi
+      if [ -f "${src_file}" ]; then
+        exec_build_debug "src/main.sh" "${bin_file}" "${lib_file}"
+      fi
     fi
   fi
 
@@ -874,16 +885,16 @@ run_new() {
 }
 
 parser_definition_run() {
-	setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
+  setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
 
-	msg -- 'OPTIONS:'
+  msg -- 'OPTIONS:'
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
 
-	disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_args_error() {
@@ -1746,6 +1757,16 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
               ;;
+            MUSH_DEPS)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              signature=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS="${MUSH_DEPS}${package}=${signature}${newline}"
+              ;;
+            MUSH_DEPS_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS_BUILD="${MUSH_DEPS_BUILD}${package}=${script}${newline}"
+              ;;
             MUSH_DEV_DEPS)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               signature=$(echo "$line" | cut -d'=' -f2 | xargs)
@@ -2020,11 +2041,54 @@ exec_publish() {
 }
 
 exec_dependencies() {
-  echo "DEV DEP"
+echo "DEPS------------------ ${MUSH_DEPS}"
+  process_dependencies
+  process_dependencies_build
   process_dev_dependencies
-  echo "BUILD DEV DEP"
   process_dev_dependencies_build
 }
+
+process_dependencies() {
+  echo "${MUSH_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    local package_name=${dependency%=*}
+    local package_signature=${dependency#*=}
+
+    if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+      process_dependency "$package_name" $package_signature
+    fi
+  done
+}
+
+process_dependency() {
+  case "$2" in
+    git)
+      git_dependency "$1" "$3" "$4"
+      ;;
+    mush)
+      mush_dependency "$1" "$3" "$4"
+      ;;
+    *)
+      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      exit 101
+      ;;
+  esac
+}
+
+process_dependencies_build() {
+  echo "${MUSH_DEPS_BUILD}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    local package_name=${dependency%=*}
+    local package_script=${dependency#*=}
+    local package_dir="${MUSH_DEPS_DIR}/${package_name}"
+
+    if [ -d "${package_dir}" ]; then
+      local pwd=$PWD
+      cd "${package_dir}"
+      eval "PATH=${PATH}:${PWD} ${package_script}"
+      cd "$pwd"
+    fi
+  done
+}
+
 
 process_dev_dependencies() {
   echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do

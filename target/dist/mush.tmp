@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-14T23:33:12Z
+## @build_date: 2023-10-14T23:50:40Z
 set -e
 extern() {
   extern=$1
@@ -1757,6 +1757,16 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
               ;;
+            MUSH_DEPS)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              signature=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS="${MUSH_DEPS}${package}=${signature}${newline}"
+              ;;
+            MUSH_DEPS_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS_BUILD="${MUSH_DEPS_BUILD}${package}=${script}${newline}"
+              ;;
             MUSH_DEV_DEPS)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               signature=$(echo "$line" | cut -d'=' -f2 | xargs)
@@ -2031,11 +2041,54 @@ exec_publish() {
 }
 
 exec_dependencies() {
-  echo "DEV DEP"
+echo "DEPS------------------ ${MUSH_DEPS}"
+  process_dependencies
+  process_dependencies_build
   process_dev_dependencies
-  echo "BUILD DEV DEP"
   process_dev_dependencies_build
 }
+
+process_dependencies() {
+  echo "${MUSH_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    local package_name=${dependency%=*}
+    local package_signature=${dependency#*=}
+
+    if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+      process_dependency "$package_name" $package_signature
+    fi
+  done
+}
+
+process_dependency() {
+  case "$2" in
+    git)
+      git_dependency "$1" "$3" "$4"
+      ;;
+    mush)
+      mush_dependency "$1" "$3" "$4"
+      ;;
+    *)
+      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      exit 101
+      ;;
+  esac
+}
+
+process_dependencies_build() {
+  echo "${MUSH_DEPS_BUILD}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    local package_name=${dependency%=*}
+    local package_script=${dependency#*=}
+    local package_dir="${MUSH_DEPS_DIR}/${package_name}"
+
+    if [ -d "${package_dir}" ]; then
+      local pwd=$PWD
+      cd "${package_dir}"
+      eval "PATH=${PATH}:${PWD} ${package_script}"
+      cd "$pwd"
+    fi
+  done
+}
+
 
 process_dev_dependencies() {
   echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do

@@ -79,6 +79,16 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
               ;;
+            MUSH_DEPS)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              signature=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS="${MUSH_DEPS}${package}=${signature}${newline}"
+              ;;
+            MUSH_DEPS_BUILD)
+              package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              script=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_DEPS_BUILD="${MUSH_DEPS_BUILD}${package}=${script}${newline}"
+              ;;
             MUSH_DEV_DEPS)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               signature=$(echo "$line" | cut -d'=' -f2 | xargs)

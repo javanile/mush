@@ -1,9 +1,7 @@
 
-extern package bashunit
-
-legacy bashunit assert
-legacy bashunit assert_arrays
-legacy bashunit assert_files
+legacy bashunit::assert
+legacy bashunit::assert_arrays
+legacy bashunit::assert_files
 legacy bashunit assert_folders
 legacy bashunit assertions
 legacy bashunit check_os

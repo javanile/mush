@@ -1,0 +1,13 @@
+[package]
+name = "getoptions"
+version = "0.1.0"
+edition = "2022"
+
+# See more keys and their definitions at https://mush.javanile.org/manifest.html
+
+[legacy-fetch]
+getoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
+gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
+
+[legacy-build]
+lib-getoptions = "gengetoptions library > getoptions.sh"
