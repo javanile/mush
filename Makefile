@@ -181,3 +181,6 @@ test-test:
 
 test-bashunit:
 	@bash tests/bare/testing/bashunit-test.sh
+
+test-getoptions:
+	@bash tests/bare/packages/getoptions-test.sh

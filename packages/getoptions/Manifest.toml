@@ -6,8 +6,8 @@ edition = "2022"
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [legacy-fetch]
-getoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
-gengetoptions = "https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
+getoptions = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
+gengetoptions = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
 
 [legacy-build]
-lib-getoptions = "gengetoptions library > getoptions.sh"
+getoptions = "gengetoptions library > getoptions.sh"
