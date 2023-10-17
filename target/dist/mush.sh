@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-15T00:08:52Z
+## @build_date: 2023-10-17T15:28:38Z
 set -e
 extern() {
   extern=$1

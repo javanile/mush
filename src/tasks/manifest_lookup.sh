@@ -62,6 +62,9 @@ manifest_parse() {
         "[dev-legacy-build]")
           section=MUSH_DEV_LEGACY_BUILD
           ;;
+        "[features]")
+          section=MUSH_FEATURE
+          ;;
         [a-z]*)
           case $section in
             MUSH_PACKAGE)
