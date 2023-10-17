@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-17T15:28:38Z
+## @build_date: 2023-10-17T15:48:39Z
 set -e
 extern() {
   extern=$1
@@ -643,6 +643,8 @@ run_build() {
 
   exec_manifest_lookup "${PWD}"
 
+  exec_feature_hook "build"
+
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
@@ -674,6 +676,8 @@ run_build() {
       fi
     fi
   fi
+
+  printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
@@ -1187,6 +1191,7 @@ github_get_release_id() {
 public build_debug
 public build_release
 public build_test
+public feature
 public index
 public init
 public install
@@ -1397,6 +1402,22 @@ exec_build_test() {
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+}
+
+
+exec_feature_hook() {
+  local feature=$1
+
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+    local package_name=${dependency%=*}
+
+    echo "Package: $package_name"
+  done
+
+
+
+  echo "Variables:"
+  declare -p | grep "MUSH_"
 }
 
 
@@ -1740,6 +1761,9 @@ manifest_parse() {
         "[dev-legacy-build]")
           section=MUSH_DEV_LEGACY_BUILD
           ;;
+        "[features]")
+          section=MUSH_FEATURE
+          ;;
         [a-z]*)
           case $section in
             MUSH_PACKAGE)
@@ -1776,6 +1800,11 @@ manifest_parse() {
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
+              ;;
+            MUSH_FEATURE)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              eval "${section}_${field}=\$value"
               ;;
             *)
               ;;

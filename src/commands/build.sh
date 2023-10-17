@@ -30,6 +30,8 @@ run_build() {
 
   exec_manifest_lookup "${PWD}"
 
+  exec_feature_hook "build"
+
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
   exec_legacy_build "${MUSH_TARGET_DIR}"
 
@@ -61,6 +63,8 @@ run_build() {
       fi
     fi
   fi
+
+  printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }

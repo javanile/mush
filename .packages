@@ -8,4 +8,5 @@ index https://github.com/francescobianco/mush-packages
 
 package mush https://github.com/javanile/mush.git
 package console https://github.com/javanile/mush.git packages/console
+package build_logger https://github.com/javanile/mush.git packages/build_logger
 package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit

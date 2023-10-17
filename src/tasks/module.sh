@@ -2,6 +2,7 @@
 public build_debug
 public build_release
 public build_test
+public feature
 public index
 public init
 public install

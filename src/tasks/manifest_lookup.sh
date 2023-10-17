@@ -102,6 +102,11 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
+            MUSH_FEATURE)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              eval "${section}_${field}=\$value"
+              ;;
             *)
               ;;
           esac
