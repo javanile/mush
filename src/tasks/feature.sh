@@ -1,16 +1,20 @@
 
 
 exec_feature_hook() {
-  local feature=$1
+  local feature_hook=$1
 
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    local package_name=${dependency%=*}
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
+    local feature_package=${dependency%=*}
+    local feature_var="MUSH_FEATURE_$(echo "${feature_package}" | awk '{ print toupper($0) }')"
+    local feature_value=$(eval "echo \$$feature_var")
+    local feature_function="__feature_${feature_package}_hook_${feature_hook}"
 
-    echo "Package: $package_name"
+    if [ -n "$feature_value" ]; then
+      $feature_function
+    fi
   done
 
 
 
-  echo "Variables:"
-  declare -p | grep "MUSH_"
+
 }

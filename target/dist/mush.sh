@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-17T15:48:39Z
+## @build_date: 2023-10-17T16:23:29Z
 set -e
 extern() {
   extern=$1
@@ -1102,9 +1102,11 @@ git_dependency() {
 }
 
 mush_dependency() {
-    echo "MUST DEP: $1 $2 $3"
+  echo "MUST DEP: $1 $2 $3"
 
-    exec_install_from_index "$2"
+  exec_index_update
+
+  exec_install_from_index "$2"
 }
 
 public github
@@ -1406,18 +1408,22 @@ exec_build_test() {
 
 
 exec_feature_hook() {
-  local feature=$1
+  local feature_hook=$1
 
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
-    local package_name=${dependency%=*}
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
+    local feature_package=${dependency%=*}
+    local feature_var="MUSH_FEATURE_$(echo "${feature_package}" | awk '{ print toupper($0) }')"
+    local feature_value=$(eval "echo \$$feature_var")
+    local feature_function="__feature_${feature_package}_hook_${feature_hook}"
 
-    echo "Package: $package_name"
+    $feature_function
   done
 
 
 
-  echo "Variables:"
-  declare -p | grep "MUSH_"
+
+  #echo "Variables:"
+  #declare -p | grep "MUSH_"
 }
 
 
@@ -2070,7 +2076,7 @@ exec_publish() {
 }
 
 exec_dependencies() {
-echo "DEPS------------------ ${MUSH_DEPS}"
+  #echo "DEPS------------------ ${MUSH_DEV_DEPS}"
   process_dependencies
   process_dependencies_build
   process_dev_dependencies
