@@ -1,6 +1,5 @@
 
 extern package console
-#extern package json
 
 module api
 module errors
@@ -49,10 +48,6 @@ args_error() {
 }
 
 main() {
-  #echo "ARGS: $@"
-  #chmod +x target/debug/legacy/getoptions
-  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
-
   if [ $# -eq 0 ]; then
     eval "set -- --help"
   fi
@@ -60,8 +55,6 @@ main() {
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"
-
-  #echo "V $VERBOSE"
 
   if [ $# -gt 0 ]; then
     cmd=$1

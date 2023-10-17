@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-17T16:23:29Z
+## @build_date: 2023-10-17T16:44:48Z
 set -e
 extern() {
   extern=$1
@@ -24,7 +24,6 @@ embed() {
 ## BP004: Compile the entrypoint
 
 extern package console
-#extern package json
 
 module api
 module errors
@@ -73,10 +72,6 @@ args_error() {
 }
 
 main() {
-  #echo "ARGS: $@"
-  #chmod +x target/debug/legacy/getoptions
-  #bash target/debug/legacy/gengetoptions library > target/debug/legacy/getoptions.sh
-
   if [ $# -eq 0 ]; then
     eval "set -- --help"
   fi
@@ -84,8 +79,6 @@ main() {
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"
-
-  #echo "V $VERBOSE"
 
   if [ $# -gt 0 ]; then
     cmd=$1
@@ -1416,14 +1409,18 @@ exec_feature_hook() {
     local feature_value=$(eval "echo \$$feature_var")
     local feature_function="__feature_${feature_package}_hook_${feature_hook}"
 
-    $feature_function
+    if [ -n "$feature_value" ]; then
+      if [ "$(type -t "$feature_function")" = "function" ]; then
+          $feature_function
+      else
+          console_warning "Feature '${feature_package}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
+      fi
+    fi
   done
 
 
 
 
-  #echo "Variables:"
-  #declare -p | grep "MUSH_"
 }
 
 

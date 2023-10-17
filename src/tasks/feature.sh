@@ -1,5 +1,4 @@
 
-
 exec_feature_hook() {
   local feature_hook=$1
 
@@ -10,11 +9,11 @@ exec_feature_hook() {
     local feature_function="__feature_${feature_package}_hook_${feature_hook}"
 
     if [ -n "$feature_value" ]; then
-      $feature_function
+      if [ "$(type -t "$feature_function")" = "function" ]; then
+          $feature_function
+      else
+          echo "Warning: Feature '${feature_package}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
+      fi
     fi
   done
-
-
-
-
 }
