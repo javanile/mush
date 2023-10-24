@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-24T21:24:22Z
+## @build_date: 2023-10-24T22:02:36Z
 set -e
 extern() {
   extern=$1
@@ -780,27 +780,32 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
-  echo "INSTALL: '$PACKAGE_PATH'"
+  #echo "INSTALL: '$PACKAGE_PATH'  $# "
 
-
-  if [ -z "$PACKAGE_PATH" ]; then
-    exec_index_update
-    exec_install_from_index "$1"
-  else
-    if [ -f "Manifest.toml" ]; then
-      exec_manifest_lookup "${PWD}"
+  if [ -n "$PACKAGE_PATH" ]; then
+    local package_path=$(realpath "$PACKAGE_PATH")
+    if [ -f "${package_path}/Manifest.toml" ]; then
+      exec_manifest_lookup "${package_path}"
       MUSH_TARGET_DIR=target/dist
-
       exec_legacy_fetch "${MUSH_TARGET_DIR}"
       exec_legacy_build "${MUSH_TARGET_DIR}"
-
       exec_build_release "$@"
-
       exec_install
-     else
-       console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source"
-     fi
-   fi
+    else
+      console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
+    fi
+  else
+    if [ "$#" -eq 0 ]; then
+      if [ -f "Manifest.toml" ]; then
+        console_error "Using 'mush install' to install the binaries for the package in current working directory is not supported, use 'mush install --path .' instead. Use 'mush build' if you want to simply build the package."
+      else
+        console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source."
+      fi
+    else
+      exec_index_update
+      exec_install_from_index "$1"
+    fi
+  fi
 }
 
 parser_definition_legacy() {
