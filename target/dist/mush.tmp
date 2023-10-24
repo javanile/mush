@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-17T16:46:11Z
+## @build_date: 2023-10-24T21:24:35Z
 set -e
 extern() {
   extern=$1
@@ -34,7 +34,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-10-13)"
+VERSION="Mush 0.1.1 (2023-10-24)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -762,17 +762,17 @@ run_init() {
 }
 
 parser_definition_install() {
-	setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
   msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
-	msg    -- 'OPTIONS:'
+  msg    -- 'OPTIONS:'
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
 
   param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-	disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage         -h --help                         -- "Print help information"
 }
 
 run_install() {
@@ -780,21 +780,27 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
+  echo "INSTALL: '$PACKAGE_PATH'  $# "
+
+
   if [ -z "$PACKAGE_PATH" ]; then
     exec_index_update
     exec_install_from_index "$1"
   else
-    exec_manifest_lookup "${PWD}"
+    if [ -f "Manifest.toml" ]; then
+      exec_manifest_lookup "${PWD}"
+      MUSH_TARGET_DIR=target/dist
 
-    MUSH_TARGET_DIR=target/dist
+      exec_legacy_fetch "${MUSH_TARGET_DIR}"
+      exec_legacy_build "${MUSH_TARGET_DIR}"
 
-    exec_legacy_fetch "${MUSH_TARGET_DIR}"
-    exec_legacy_build "${MUSH_TARGET_DIR}"
+      exec_build_release "$@"
 
-    exec_build_release "$@"
-
-    exec_install
-  fi
+      exec_install
+     else
+       console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source"
+     fi
+   fi
 }
 
 parser_definition_legacy() {
