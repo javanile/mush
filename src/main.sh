@@ -2,6 +2,7 @@
 extern package console
 
 module api
+module build
 module errors
 module commands
 module package_managers
@@ -19,6 +20,8 @@ parser_definition() {
 
   msg   -- 'OPTIONS:'
   disp  VERSION -V --version                      -- "Print version info and exit"
+  param PRINT      --print                        -- "Builder information to print on stdout"
+  param EXPLAIN    --explain                      -- "Provide a detailed explanation of an error message"
   flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
@@ -41,8 +44,11 @@ args_error() {
     notcmd)
       console_error "no such command: '$3'\n\n\tView all available commands with 'mush --help'"
       ;;
+    required)
+      console_error "argument to option '$3' missing."
+      ;;
     *)
-      echo "ERROR: ($2) $1"
+      echo "ERROR: ($2 $3) $1"
   esac
   exit 101
 }
@@ -56,7 +62,11 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
-  if [ $# -gt 0 ]; then
+  if [ -n "${PRINT}" ]; then
+    mush_build_print "${PRINT}"
+  elif [ -n "${EXPLAIN}" ]; then
+    mush_errors_explain "${EXPLAIN}"
+  elif [ $# -gt 0 ]; then
     cmd=$1
     shift
     case $cmd in
