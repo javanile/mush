@@ -3,8 +3,9 @@ extern package console
 
 module api
 module build
-module errors
+module collections
 module commands
+module errors
 module package_managers
 module registry
 module tasks

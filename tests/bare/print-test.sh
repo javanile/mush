@@ -8,4 +8,4 @@ bash target/dist/mush --version
 
 echo "==> Test: print"
 cd tests/fixtures/complex-app
-bash ../../../target/dist/mush --print cavallo
+bash ../../../target/dist/mush --print b
