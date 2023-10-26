@@ -42,7 +42,7 @@ exec_index_parse() {
     console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
   fi
 
-  while read line; do
+  while read -r line; do
     #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
     [ "${line:0:1}" = "#" ] && continue

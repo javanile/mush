@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-25T17:19:24Z
+## @build_date: 2023-10-26T16:04:11Z
 set -e
 extern() {
   extern=$1
@@ -26,8 +26,10 @@ embed() {
 extern package console
 
 module api
-module errors
+module build
+module collections
 module commands
+module errors
 module package_managers
 module registry
 module tasks
@@ -43,6 +45,8 @@ parser_definition() {
 
   msg   -- 'OPTIONS:'
   disp  VERSION -V --version                      -- "Print version info and exit"
+  param PRINT      --print                        -- "Builder information to print on stdout"
+  param EXPLAIN    --explain                      -- "Provide a detailed explanation of an error message"
   flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
@@ -65,8 +69,11 @@ args_error() {
     notcmd)
       console_error "no such command: '$3'\n\n\tView all available commands with 'mush --help'"
       ;;
+    required)
+      console_error "argument to option '$3' missing."
+      ;;
     *)
-      echo "ERROR: ($2) $1"
+      echo "ERROR: ($2 $3) $1"
   esac
   exit 101
 }
@@ -80,7 +87,11 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
-  if [ $# -gt 0 ]; then
+  if [ -n "${PRINT}" ]; then
+    mush_build_print "${PRINT}"
+  elif [ -n "${EXPLAIN}" ]; then
+    mush_errors_explain "${EXPLAIN}"
+  elif [ $# -gt 0 ]; then
     cmd=$1
     shift
     case $cmd in
@@ -549,44 +560,23 @@ mush_api_test_2022 () {
 EOF
 }
 
-error_dump_code() {
-  local file=$1
-  local line=$2
-  local source=$(sed -n "${line}p" "${file}")
-
-  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m --> ${ESCAPE}[0m${file}:${line}:1"
-  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m  |${ESCAPE}[0m"
-  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m${line} | ${ESCAPE}[0m$source"
-  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m  | ${ESCAPE}[0m^^^^^^^^^^^^^^^^^^^^^ can't find crate"
-  echo -e ""
+mush_build_print() {
+    case "$1" in
+        a)
+            echo "a"
+            ;;
+        *)
+            local print_options="
+            a   a
+            b   b
+            c   c
+            "
+            console_error "unknown print request '$1'\n\nAvailable print options:\n${print_options}"
+    esac
 }
 
-error_package_not_found() {
-  local package_name=$MUSH_PACKAGE_NAME
-  local extern_package_name=$1
-  local debug_file=$2
-
-  echo "error[E0463]: can't find package for '${extern_package_name}'"
-  echo " --> ${debug_file}:8:1"
-  echo "  |"
-  echo "8 | extern crate cavallo;"
-  echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
-  echo ""
-  echo "For more information about this error, try 'mush explain E0463'."
-  echo "error: could not compile '${package_name}' due to previous error"
-}
-
-error_E0583_file_not_found() {
-  local package_name=$MUSH_PACKAGE_NAME
-  local module_name=$1
-  local debug_file=$2
-  local debug_line=$3
-
-  console_error_code "E0583" "file not found for module '${module_name}'"
-  error_dump_code "${debug_file}" "${debug_line}"
-
-  echo "For more information about this error, try 'mush explain E0463'."
-  echo "error: could not compile '${package_name}' due to previous error"
+mush_space_iterable() {
+    echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
 
 public add
@@ -1085,6 +1075,50 @@ run_uninstall() {
   cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
 }
 
+mush_errors_explain() {
+    echo "Explain: $1"
+}
+
+error_dump_code() {
+  local file=$1
+  local line=$2
+  local source=$(sed -n "${line}p" "${file}")
+
+  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m --> ${ESCAPE}[0m${file}:${line}:1"
+  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m  |${ESCAPE}[0m"
+  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m${line} | ${ESCAPE}[0m$source"
+  echo -e "${ESCAPE}[1m${ESCAPE}[38;5;12m  | ${ESCAPE}[0m^^^^^^^^^^^^^^^^^^^^^ can't find crate"
+  echo -e ""
+}
+
+error_package_not_found() {
+  local package_name=$MUSH_PACKAGE_NAME
+  local extern_package_name=$1
+  local debug_file=$2
+
+  echo "error[E0463]: can't find package for '${extern_package_name}'"
+  echo " --> ${debug_file}:8:1"
+  echo "  |"
+  echo "8 | extern crate cavallo;"
+  echo "  | ^^^^^^^^^^^^^^^^^^^^^ can't find crate"
+  echo ""
+  echo "For more information about this error, try 'mush explain E0463'."
+  echo "error: could not compile '${package_name}' due to previous error"
+}
+
+error_E0583_file_not_found() {
+  local package_name=$MUSH_PACKAGE_NAME
+  local module_name=$1
+  local debug_file=$2
+  local debug_line=$3
+
+  console_error_code "E0583" "file not found for module '${module_name}'"
+  error_dump_code "${debug_file}" "${debug_line}"
+
+  echo "For more information about this error, try 'mush explain E0463'."
+  echo "error: could not compile '${package_name}' due to previous error"
+}
+
 public apt
 public basher
 public bpkg
@@ -1468,11 +1502,12 @@ exec_index_parse() {
   local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   curl -s -L "${packages_file}" > "${packages_local_file}"
+  sort -o "${packages_local_file}" "${packages_local_file}"
   if [ ! -s "${packages_local_file}" ]; then
     console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
   fi
 
-  while read line; do
+  while read -r line; do
     #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
     [ "${line:0:1}" = "#" ] && continue
@@ -1576,6 +1611,7 @@ exec_install_from_index() {
   fi
 
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null
+  rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 

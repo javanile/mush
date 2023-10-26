@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-26T14:43:22Z
+## @build_date: 2023-10-26T16:08:02Z
 set -e
 extern() {
   extern=$1
@@ -1331,7 +1331,7 @@ exec_build_from_src() {
     exec_build_lib_from_src "${package_src}"
   fi
 
-  echo "PROCESS BIN ${package_src}"
+  #echo "PROCESS BIN ${package_src}"
 
   if [ -f "${package_src}/src/main.sh" ]; then
     exec_build_bin_from_src "${package_src}"
@@ -1506,7 +1506,7 @@ exec_index_parse() {
     console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
   fi
 
-  while read line; do
+  while read -r line; do
     #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
     [ "${line:0:1}" = "#" ] && continue
@@ -1609,7 +1609,8 @@ exec_install_from_index() {
     rm -fr "${package_src}"
   fi
 
-  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null
+  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
+  rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 

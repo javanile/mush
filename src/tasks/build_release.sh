@@ -44,7 +44,7 @@ exec_build_from_src() {
     exec_build_lib_from_src "${package_src}"
   fi
 
-  echo "PROCESS BIN ${package_src}"
+  #echo "PROCESS BIN ${package_src}"
 
   if [ -f "${package_src}/src/main.sh" ]; then
     exec_build_bin_from_src "${package_src}"
