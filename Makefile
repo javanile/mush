@@ -53,6 +53,9 @@ serve-docs:
 ## Test
 ## ====
 
+test-docker:
+	@docker build -q -t mush-test-docker-ubuntu tests/docker/ubuntu
+
 test-legacy-fetch-debug:
 	@bash tests/bare/legacy/debug-fetch-test.sh
 
@@ -193,3 +196,6 @@ test-simple-feature:
 
 test-print:
 	@bash tests/bare/print-test.sh
+
+test-system-ubuntu: test-docker
+	@docker run --rm -v $${PWD}:/mush -w /mush mush-test-docker-ubuntu bash tests/bare/system/ubuntu-test.sh

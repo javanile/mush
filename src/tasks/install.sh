@@ -51,6 +51,7 @@ exec_install_from_index() {
   fi
 
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null
+  rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
