@@ -1,4 +1,8 @@
 
+mush_errors_explain() {
+    echo "Explain: $1"
+}
+
 error_dump_code() {
   local file=$1
   local line=$2

@@ -7,7 +7,7 @@
 	@mush $@
 
 build-dist:
-	@mush build -v --target dist
+	@mush build -v --target bash5
 
 release:
 	@mush build -v --release
@@ -165,7 +165,10 @@ test-sysinfo:
 	@bash tests/bare/sysinfo-test.sh
 
 test-install-help:
-	@bash tests/bare/help/install-test.sh
+	@bash tests/bare/help/install-help-test.sh
+
+test-help:
+	@bash tests/bare/help/help-test.sh
 
 test-command-options:
 	@bash tests/bare/command-options-test.sh
@@ -187,3 +190,6 @@ test-getoptions:
 
 test-simple-feature:
 	@bash tests/bare/features/simple-test.sh
+
+test-print:
+	@bash tests/bare/print-test.sh
