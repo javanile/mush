@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-26T16:04:11Z
+## @build_date: 2023-10-26T16:14:07Z
 set -e
 extern() {
   extern=$1
@@ -1331,7 +1331,7 @@ exec_build_from_src() {
     exec_build_lib_from_src "${package_src}"
   fi
 
-  echo "PROCESS BIN ${package_src}"
+  #echo "PROCESS BIN ${package_src}"
 
   if [ -f "${package_src}/src/main.sh" ]; then
     exec_build_bin_from_src "${package_src}"
@@ -1502,7 +1502,9 @@ exec_index_parse() {
   local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   curl -s -L "${packages_file}" > "${packages_local_file}"
-  sort -o "${packages_local_file}" "${packages_local_file}"
+
+  sort -t "|" -k 1,1 -o "${packages_local_file}" "${packages_local_file}"
+
   if [ ! -s "${packages_local_file}" ]; then
     console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
   fi
@@ -1610,7 +1612,7 @@ exec_install_from_index() {
     rm -fr "${package_src}"
   fi
 
-  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null
+  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"

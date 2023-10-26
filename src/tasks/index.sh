@@ -38,6 +38,9 @@ exec_index_parse() {
   local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   curl -s -L "${packages_file}" > "${packages_local_file}"
+
+  #sort -t "|" -k 1,1 -o "${packages_local_file}" "${packages_local_file}"
+
   if [ ! -s "${packages_local_file}" ]; then
     console_error "spurious network error: Couldn't retrieve '.packages' file at '${packages_file}'"
   fi
