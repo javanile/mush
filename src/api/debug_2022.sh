@@ -92,7 +92,7 @@ public() {
 }
 
 use() {
-  source src/assets/server.sh
+  return 0
 }
 
 embed() {

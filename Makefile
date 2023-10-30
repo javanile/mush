@@ -13,6 +13,14 @@ release:
 	@mush build -v --release
 
 ## ====
+## Lint
+## ====
+
+shellcheck:
+	@find src -name '*.sh' -type f -exec shellcheck \
+		-e SC2148 -e SC2155 -e SC2034 {} \;
+
+## ====
 ## Prod
 ## ====
 

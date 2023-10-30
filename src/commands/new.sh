@@ -26,7 +26,7 @@ run_new() {
 
   mkdir -p "$1"
 
-  cd "$1"
+  cd "$1" || exit 101
 
   exec_init
 }
