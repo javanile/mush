@@ -21,25 +21,34 @@ process_dependencies() {
 }
 
 process_dependency() {
+  local package_name
   local package_source
+  local package_full_name
+  local package_version_constraint
+
+  package_name="$1"
 
   if [ "$2" = "*" ]; then
-    package_source=mush
+    package_source="mush"
+    package_full_name="${package_name}"
+    package_version_constraint="*"
   else
-    package_source=${2%% *}
+    package_source="${2%% *}"
+    package_full_name=$(echo "$your_variable" | awk '{print $2}')
+    package_version_constraint=$(echo "$your_variable" | awk '{print $3}')
   fi
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
 
   case "${package_source}" in
     git)
-      git_dependency "$1" "$3" "$4"
+      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     mush)
-      mush_dependency "$1" "$3" "$4"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     *)
-      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
       exit 101
       ;;
   esac

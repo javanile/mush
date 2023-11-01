@@ -6,4 +6,4 @@ edition = "2022"
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [dependencies]
-getoptions = "mush getoptions 1 | apt getoptions"
+getoptions = "*"
