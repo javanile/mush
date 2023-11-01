@@ -14,7 +14,7 @@ extern() {
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
     local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
-    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
 
     if [ -d "${extern_package_path}" ]; then
       debug_file "${extern_package_lib_file}"
@@ -37,7 +37,7 @@ extern() {
 }
 
 legacy() {
-  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file="target/debug/legacy/__$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
 
   if [ ! -f "$legacy_file_path" ]; then
@@ -88,6 +88,9 @@ public() {
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
+  else
+    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+    exit 101
   fi
 }
 

@@ -3,7 +3,7 @@ set -e
 
 ## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME=mush
-MUSH_DEBUG_PATH=/Users/francescobianco/Develop/Javanile/mush
+MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
 MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
 
 ## BP003: Embedding debug api
@@ -19,7 +19,7 @@ extern() {
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
     local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
-    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
     if [ -d "${extern_package_path}" ]; then
       debug_file "${extern_package_lib_file}"
     else
@@ -40,7 +40,7 @@ extern() {
   fi
 }
 legacy() {
-  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file="target/debug/legacy/__$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
   if [ ! -f "$legacy_file_path" ]; then
     echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
@@ -85,10 +85,13 @@ public() {
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
+  else
+    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+    exit 101
   fi
 }
 use() {
-  source src/assets/server.sh
+  return 0
 }
 embed() {
   local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"

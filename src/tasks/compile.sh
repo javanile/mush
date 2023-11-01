@@ -1,37 +1,42 @@
 
 compile_file() {
-  #echo "COMPILE: $1 -> $2 ($PWD)"
+  local src_file
+  local build_file
+  local manifest_directory
+  local build_mode
 
-  local src_file=$1
-  local build_file=$2
+  src_file=$1
+  build_file=$2
+  manifest_directory=${3:-$PWD}
+  build_mode=${4:-debug}
+
+  [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
 
-  compile_scan_legacy "${src_file}" "${build_file}"
+  compile_scan_legacy "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_public "${src_file}" "${build_file}"
+  compile_scan_public "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_module "${src_file}" "${build_file}"
+  compile_scan_module "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_extern_package "${src_file}" "${build_file}"
+  compile_scan_extern_package "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_embed "${src_file}" "${build_file}"
-
-  return 0
+  compile_scan_embed "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 }
 
 compile_scan_legacy() {
   local src_file=$1
   local build_file=$2
-  local legacy_dir=target/debug/legacy
+  local legacy_dir=$3/target/$4/legacy
 
   grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local legacy_name=$(echo "${line#*legacy}" | xargs)
-    local legacy_file="${legacy_dir}/${legacy_name}.sh"
-    local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
+    local legacy_file="${legacy_dir}/__${legacy_name}.sh"
+    local legacy_dir_file="${legacy_dir}/${legacy_name}/__${legacy_name}.sh"
     #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
@@ -106,8 +111,8 @@ compile_scan_module() {
 compile_scan_extern_package() {
   local src_file=$1
   local build_file=$2
-  local module_dir=$(dirname $src_file)
-  local extern_package_dir=target/dist
+  local module_dir=$(dirname "${src_file}")
+  local extern_package_dir=${MUSH_TARGET_DIR}
 
   grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local package_name=$(echo "${line#*package}" | xargs)
@@ -119,6 +124,7 @@ compile_scan_extern_package() {
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
+      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file}"
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
       #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
       #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."

@@ -1,6 +1,5 @@
 
 exec_dependencies() {
-  #echo "DEPS------------------ ${MUSH_DEV_DEPS}"
   process_dependencies
   process_dependencies_build
   process_dev_dependencies
@@ -8,26 +7,47 @@ exec_dependencies() {
 }
 
 process_dependencies() {
-  echo "${MUSH_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
+    [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
+
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dependency "$package_name" $package_signature
+      process_dependency "$package_name" "$package_signature"
     fi
   done
 }
 
 process_dependency() {
-  case "$2" in
+  local package_name
+  local package_source
+  local package_full_name
+  local package_version_constraint
+
+  package_name="$1"
+
+  if [ "$2" = "*" ]; then
+    package_source="mush"
+    package_full_name="${package_name}"
+    package_version_constraint="*"
+  else
+    package_source="${2%% *}"
+    package_full_name=$(echo "$your_variable" | awk '{print $2}')
+    package_version_constraint=$(echo "$your_variable" | awk '{print $3}')
+  fi
+
+  [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
+
+  case "${package_source}" in
     git)
-      git_dependency "$1" "$3" "$4"
+      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     mush)
-      mush_dependency "$1" "$3" "$4"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     *)
-      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
       exit 101
       ;;
   esac
@@ -48,14 +68,13 @@ process_dependencies_build() {
   done
 }
 
-
 process_dev_dependencies() {
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dev_dependency "$package_name" $package_signature
+      process_dev_dependency "$package_name" "$package_signature"
     fi
   done
 }

@@ -30,7 +30,11 @@ exec_install() {
 }
 
 exec_install_from_index() {
-  local package_name=$1
+  local package_name
+  local package_version_constraint
+
+  package_name=$1
+  package_version_constraint=$2
 
   local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
@@ -39,6 +43,8 @@ exec_install_from_index() {
     exit 101
   fi
 
+  ## TODO: Implement version constraint
+  local package_version_selected=1
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
   local package_name=$(echo "${package_search}" | awk '{print $1}')
@@ -53,18 +59,17 @@ exec_install_from_index() {
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
-  local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  #echo "${package_src}/Manifest.toml"
-  #cat "${package_src}/Manifest.toml"
-
-  exec_install_from_src "${package_src}"
+  exec_install_from_src "${package_nested_src}"
 }
 
 exec_install_from_src() {
   local package_src=$1
 
   exec_manifest_lookup "${package_src}"
+  exec_legacy_fetch "${package_src}/target/dist"
+  exec_legacy_build "${package_src}/target/dist"
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -115,6 +120,8 @@ exec_install_lib_from_src() {
   local pwd=$PWD
 
   local lib_file=${pwd}/lib/${lib_name}
+  local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
+  local lib_package_file=${lib_package_dir}/lib.sh
   local final_file=${package_src}/target/dist/lib.sh
 
   local cp=cp
@@ -124,9 +131,12 @@ exec_install_lib_from_src() {
   #    chmod="sudo ${chmod}"
   #fi
 
-  mkdir -p ${pwd}/lib
+  mkdir -p "${pwd}/lib" "${lib_package_dir}"
+
   ${cp} "${final_file}" "${lib_file}"
-  ${chmod} +x "${lib_file}"
+  ${cp} "${final_file}" "${lib_package_file}"
+
+  ${chmod} +x "${lib_file}" "${lib_package_file}"
 
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 

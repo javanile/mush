@@ -7,7 +7,6 @@ bash target/debug/mush.sh build
 echo ""
 
 echo "==> Build: basic-app (from debug)"
-cd tests/fixtures/basic-app
+cd packages/getoptions
 rm -fr target lib && true
-bash ../../../target/debug/mush -vvvvvvv build
-bash ../../../target/debug/mush -vvvvvvv run
+bash ../../target/debug/mush -vvvvvvv build

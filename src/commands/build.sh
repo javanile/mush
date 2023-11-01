@@ -1,16 +1,17 @@
 
 parser_definition_build() {
-  setup   REST help:usage abbr:true -- "Compile the current package" ''
+  setup REST help:usage abbr:true -- "Compile the current package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-  msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
-  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+  msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose "counter:true" "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
 
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-  disp   :usage         -h --help                         -- "Print help information"
+  flag  QUIET          -q --quiet       -- "Do not print mush log messages"
+  flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
+
+  param BUILD_TARGET   -t --target      -- "Build for the specific target"
+  disp  :usage         -h --help        -- "Print help information"
 }
 
 run_build() {
@@ -64,7 +65,7 @@ run_build() {
     fi
   fi
 
-  printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
+  #printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }

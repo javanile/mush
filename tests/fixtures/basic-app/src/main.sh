@@ -1,4 +1,7 @@
 
+
+extern package getoptions
+
 #legacy lib_helloworld
 
 #module notfound
