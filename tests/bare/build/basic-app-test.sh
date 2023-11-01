@@ -8,4 +8,5 @@ echo ""
 
 echo "==> Build: basic-app (from debug)"
 cd tests/fixtures/basic-app
+rm -fr target lib && true
 bash ../../../target/debug/mush -vvvvvvv build

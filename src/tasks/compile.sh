@@ -124,6 +124,7 @@ compile_scan_extern_package() {
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
+      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file}"
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
       #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
       #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
