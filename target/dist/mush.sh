@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-01T14:34:18Z
+## @build_date: 2023-11-01T17:18:34Z
 set -e
 extern() {
   extern=$1
@@ -36,7 +36,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-10-24)"
+VERSION="Mush 0.1.1 (2023-11-01)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -86,6 +86,8 @@ main() {
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"
+
+  [ "${VERBOSE}" -gt 2 ] && echo "Verbosity level: ${VERBOSE}"
 
   if [ -n "${PRINT}" ]; then
     mush_build_print "${PRINT}"
@@ -445,7 +447,7 @@ extern() {
     local package_name=$MUSH_PACKAGE_NAME
     local extern_package_name=$2
     local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
-    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/src/lib.sh"
+    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
     if [ -d "${extern_package_path}" ]; then
       debug_file "${extern_package_lib_file}"
     else
@@ -596,17 +598,18 @@ test0 () {
   echo "TEST"
 }
 parser_definition_build() {
-  setup   REST help:usage abbr:true -- "Compile the current package" ''
+  setup REST help:usage abbr:true -- "Compile the current package" ''
 
   msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
 
-  msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
-  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+  msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose "counter:true" "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
 
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-  disp   :usage         -h --help                         -- "Print help information"
+  flag  QUIET          -q --quiet       -- "Do not print mush log messages"
+  flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
+
+  param BUILD_TARGET   -t --target      -- "Build for the specific target"
+  disp  :usage         -h --help        -- "Print help information"
 }
 
 run_build() {
@@ -660,7 +663,7 @@ run_build() {
     fi
   fi
 
-  printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
+  #printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
@@ -1140,11 +1143,19 @@ git_dependency() {
 }
 
 mush_dependency() {
-  echo "MUST DEP: $1 $2 $3"
+  local package_name
+  local package_full_name
+  local package_version_constraint
+
+  package_name=$1
+  package_full_name=$2
+  package_version_constraint=$3
 
   exec_index_update
 
-  exec_install_from_index "$2"
+  [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
+
+  exec_install_from_index "${package_full_name}" "${package_version_constraint}"
 }
 
 public github
@@ -1395,7 +1406,7 @@ exec_build_lib_from_src() {
   dist_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}"
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "dist"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -1501,7 +1512,7 @@ exec_index_parse() {
   local packages_file=$1
   local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
-  curl -s -L "${packages_file}" > "${packages_local_file}"
+  curl -s -L -H 'Cache-Control: no-cache, no-store' "${packages_file}" > "${packages_local_file}"
 
   #sort -t "|" -k 1,1 -o "${packages_local_file}" "${packages_local_file}"
 
@@ -1592,7 +1603,11 @@ exec_install() {
 }
 
 exec_install_from_index() {
-  local package_name=$1
+  local package_name
+  local package_version_constraint
+
+  package_name=$1
+  package_version_constraint=$2
 
   local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
@@ -1601,6 +1616,8 @@ exec_install_from_index() {
     exit 101
   fi
 
+  ## TODO: Implement version constraint
+  local package_version_selected=1
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
   local package_name=$(echo "${package_search}" | awk '{print $1}')
@@ -1615,18 +1632,17 @@ exec_install_from_index() {
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
-  local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  #echo "${package_src}/Manifest.toml"
-  #cat "${package_src}/Manifest.toml"
-
-  exec_install_from_src "${package_src}"
+  exec_install_from_src "${package_nested_src}"
 }
 
 exec_install_from_src() {
   local package_src=$1
 
   exec_manifest_lookup "${package_src}"
+  exec_legacy_fetch "${package_src}/target/dist"
+  exec_legacy_build "${package_src}/target/dist"
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -1677,6 +1693,8 @@ exec_install_lib_from_src() {
   local pwd=$PWD
 
   local lib_file=${pwd}/lib/${lib_name}
+  local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
+  local lib_package_file=${lib_package_dir}/lib.sh
   local final_file=${package_src}/target/dist/lib.sh
 
   local cp=cp
@@ -1686,9 +1704,12 @@ exec_install_lib_from_src() {
   #    chmod="sudo ${chmod}"
   #fi
 
-  mkdir -p ${pwd}/lib
+  mkdir -p "${pwd}/lib" "${lib_package_dir}"
+
   ${cp} "${final_file}" "${lib_file}"
-  ${chmod} +x "${lib_file}"
+  ${cp} "${final_file}" "${lib_package_file}"
+
+  ${chmod} +x "${lib_file}" "${lib_package_file}"
 
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
@@ -1707,18 +1728,34 @@ exec_legacy_fetch() {
 
   mkdir -p "${legacy_dir}"
 
-  echo "${MUSH_LEGACY_FETCH}" | while IFS=$'\n' read package && [ -n "$package" ]; do
+  echo "${MUSH_LEGACY_FETCH}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
     package_name=${package%=*}
-    package_file=${legacy_dir}/${package_name}.sh
     package_bin=${legacy_dir}/${package_name}
-    package_url=${package#*=}
+    package_signature=${package#*=}
+    package_type=${package_signature%% *}
+    package_url=${package_signature#* }
 
-    if [ ! -f "${package_file}" ]; then
-      console_status "Downloading" "$package_name => $package_url ($package_file)"
-      curl -s -L -X GET -o "${package_file}" "${package_url}"
-      ln "${package_file}" "${package_bin}"
-      chmod +x "${package_bin}"
-    fi
+    [ "${VERBOSE}" -gt 4 ] && echo "Process legacy source of type '$package_type' with url '$package_url' for '$package_name'"
+
+    case "${package_type}" in
+      git)
+        echo "NOT IMPLEMENTED YET!"
+        exit 101
+        ;;
+      file)
+        package_file=${legacy_dir}/${package_name}.sh
+        if [ ! -f "${package_file}" ]; then
+          console_status "Downloading" "$package_name => $package_url ($package_file)"
+          curl -s -L -X GET -o "${package_file}" "${package_url}"
+          ln "${package_file}" "${package_bin}"
+          chmod +x "${package_bin}"
+        fi
+        ;;
+      *)
+        console_error "Unsupported legacy package type '$package_type' for '$package_name' on Manifest.toml"
+        exit 101
+        ;;
+    esac
   done
 }
 
@@ -1741,8 +1778,6 @@ exec_legacy_build() {
       cd "$pwd"
     fi
   done
-
-
 }
 
 exec_manifest_lookup() {
@@ -1866,33 +1901,38 @@ manifest_parse() {
 }
 
 compile_file() {
-  #echo "COMPILE: $1 -> $2 ($PWD)"
+  local src_file
+  local build_file
+  local manifest_directory
+  local build_mode
 
-  local src_file=$1
-  local build_file=$2
+  src_file=$1
+  build_file=$2
+  manifest_directory=${3:-$PWD}
+  build_mode=${4:-debug}
+
+  [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
 
-  compile_scan_legacy "${src_file}" "${build_file}"
+  compile_scan_legacy "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_public "${src_file}" "${build_file}"
+  compile_scan_public "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_module "${src_file}" "${build_file}"
+  compile_scan_module "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_extern_package "${src_file}" "${build_file}"
+  compile_scan_extern_package "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_embed "${src_file}" "${build_file}"
-
-  return 0
+  compile_scan_embed "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 }
 
 compile_scan_legacy() {
   local src_file=$1
   local build_file=$2
-  local legacy_dir=target/debug/legacy
+  local legacy_dir=$3/target/$4/legacy
 
   grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local legacy_name=$(echo "${line#*legacy}" | xargs)
@@ -1972,8 +2012,8 @@ compile_scan_module() {
 compile_scan_extern_package() {
   local src_file=$1
   local build_file=$2
-  local module_dir=$(dirname $src_file)
-  local extern_package_dir=target/dist
+  local module_dir=$(dirname "${src_file}")
+  local extern_package_dir=${MUSH_TARGET_DIR}
 
   grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local package_name=$(echo "${line#*package}" | xargs)
@@ -1985,6 +2025,7 @@ compile_scan_extern_package() {
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
+      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file}"
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
       #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
       #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
@@ -2117,7 +2158,6 @@ exec_publish() {
 }
 
 exec_dependencies() {
-  #echo "DEPS------------------ ${MUSH_DEV_DEPS}"
   process_dependencies
   process_dependencies_build
   process_dev_dependencies
@@ -2125,26 +2165,47 @@ exec_dependencies() {
 }
 
 process_dependencies() {
-  echo "${MUSH_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
+    [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
+
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dependency "$package_name" $package_signature
+      process_dependency "$package_name" "$package_signature"
     fi
   done
 }
 
 process_dependency() {
-  case "$2" in
+  local package_name
+  local package_source
+  local package_full_name
+  local package_version_constraint
+
+  package_name="$1"
+
+  if [ "$2" = "*" ]; then
+    package_source="mush"
+    package_full_name="${package_name}"
+    package_version_constraint="*"
+  else
+    package_source="${2%% *}"
+    package_full_name=$(echo "$your_variable" | awk '{print $2}')
+    package_version_constraint=$(echo "$your_variable" | awk '{print $3}')
+  fi
+
+  [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
+
+  case "${package_source}" in
     git)
-      git_dependency "$1" "$3" "$4"
+      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     mush)
-      mush_dependency "$1" "$3" "$4"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
       ;;
     *)
-      console_error "Unsupported package manager '$2' for '$1' on Manifest.toml"
+      console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
       exit 101
       ;;
   esac
@@ -2165,14 +2226,13 @@ process_dependencies_build() {
   done
 }
 
-
 process_dev_dependencies() {
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dev_dependency "$package_name" $package_signature
+      process_dev_dependency "$package_name" "$package_signature"
     fi
   done
 }

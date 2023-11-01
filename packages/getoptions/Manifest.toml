@@ -10,4 +10,4 @@ getoptions = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.
 gengetoptions = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
 
 [legacy-build]
-getoptions = "gengetoptions library > getoptions.sh"
+getoptions = "gengetoptions library > __getoptions.sh"
