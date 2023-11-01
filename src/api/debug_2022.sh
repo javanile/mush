@@ -88,6 +88,9 @@ public() {
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
+  else
+    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+    exit 101
   fi
 }
 
