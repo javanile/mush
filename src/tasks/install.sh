@@ -120,9 +120,8 @@ exec_install_lib_from_src() {
   local pwd=$PWD
 
   local lib_file=${pwd}/lib/${lib_name}
-  local lib_package_dir=${pwd}/target/dist/packages/${lib_name}
+  local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
-  local final_file=${package_src}/target/dist/lib.sh
   local final_file=${package_src}/target/dist/lib.sh
 
   local cp=cp

@@ -111,8 +111,8 @@ compile_scan_module() {
 compile_scan_extern_package() {
   local src_file=$1
   local build_file=$2
-  local module_dir=$(dirname $src_file)
-  local extern_package_dir=target/dist
+  local module_dir=$(dirname "${src_file}")
+  local extern_package_dir=${MUSH_TARGET_DIR}
 
   grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local package_name=$(echo "${line#*package}" | xargs)

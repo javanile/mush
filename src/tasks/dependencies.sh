@@ -1,6 +1,5 @@
 
 exec_dependencies() {
-  #echo "DEPS------------------ ${MUSH_DEV_DEPS}"
   process_dependencies
   process_dependencies_build
   process_dev_dependencies
