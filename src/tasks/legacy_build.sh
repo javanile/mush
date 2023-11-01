@@ -18,6 +18,4 @@ exec_legacy_build() {
       cd "$pwd"
     fi
   done
-
-
 }

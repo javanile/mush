@@ -68,6 +68,8 @@ exec_install_from_src() {
   local package_src=$1
 
   exec_manifest_lookup "${package_src}"
+  exec_legacy_fetch "${package_src}/target/dist"
+  exec_legacy_build "${package_src}/target/dist"
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
