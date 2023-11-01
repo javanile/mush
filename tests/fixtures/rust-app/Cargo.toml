@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Mush, a build system for shell."
 license = "MIT"
 edition = "2021"
+rust = "1.65"
 
 #[badges]
 #travis-ci = { repository = "https://travis-ci.org/javanile/cask" }
