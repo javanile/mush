@@ -30,7 +30,11 @@ exec_install() {
 }
 
 exec_install_from_index() {
-  local package_name=$1
+  local package_name
+  local package_version_constraint
+
+  package_name=$1
+  package_version_constraint=$2
 
   local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
@@ -39,6 +43,8 @@ exec_install_from_index() {
     exit 101
   fi
 
+  ## TODO: Implement version constraint
+  local package_version_selected=1
   local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
   local package_name=$(echo "${package_search}" | awk '{print $1}')
@@ -53,12 +59,9 @@ exec_install_from_index() {
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
-  local package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  #echo "${package_src}/Manifest.toml"
-  #cat "${package_src}/Manifest.toml"
-
-  exec_install_from_src "${package_src}"
+  exec_install_from_src "${package_nested_src}"
 }
 
 exec_install_from_src() {
