@@ -108,7 +108,7 @@ exec_build_lib_from_src() {
   dist_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}"
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "dist"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

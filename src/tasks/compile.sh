@@ -4,21 +4,25 @@ compile_file() {
 
   local src_file=$1
   local build_file=$2
+  local manifest_directory=${3:-$PWD}
+  local build_mode=${4:-debug}
+
+  [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
 
-  compile_scan_legacy "${src_file}" "${build_file}"
+  compile_scan_legacy "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_public "${src_file}" "${build_file}"
+  compile_scan_public "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_module "${src_file}" "${build_file}"
+  compile_scan_module "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_extern_package "${src_file}" "${build_file}"
+  compile_scan_extern_package "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
-  compile_scan_embed "${src_file}" "${build_file}"
+  compile_scan_embed "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
   return 0
 }
@@ -26,7 +30,7 @@ compile_file() {
 compile_scan_legacy() {
   local src_file=$1
   local build_file=$2
-  local legacy_dir=target/debug/legacy
+  local legacy_dir=$3/target/$4/legacy
 
   grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local legacy_name=$(echo "${line#*legacy}" | xargs)
