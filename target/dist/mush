@@ -1,26 +1,38 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-01T18:00:36Z
+## @build_date: 2023-11-01T18:40:20Z
 set -e
-extern() {
-  extern=$1
-}
-legacy() {
-  legacy=$1
-}
-module() {
-  module=$1
-}
-public() {
-  public=$1
-}
-use() {
-  use=$1
-}
-embed() {
-  embed=$1
-}
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -513,6 +525,9 @@ public() {
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
+  else
+    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+    exit 101
   fi
 }
 use() {
@@ -527,24 +542,36 @@ EOF
 }
 dist_2022() {
   cat <<'EOF'
-extern() {
-  extern=$1
-}
-legacy() {
-  legacy=$1
-}
-module() {
-  module=$1
-}
-public() {
-  public=$1
-}
-use() {
-  use=$1
-}
-embed() {
-  embed=$1
-}
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
 EOF
 }
 test_2022() {

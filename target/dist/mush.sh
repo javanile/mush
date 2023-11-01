@@ -1,26 +1,38 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-01T17:18:34Z
+## @build_date: 2023-11-01T18:40:13Z
 set -e
-extern() {
-  extern=$1
-}
-legacy() {
-  legacy=$1
-}
-module() {
-  module=$1
-}
-public() {
-  public=$1
-}
-use() {
-  use=$1
-}
-embed() {
-  embed=$1
-}
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -468,7 +480,7 @@ extern() {
   fi
 }
 legacy() {
-  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file="target/debug/legacy/__$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
   if [ ! -f "$legacy_file_path" ]; then
     echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
@@ -513,6 +525,9 @@ public() {
     source "${module_file_path}"
   elif [ -f "${module_dir_file_path}" ]; then
     source "${module_dir_file_path}"
+  else
+    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+    exit 101
   fi
 }
 use() {
@@ -527,24 +542,36 @@ EOF
 }
 dist_2022() {
   cat <<'EOF'
-extern() {
-  extern=$1
-}
-legacy() {
-  legacy=$1
-}
-module() {
-  module=$1
-}
-public() {
-  public=$1
-}
-use() {
-  use=$1
-}
-embed() {
-  embed=$1
-}
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
 EOF
 }
 test_2022() {
@@ -1765,10 +1792,14 @@ exec_legacy_build() {
 
   mkdir -p "${legacy_dir}"
 
-  echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read package && [ -n "$package" ]; do
+  [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
+
+  echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
     package_name=${package%=*}
-    package_file=${legacy_dir}/${package_name}.sh
+    package_file=${legacy_dir}/__${package_name}.sh
     package_script=${package#*=}
+
+    [ "${VERBOSE}" -gt 4 ] && echo "! Building '${package_script}' for '$package_name'"
 
     if [ ! -f "${package_file}" ]; then
       console_status "Compiling" "$package_name => $package_script ($package_file)"
@@ -1861,7 +1892,7 @@ manifest_parse() {
             MUSH_LEGACY_BUILD)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
-              MUSH_LEGACY_BUILD="${MUSH_LEGACY_FETCH}${package}=${script}${newline}"
+              MUSH_LEGACY_BUILD="${MUSH_LEGACY_BUILD}${package}=${script}${newline}"
               ;;
             MUSH_DEPS)
               package=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
@@ -1936,8 +1967,8 @@ compile_scan_legacy() {
 
   grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local legacy_name=$(echo "${line#*legacy}" | xargs)
-    local legacy_file="${legacy_dir}/${legacy_name}.sh"
-    local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
+    local legacy_file="${legacy_dir}/__${legacy_name}.sh"
+    local legacy_dir_file="${legacy_dir}/${legacy_name}/__${legacy_name}.sh"
     #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
