@@ -1,11 +1,14 @@
 
 compile_file() {
-  #echo "COMPILE: $1 -> $2 ($PWD)"
+  local src_file
+  local build_file
+  local manifest_directory
+  local build_mode
 
-  local src_file=$1
-  local build_file=$2
-  local manifest_directory=${3:-$PWD}
-  local build_mode=${4:-debug}
+  src_file=$1
+  build_file=$2
+  manifest_directory=${3:-$PWD}
+  build_mode=${4:-debug}
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
@@ -23,8 +26,6 @@ compile_file() {
   compile_scan_extern_package "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
 
   compile_scan_embed "${src_file}" "${build_file}" "${manifest_directory}" "${build_mode}"
-
-  return 0
 }
 
 compile_scan_legacy() {
