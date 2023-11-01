@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-10-26T16:14:50Z
+## @build_date: 2023-11-01T14:34:19Z
 set -e
 extern() {
   extern=$1
@@ -514,7 +514,7 @@ public() {
   fi
 }
 use() {
-  source src/assets/server.sh
+  return 0
 }
 embed() {
   local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
@@ -550,7 +550,7 @@ test_2022() {
 mush_api_test_2022 () {
   echo "Filter: $1"
   echo "Functions:"
-  declare -F | awk '{print $3}' | grep "test_$1" | while read unit_test; do
+  declare -F | awk '{print $3}' | grep "test_$1" | while read -r unit_test; do
     [ "${unit_test}" = "test_2022" ] && continue
     [ "${unit_test}" = "mush_api_test_2022" ] && continue
     echo "Testing: $unit_test"
@@ -799,21 +799,21 @@ run_install() {
 }
 
 parser_definition_legacy() {
-	setup   REST help:usage abbr:true -- \
-		"Usage: ${2##*/} legacy [options...] [arguments...]"
-	msg -- '' 'Add legacy dependencies to a Manifest.toml file' ''
-	msg -- 'Options:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	disp    :usage       -h --help
+  setup   REST help:usage abbr:true -- \
+    "Usage: ${2##*/} legacy [options...] [arguments...]"
+  msg -- '' 'Add legacy dependencies to a Manifest.toml file' ''
+  msg -- 'Options:'
+  flag    FLAG_C       -c --flag-c
+  param   MODULE_NAME  -n --name
+  disp    :usage       -h --help
 }
 
 run_legacy() {
   eval "$(getoptions parser_definition_legacy parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  echo "FLAG_C: $FLAG_C"
-  echo "MODULE_NAME: $MODULE_NAME"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
 
   exec_manifest_lookup "${PWD}"
 
@@ -823,7 +823,7 @@ run_legacy() {
   i=0
   while [ $# -gt 0 ] && i=$((i + 1)); do
     module_url=$1
-    module_name=$(basename $1)
+    module_name=$(basename "$1")
     module_file=target/debug/legacy/$module_name
     echo "$i Downloading '$module_name' from $1"
     curl -sL "${module_url}" -o "${module_file}"
@@ -831,11 +831,11 @@ run_legacy() {
 
     if grep -q "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml"; then
         legacy_line=$(grep -n -m 1 "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml" | cut -d: -f1)
-        legacy_tail=$(expr ${legacy_line} + 1)
+        legacy_tail=$((legacy_line + 1))
         echo "The section '[legacy]' exists in the INI file at ${legacy_line}."
-        head -n ${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml" > "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        head -n "${legacy_line}" "$MUSH_MANIFEST_DIR/Manifest.toml" > "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
         echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
-        tail -n +${legacy_line} "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        tail -n +"${legacy_line}" "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
         mv "$MUSH_MANIFEST_DIR/Manifest.toml.tmp" "$MUSH_MANIFEST_DIR/Manifest.toml"
     else
       echo "[legacy]" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
@@ -877,7 +877,7 @@ run_new() {
 
   mkdir -p "$1"
 
-  cd "$1"
+  cd "$1" || exit 101
 
   exec_init
 }

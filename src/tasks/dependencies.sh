@@ -8,18 +8,30 @@ exec_dependencies() {
 }
 
 process_dependencies() {
-  echo "${MUSH_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
+    [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
+
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dependency "$package_name" $package_signature
+      process_dependency "$package_name" "$package_signature"
     fi
   done
 }
 
 process_dependency() {
-  case "$2" in
+  local package_source
+
+  if [ "$2" = "*" ]; then
+    package_source=mush
+  else
+    package_source=${2%% *}
+  fi
+
+  [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
+
+  case "${package_source}" in
     git)
       git_dependency "$1" "$3" "$4"
       ;;
@@ -48,14 +60,13 @@ process_dependencies_build() {
   done
 }
 
-
 process_dev_dependencies() {
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read dependency && [ -n "$dependency" ]; do
+  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     local package_name=${dependency%=*}
     local package_signature=${dependency#*=}
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dev_dependency "$package_name" $package_signature
+      process_dev_dependency "$package_name" "$package_signature"
     fi
   done
 }

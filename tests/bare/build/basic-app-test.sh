@@ -8,4 +8,4 @@ echo ""
 
 echo "==> Build: basic-app (from debug)"
 cd tests/fixtures/basic-app
-bash ../../../target/debug/mush build
+bash ../../../target/debug/mush -vvvvvvv build

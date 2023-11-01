@@ -88,7 +88,7 @@ public() {
   fi
 }
 use() {
-  source src/assets/server.sh
+  return 0
 }
 embed() {
   local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"

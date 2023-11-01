@@ -63,6 +63,8 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
+  [ "${VERBOSE}" -gt 2 ] && echo "Verbosity level: ${VERBOSE}"
+
   if [ -n "${PRINT}" ]; then
     mush_build_print "${PRINT}"
   elif [ -n "${EXPLAIN}" ]; then
