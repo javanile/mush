@@ -35,8 +35,8 @@ compile_scan_legacy() {
 
   grep -n '^legacy [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local legacy_name=$(echo "${line#*legacy}" | xargs)
-    local legacy_file="${legacy_dir}/${legacy_name}.sh"
-    local legacy_dir_file="${legacy_dir}/${legacy_name}/${legacy_name}.sh"
+    local legacy_file="${legacy_dir}/__${legacy_name}.sh"
+    local legacy_dir_file="${legacy_dir}/${legacy_name}/__${legacy_name}.sh"
     #echo "LEGACY: $legacy_file"
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"

@@ -157,6 +157,9 @@ test-build-basic-app:
 test-legacy:
 	@bash tests/bare/legacy-test.sh
 
+test-getoptions-legacy:
+	@bash tests/bare/legacy/getoptions-test.sh
+
 test-command:
 	@bash tests/bare/command-test.sh
 

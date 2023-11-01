@@ -37,7 +37,7 @@ extern() {
 }
 
 legacy() {
-  local legacy_file="target/debug/legacy/$1.sh"
+  local legacy_file="target/debug/legacy/__$1.sh"
   local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
 
   if [ ! -f "$legacy_file_path" ]; then
