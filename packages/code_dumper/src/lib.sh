@@ -1,5 +1,5 @@
 
-code_dumper_error() {
+code_dumper() {
   local file
   local line
   local keyword
