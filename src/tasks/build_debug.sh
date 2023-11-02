@@ -26,6 +26,8 @@ exec_build_debug() {
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
+  exec_feature_hook "build_debug_head_section"
+
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"

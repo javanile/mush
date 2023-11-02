@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-02T14:37:46Z
+## @build_date: 2023-11-02T14:42:23Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -1158,7 +1158,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T14:37:43Z
+## @build_date: 2023-11-02T14:42:21Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -2308,8 +2308,8 @@ process_dependency() {
     package_version_constraint="*"
   else
     package_source="${3%% *}"
-    package_full_name=$(echo "$your_variable" | awk '{print $2}')
-    package_version_constraint=$(echo "$your_variable" | awk '{print $3}')
+    package_full_name=$(echo "$3" | awk '{print $2}')
+    package_version_constraint=$(echo "$3" | awk '{print $3}')
   fi
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing '$1' dependency '$2', '$3', 'source=${package_source}'"
@@ -2355,7 +2355,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T14:37:46Z
+## @build_date: 2023-11-02T14:42:23Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {

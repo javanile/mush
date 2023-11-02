@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+## BP010: Release metadata
+## @build_type: bin
+## @build_date: 2023-11-02T14:10:06Z
+set -e
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
+## BP004: Compile the entrypoint
+
+extern package not_a_package
+
+main() {
+  return 0
+}

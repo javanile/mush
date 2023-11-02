@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-02T14:39:15Z
+## @build_date: 2023-11-02T15:04:19Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -1158,7 +1158,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T14:39:13Z
+## @build_date: 2023-11-02T15:04:17Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -1380,6 +1380,8 @@ exec_build_debug() {
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
+  exec_feature_hook "build_debug_head_section"
+
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"
@@ -1564,9 +1566,11 @@ exec_feature_hook() {
     local feature_value=$(eval "echo \$$feature_var")
     local feature_function="__feature_${feature_package}_hook_${feature_hook}"
 
+    [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature '${feature_package}' with value '${feature_value}'"
+
     if [ -n "$feature_value" ]; then
       if [ "$(type -t "$feature_function")" = "function" ]; then
-          $feature_function
+          $feature_function "${feature_value}"
       else
           echo "Warning: Feature '${feature_package}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
       fi
@@ -2355,7 +2359,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T14:39:15Z
+## @build_date: 2023-11-02T15:04:19Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {

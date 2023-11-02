@@ -1,4 +1,5 @@
 
+extern package build_logger
 #legacy lib_helloworld
 
 main() {
