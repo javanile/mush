@@ -1,38 +1,26 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T16:43:53Z
+## @build_date: 2023-11-02T16:48:01Z
 set -e
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 
 code_dumper() {
