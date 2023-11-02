@@ -1,0 +1,24 @@
+Shell's build system
+
+USAGE:
+  mush [OPTIONS] [SUBCOMMAND]
+
+OPTIONS:
+  -V, --version               Print version info and exit
+	  --print PRINT           Builder information to print on stdout
+	  --explain EXPLAIN       Provide a detailed explanation of an error message
+  -v, --verbose               Use verbose output (-vv or -vvv to increase level)
+  -q, --quiet                 Do not print cargo log messages
+  -h, --help                  Print help information
+
+See 'mush <command> --help' for more information on a specific command.
+  build     Compile the current package
+  check     Analyze the current package and report errors, but don't build it
+  fetch     Fetch dependencies of a package from the network
+  init      Create a new package in an existing directory
+  install   Build and install a Mush binary
+  legacy    Add legacy dependencies to a Manifest.toml file
+  new       Create a new Mush package
+  run       Run a binary or example of the local package
+  test      Run the tests
+  publish   Package and upload this package to the registry

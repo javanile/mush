@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
+set -e
 
-./lib/shellspec/shellspec tests/coverage/coverage_spec.sh --kcov-options "--include-pattern="
+cp ./tests/coverage/.shellspec .shellspec
+./lib/shellspec/shellspec tests/coverage/coverage_spec.sh
+rm .shellspec
