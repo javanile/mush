@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T17:43:14Z
+## @build_date: 2023-11-02T17:44:46Z
 set -e
 extern() {
   extern=$1
@@ -23,7 +23,7 @@ embed() {
 }
 ## BP004: Compile the entrypoint
 
-__feature_error_dumper__hook_build_debug_head_section() {
+__plugin_error_trace__feature_error_dumper__hook_build_debug_head_section() {
   local value
 
   value=$1
