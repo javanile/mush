@@ -1,4 +1,4 @@
-   Compiling package v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/ui/error/E0463/package)
+   Compiling package v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/ui/error/E0463/package)
 error[E0463]: can't find package for 'not_a_package'
  --> src/main.sh:2:15
   |

@@ -16,7 +16,7 @@ function mush_mock() {
 
 echo "#!/usr/bin/env bash" > tests/ui/ui-test.sh
 
-find tests/ui -mindepth 2 -maxdepth 2 -type d | while read -r testsuite; do
+find tests/fixtures/ui -mindepth 2 -maxdepth 2 -type d | while read -r testsuite; do
   find "${testsuite}" -type f -name '*.out' | while read -r testcase; do
     mush_mock "${testsuite}" "${testcase}" \
       | sed -e 's/\x1b\[[0-9;]*m//g' \
