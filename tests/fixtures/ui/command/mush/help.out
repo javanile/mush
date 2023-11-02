@@ -5,8 +5,8 @@ USAGE:
 
 OPTIONS:
   -V, --version               Print version info and exit
-	  --print PRINT           Builder information to print on stdout
-	  --explain EXPLAIN       Provide a detailed explanation of an error message
+      --print PRINT           Builder information to print on stdout
+      --explain EXPLAIN       Provide a detailed explanation of an error message
   -v, --verbose               Use verbose output (-vv or -vvv to increase level)
   -q, --quiet                 Do not print cargo log messages
   -h, --help                  Print help information
