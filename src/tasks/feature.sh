@@ -14,8 +14,14 @@ exec_feature_hook() {
 
       [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
 
+      echo "----"
+      type -t "${feature_function}" && true
+      type -t __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section && true
+      ${feature_function} && true
+      echo "----"
+
       if [ -n "$feature_value" ]; then
-        if [ "$(type -t "$feature_function")" = "function" ]; then
+        if [ "$(type -t "$feature_function" && true)" = "function" ]; then
           $feature_function "${feature_value}"
         else
           echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"

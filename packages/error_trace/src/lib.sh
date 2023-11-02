@@ -8,3 +8,5 @@ __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section() {
     echo "Adding error dumper to the build"
   fi
 }
+
+export -f __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section

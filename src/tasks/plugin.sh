@@ -8,6 +8,7 @@ exec_plugin_load() {
     find "$plugins_dir" -type f -name "*.sh" | while IFS=$'\n' read -r plugin_file; do
       echo "Loading plugin: ${plugin_file}"
       source "${plugin_file}"
+      type -t __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section
     done
   fi
 }
