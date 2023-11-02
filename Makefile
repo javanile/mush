@@ -210,3 +210,6 @@ test-print:
 
 test-system-ubuntu: test-docker
 	@docker run --rm -v $${PWD}:/mush -w /mush mush-test-docker-ubuntu bash tests/bare/system/ubuntu-test.sh
+
+test-ui:
+	@bash tests/ui/test-runner.sh

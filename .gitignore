@@ -7,4 +7,5 @@ docs/_site/
 docs/Gemfile
 docs/Gemfile.lock
 docs/_config_dev.yml
+*.out.0
 .env
