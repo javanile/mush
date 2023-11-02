@@ -1,3 +1,39 @@
+#!/usr/bin/env bash
+## BP010: Release metadata
+## @build_type: lib
+## @build_date: 2023-11-02T16:43:55Z
+set -e
+if ! declare -F "extern" > /dev/null; then
+  extern() {
+    extern=$1
+  }
+fi
+if ! declare -F "legacy" > /dev/null; then
+  legacy() {
+    legacy=$1
+  }
+fi
+if ! declare -F "module" > /dev/null; then
+  module() {
+    module=$1
+  }
+fi
+if ! declare -F "public" > /dev/null; then
+  public() {
+    public=$1
+  }
+fi
+if ! declare -F "use" > /dev/null; then
+  use() {
+    use=$1
+  }
+fi
+if ! declare -F "embed" > /dev/null; then
+  embed() {
+    embed=$1
+  }
+fi
+## BP004: Compile the entrypoint
 
 # FATAL
 # ERROR
@@ -42,6 +78,14 @@ console_status() {
 
 console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
+}
+
+console_error_code() {
+  echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[1;39m: $2${ESCAPE}[0m" >&2
+}
+
+console_hint() {
+  echo -e "${ESCAPE}[1;39m$1${ESCAPE}[0m" >&2
 }
 
 console_print() {

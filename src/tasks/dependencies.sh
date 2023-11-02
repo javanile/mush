@@ -31,13 +31,13 @@ process_dependencies() {
 }
 
 process_dependency() {
-  local dependencies_type
+  local dependency_type
   local package_name
   local package_source
   local package_full_name
   local package_version_constraint
 
-  dependencies_type="$1"
+  dependency_type="$1"
   package_name="$2"
 
   if [ "$3" = "*" ]; then
@@ -54,10 +54,10 @@ process_dependency() {
 
   case "${package_source}" in
     git)
-      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
+      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     mush)
-      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     *)
       console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"

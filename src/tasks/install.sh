@@ -32,9 +32,11 @@ exec_install() {
 exec_install_from_index() {
   local package_name
   local package_version_constraint
+  local dependency_type
 
   package_name=$1
   package_version_constraint=$2
+  dependency_type=$3
 
   local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
@@ -61,15 +63,28 @@ exec_install_from_index() {
 
   local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  exec_install_from_src "${package_nested_src}"
+  exec_install_from_src "${package_nested_src}" "${dependency_type}"
 }
 
 exec_install_from_src() {
-  local package_src=$1
+  local package_src
+  local dependency_type
+
+  package_src=$1
+  dependency_type=$2
 
   exec_manifest_lookup "${package_src}"
+
+  [ "${VERBOSE}" -gt 6 ] && echo "Installing '${MUSH_PACKAGE_NAME}' from source '${package_src}' for '${dependency_type}'"
+
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ] && [ "${dependency_type}" = "prod" ]; then
+    console_error "cannot install plugin '${MUSH_PACKAGE_NAME}' as a non dev-dependency, move it from [dependencies] to [dev-dependencies] in your Manifest.toml file."
+    exit 101
+  fi
+
   exec_legacy_fetch "${package_src}/target/dist"
   exec_legacy_build "${package_src}/target/dist"
+
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -122,6 +137,8 @@ exec_install_lib_from_src() {
   local lib_file=${pwd}/lib/${lib_name}
   local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
+  local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
+  local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
   local final_file=${package_src}/target/dist/lib.sh
 
   local cp=cp
@@ -137,6 +154,12 @@ exec_install_lib_from_src() {
   ${cp} "${final_file}" "${lib_package_file}"
 
   ${chmod} +x "${lib_file}" "${lib_package_file}"
+
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+    mkdir -p "${lib_plugin_dir}"
+    ${cp} "${final_file}" "${lib_plugin_file}"
+    ${chmod} +x "${lib_plugin_file}"
+  fi
 
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 

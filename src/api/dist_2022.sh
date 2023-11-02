@@ -1,36 +1,24 @@
 
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
+extern() {
+  extern=$1
+}
 
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
+legacy() {
+  legacy=$1
+}
 
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
+module() {
+  module=$1
+}
 
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
+public() {
+  public=$1
+}
 
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
+use() {
+  use=$1
+}
 
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+embed() {
+  embed=$1
+}

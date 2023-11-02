@@ -38,7 +38,8 @@ exec_build_debug() {
   fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
+  echo "debug init" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
