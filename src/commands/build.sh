@@ -38,6 +38,8 @@ run_build() {
 
   exec_dependencies "${MUSH_TARGET_DIR}"
 
+  exec_plugin_load "${MUSH_TARGET_DIR}"
+
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
