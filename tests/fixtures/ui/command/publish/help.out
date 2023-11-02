@@ -1,0 +1,11 @@
+Package and upload this package to the registry
+
+USAGE:
+  mush publish [OPTIONS]
+
+OPTIONS:
+  -c, --flag-c                
+      --allow-dirty           Build artifacts in release mode, with optimizations
+  -n, --name MODULE_NAME      
+  -t, --target BUILD_TARGET   
+  -h, --help                  

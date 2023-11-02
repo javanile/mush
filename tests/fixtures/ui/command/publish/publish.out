@@ -1,0 +1,9 @@
+ALLOW_DIRTY:
+error[E0463]: can't find package for 'not_a_package'
+ --> src/main.sh:2:15
+  |
+2 | extern package not_a_package
+  |                ^^^^^^^^^^^^^ can't find package
+
+For more information about this error, try 'mush --explain E0463'.
+error: could not compile 'package' due to previous error

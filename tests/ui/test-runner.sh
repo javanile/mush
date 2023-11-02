@@ -4,11 +4,23 @@ function mush_mock() {
   local pwd=$(pwd)
   local mush_bin=$(realpath "${pwd}/target/dist/mush")
   local testsuite=$1
+  local testsuite_name=$(basename "${testsuite}")
   local testcase=$(basename "$2" .out)
+  mkdir -p "${testsuite}/package"
   cd "${testsuite}/package"
   case "${testcase}" in
-    build)
-      ${mush_bin} build 2>&1 || true
+    version)
+      ${mush_bin} --version 2>&1 || true
+      ;;
+    help)
+      if [ "${testsuite_name}" = "mush" ]; then
+        ${mush_bin} --help 2>&1 || true
+      else
+        ${mush_bin} "${testsuite_name}" --help  2>&1 || true
+      fi
+      ;;
+    *)
+      ${mush_bin} "${testcase}" 2>&1 || true
       ;;
   esac
   cd "${pwd}"
@@ -21,9 +33,9 @@ find tests/fixtures/ui -mindepth 2 -maxdepth 2 -type d | while read -r testsuite
     mush_mock "${testsuite}" "${testcase}" \
       | sed -e 's/\x1b\[[0-9;]*m//g' \
       > "${testcase}.0"
-    testcase_name=$(echo "${testcase:9}" | sed -e 's/\.out$//' | sed -e 's/[\/\-]/_/g')
+    testcase_name=$(echo "${testcase:18}" | sed -e 's/\.out$//' | sed -e 's/[\/\-]/_/g')
     echo "test_${testcase_name}() { assert_equals \"\$(cat ${testcase})\" \"\$(cat ${testcase}.0)\"; }" >> tests/ui/ui-test.sh
   done
 done
 
-./lib/bashunit tests/ui/ui-test.sh
+./lib/bashunit --stop-on-failure tests/ui/ui-test.sh
