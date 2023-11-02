@@ -103,9 +103,10 @@ manifest_parse() {
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
             MUSH_FEATURE)
-              field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+              feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
-              eval "${section}_${field}=\$value"
+              MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
+              #eval "${section}_${field}=\$value"
               ;;
             *)
               ;;
