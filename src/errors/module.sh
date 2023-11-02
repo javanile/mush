@@ -27,14 +27,16 @@ error_E0583_file_not_found() {
   local module_name
   local debug_file
   local debug_line
+  local help
 
   package_name=$MUSH_PACKAGE_NAME
   module_name=$1
   debug_file=$2
   debug_line=$3
+  help="module not found" "to create the module '${module_name}', create file 'src/mod2.rs' or 'src/mod2/mod.rs'"
 
   console_error_code "E0583" "file not found for module '${module_name}'"
-  code_dumper "${debug_file}" "${debug_line}" "${module_name}" "module not found"
+  code_dumper "${debug_file}" "${debug_line}" "${module_name}" "${help}"
   echo ""
   console_hint "For more information about this error, try 'mush --explain E0463'."
   console_error "could not compile '${package_name}' due to previous error"
