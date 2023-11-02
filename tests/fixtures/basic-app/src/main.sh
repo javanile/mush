@@ -13,11 +13,11 @@
 
 
 
-extern package getoptions
+#extern package getoptions
 
 #legacy lib_helloworld
 
-#module notfound
+module notfound
 
 main() {
   echo "Hello World!"

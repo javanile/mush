@@ -19,9 +19,9 @@
 //mod mod1;
 //mod notfound;
 
-//mod mod1;
+mod mod2;
 
-extern crate cavallo;
+//extern crate cavallo;
 
 
 //use package::mod1::hello;

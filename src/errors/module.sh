@@ -34,10 +34,10 @@ error_E0583_file_not_found() {
   debug_line=$3
 
   console_error_code "E0583" "file not found for module '${module_name}'"
-  code_dumper "${debug_file}" "${debug_line}" "${module_name}" "..."
+  code_dumper "${debug_file}" "${debug_line}" "${module_name}" "module not found"
   echo ""
-  echo "For more information about this error, try 'mush --explain E0463'."
-  echo "error: could not compile '${package_name}' due to previous error"
+  console_hint "For more information about this error, try 'mush --explain E0463'."
+  console_error "could not compile '${package_name}' due to previous error"
 }
 
 console_error_code() {
