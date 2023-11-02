@@ -1,5 +1,5 @@
 [package]
-name = "code_dumper"
+name = "error_trace"
 version = "0.1.0"
 edition = "2022"
 

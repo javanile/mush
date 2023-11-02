@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-02T15:04:19Z
+## @build_date: 2023-11-02T15:06:21Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -1158,7 +1158,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T15:04:17Z
+## @build_date: 2023-11-02T15:06:19Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
@@ -2359,7 +2359,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T15:04:19Z
+## @build_date: 2023-11-02T15:06:21Z
 set -e
 if ! declare -F "extern" > /dev/null; then
   extern() {
