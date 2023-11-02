@@ -7,4 +7,5 @@ bash target/dist/mush.sh -vv build --release
 
 echo "==> Test: complex-app"
 cd tests/fixtures/complex-app
+rm -fr bin lib libexec share target
 bash ../../../target/dist/mush build

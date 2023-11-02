@@ -7,7 +7,7 @@ edition = "2022"
 
 [dependencies]
 code_dumper = "*"
-#console = "mush javanile/mush/console"
+console = "*"
 #getoptions = "mush javanile/mush/getoptions"
 
 [dev-dependencies]
