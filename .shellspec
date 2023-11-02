@@ -1,0 +1,4 @@
+--kcov
+--kcov-options "--include-pattern="
+--kcov-options "--include-path=./src"
+--kcov-options "--exclude-pattern=/.,_generated.sh"

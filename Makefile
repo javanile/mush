@@ -213,3 +213,6 @@ test-system-ubuntu: test-docker
 
 test-ui:
 	@bash tests/ui/test-runner.sh
+
+test-coverage:
+	@bash tests/coverage/test-runner.sh
