@@ -24,5 +24,5 @@ trap 'errexit' ERR
 set -e -o errtrace
 
 main() {
-  code_dumper "examples/demo.sh" "22" "errtrace" "Syntax error!"
+  code_dumper "examples/demo.sh" "22" "errtrace" "Syntax error!" "this is an help message"
 }
