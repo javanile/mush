@@ -15,7 +15,7 @@ exec_feature_hook() {
       [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
 
       exec_plugin_load "${MUSH_TARGET_DIR}"
-
+      [ -f target/debug/plugins/error_trace.sh ] && source target/debug/plugins/error_trace.sh
       echo "----"
       type -t "${feature_function}" && true
       type -t __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section && true
