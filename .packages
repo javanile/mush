@@ -9,5 +9,6 @@ index https://github.com/francescobianco/mush-packages
 package mush https://github.com/javanile/mush.git
 package console https://github.com/javanile/mush.git packages/console
 package getoptions https://github.com/javanile/mush.git packages/getoptions
+package code_dumper https://github.com/javanile/mush.git packages/code_dumper
 package build_logger https://github.com/javanile/mush.git packages/build_logger
 package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit
