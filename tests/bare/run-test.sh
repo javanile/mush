@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-cp target/dist/mush target/dist/mush.sh
+## Build Mush
+cp target/debug/mush target/debug/mush.sh
+bash target/debug/mush.sh build
 
-bash target/dist/mush.sh --quiet build --target dist
-
-cd tests/fixtures/basic-lib
-
-bash ../../../target/dist/mush run --example demo
+## Build Basic App
+cd tests/fixtures/basic-app
+rm -fr target lib && true
+bash ../../../target/debug/mush -vvv build
+bash ../../../target/debug/mush -vvv run
