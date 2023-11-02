@@ -46,8 +46,8 @@ process_dependency() {
     package_version_constraint="*"
   else
     package_source="${3%% *}"
-    package_full_name=$(echo "$your_variable" | awk '{print $2}')
-    package_version_constraint=$(echo "$your_variable" | awk '{print $3}')
+    package_full_name=$(echo "$3" | awk '{print $2}')
+    package_version_constraint=$(echo "$3" | awk '{print $3}')
   fi
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing '$1' dependency '$2', '$3', 'source=${package_source}'"
