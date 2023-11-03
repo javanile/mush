@@ -29,7 +29,7 @@ exec_feature_hook() {
         if [ -n "$feature_value" ]; then
           source "${plugin}"
           if [ "$(type -t "$feature_function" && true)" = "function" ]; then
-            $feature_function "${feature_value}" "$@"
+            $feature_function "${feature_value}" "${@:2}"
           fi
         fi
       done
