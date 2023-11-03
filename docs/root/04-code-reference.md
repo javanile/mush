@@ -24,12 +24,12 @@ for loading files and linking the final artifact.
 
 ### Keywords
 
-* [module](reference/module)
-* [public](reference/public)
-* [extern package](reference/extern-package)
-* [use](reference/use)
-* [embed](reference/embed)
-* [legacy](reference/legacy)
+* [module](/reference/module)
+* [public](/reference/public)
+* [extern package](/reference/extern-package)
+* [use](/reference/use)
+* [embed](/reference/embed)
+* [legacy](/reference/legacy)
 
 ## Extensibility with Plugins
 
