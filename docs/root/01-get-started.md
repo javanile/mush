@@ -8,7 +8,7 @@ compliance: 1
 
 # Mush
 
-![Hey Duggee](assets/img/hey-duggee.gif)
+![Linux Magic](assets/img/meme-01.jpg)
 
 Mush is the shell package builder. Mush downloads your shell package's dependencies, 
 compiles your packages, makes distributable packages, and uploads them to GitHub, 
