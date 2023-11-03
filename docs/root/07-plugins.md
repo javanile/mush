@@ -1,12 +1,12 @@
 ---
 layout: default
-title: Plugins
+title: Mush Plugins
 permalink: /plugins/
 nav_order: 07
 compliance: 1
 ---
 
-# Plugins
+# Mush Plugins
 
 Mush introduces a powerful plugin system that enables users to customize and extend the behavior of the Mush compiler.
 This customization is achieved through the use of features and hooks.
