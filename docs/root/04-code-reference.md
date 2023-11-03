@@ -22,7 +22,9 @@ allowing the use of typical shell scripting practices.
 However, for better codebase organization, Mush encourages the use of Mush-specific keywords 
 for loading files and linking the final artifact.
 
-### Keywords
+## Keywords
+
+The following keywords are reserved for Mush-specific use:
 
 * [module](/reference/module)
 * [public](/reference/public)
