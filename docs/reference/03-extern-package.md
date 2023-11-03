@@ -15,7 +15,6 @@ Example:
 
 ```shell
 ## File: src/main.sh
-
 extern package my_extern_package
 
 main() {
@@ -25,7 +24,6 @@ main() {
 
 ```toml
 ## File: Manifest.toml
-
 [packages]
 name = "my_package"
 version = "0.1.0"
