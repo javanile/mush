@@ -12,7 +12,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-11-01)"
+VERSION="Mush 0.1.1 (2023-11-03)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''

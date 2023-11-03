@@ -1,38 +1,26 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-02T15:09:23Z
+## @build_date: 2023-11-03T10:55:11Z
 set -e
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -48,7 +36,7 @@ module tasks
 
 legacy getoptions
 
-VERSION="Mush 0.1.1 (2023-11-01)"
+VERSION="Mush 0.1.1 (2023-11-03)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -447,131 +435,129 @@ embed_file() {
 }
 debug_2022() {
   cat <<'EOF'
-debug_file() {
-  local previous_debug_file=$MUSH_DEBUG_FILE
-  MUSH_DEBUG_FILE=$1
-  source "$1"
-  MUSH_DEBUG_FILE=$previous_debug_file
-}
-extern() {
-  local debug_file=$MUSH_DEBUG_FILE
-  if [ "$1" = "package" ]; then
-    local package_name=$MUSH_PACKAGE_NAME
-    local extern_package_name=$2
-    local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
-    local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
-    if [ -d "${extern_package_path}" ]; then
-      debug_file "${extern_package_lib_file}"
-    else
-      echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-      error_package_not_found "${extern_package_name}" "${debug_file}"
-      exit 1
-    fi
-  else
-    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-    echo "error: expected one of 'package' or '{', found '$1'"
-    echo " --> ${debug_file}:8:8"
-    echo "  |"
-    echo "8 | extern cavallo json;"
-    echo "  |        ^^^^^^^ expected one of 'package' or '{'"
-    echo ""
-    echo "error: could not compile '${package_name}' due to previous error"
-    exit 1
-  fi
-}
-legacy() {
-  local legacy_file="target/debug/legacy/__$1.sh"
-  local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
-  if [ ! -f "$legacy_file_path" ]; then
-    echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
-    exit 101
-  fi
-  source "${legacy_file_path}"
-}
-module() {
-  local module_name=$1
-  local module_file="src/$1.sh"
-  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
-  local module_dir_file="src/$1/module.sh"
-  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
-  local debug_file=$MUSH_DEBUG_FILE
-  local package_name=$MUSH_PACKAGE_NAME
-  if [ -f "${module_file_path}" ]; then
-    source "${module_file_path}"
-  elif [ -f "${module_dir_file_path}" ]; then
-    MUSH_RUNTIME_MODULE=$1
-    source "${module_dir_file_path}"
-  else
-    echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-    echo "error[E0583]: file not found for module '${module_name}'"
-    echo " --> ${debug_file}:4:1"
-    echo "  |"
-    echo "4 | mod notfound;"
-    echo "  | ^^^^^^^^^^^^^"
-    echo "  |"
-    echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
-    echo ""
-    echo "For more information about this error, try 'mush explain E0583'."
-    echo "error: could not compile '${package_name}' due to previous error"
-    exit 1
-  fi
-}
-public() {
-  local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
-  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
-  local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
-  local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
-  if [ -f "${module_file_path}" ]; then
-    source "${module_file_path}"
-  elif [ -f "${module_dir_file_path}" ]; then
-    source "${module_dir_file_path}"
-  else
-    echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
-    exit 101
-  fi
-}
-use() {
-  return 0
-}
-embed() {
-  local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
-  local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
-  eval "$(embed_file "$1" "${module_file_path}")"
+debug() {
+  local api
+  api=$1
+  case "${api}" in
+    init)
+      extern() {
+        local debug_file=$MUSH_DEBUG_FILE
+        if [ "$1" = "package" ]; then
+          local package_name=$MUSH_PACKAGE_NAME
+          local extern_package_name=$2
+          local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+          local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
+          if [ -d "${extern_package_path}" ]; then
+            debug file "${extern_package_lib_file}"
+            debug init
+          else
+            echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+            error_package_not_found "${extern_package_name}" "${debug_file}"
+            exit 1
+          fi
+        else
+          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+          echo "error: expected one of 'package' or '{', found '$1'"
+          echo " --> ${debug_file}:8:8"
+          echo "  |"
+          echo "8 | extern cavallo json;"
+          echo "  |        ^^^^^^^ expected one of 'package' or '{'"
+          echo ""
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      legacy() {
+        local legacy_file="target/debug/legacy/__$1.sh"
+        local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
+        if [ ! -f "$legacy_file_path" ]; then
+          echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
+          exit 101
+        fi
+        source "${legacy_file_path}"
+      }
+      module() {
+        local module_name=$1
+        local module_file="src/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        local debug_file=$MUSH_DEBUG_FILE
+        local package_name=$MUSH_PACKAGE_NAME
+        if [ -f "${module_file_path}" ]; then
+          source "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          MUSH_RUNTIME_MODULE=$1
+          source "${module_dir_file_path}"
+        else
+          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+          echo "error[E0583]: file not found for module '${module_name}'"
+          echo " --> ${debug_file}:4:1"
+          echo "  |"
+          echo "4 | mod notfound;"
+          echo "  | ^^^^^^^^^^^^^"
+          echo "  |"
+          echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
+          echo ""
+          echo "For more information about this error, try 'mush explain E0583'."
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      public() {
+        local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        if [ -f "${module_file_path}" ]; then
+          source "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          source "${module_dir_file_path}"
+        else
+          echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+          exit 101
+        fi
+      }
+      use() {
+        return 0
+      }
+      embed() {
+        local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        eval "$(embed_file "$1" "${module_file_path}")"
+      }
+      ;;
+    file)
+      local previous_debug_file=$MUSH_DEBUG_FILE
+      MUSH_DEBUG_FILE=$2
+      source "$2"
+      MUSH_DEBUG_FILE=$previous_debug_file
+      ;;
+    *)
+  esac
 }
 EOF
 }
 dist_2022() {
   cat <<'EOF'
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 EOF
 }
 test_2022() {
@@ -651,8 +637,8 @@ run_build() {
     MUSH_TARGET_DIR=target/release
   fi
 
-  MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  mkdir -p "${MUSH_DEPS_DIR}"
+  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
+  #mkdir -p "${MUSH_DEPS_DIR}"
 
   exec_manifest_lookup "${PWD}"
 
@@ -787,7 +773,7 @@ parser_definition_install() {
   msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
 
   param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
@@ -809,6 +795,7 @@ run_install() {
       MUSH_TARGET_DIR=target/dist
       exec_legacy_fetch "${MUSH_TARGET_DIR}"
       exec_legacy_build "${MUSH_TARGET_DIR}"
+      exec_dependencies "${MUSH_TARGET_DIR}"
       exec_build_release "$@"
       exec_install
     else
@@ -1056,8 +1043,8 @@ run_test() {
     MUSH_TARGET_DIR=target/release
   fi
 
-  MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  mkdir -p "${MUSH_DEPS_DIR}"
+  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
+  #mkdir -p "${MUSH_DEPS_DIR}"
 
   exec_manifest_lookup "${PWD}"
 
@@ -1158,38 +1145,26 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T15:09:21Z
+## @build_date: 2023-11-03T10:55:09Z
 set -e
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 code_dumper() {
   local file
@@ -1246,16 +1221,18 @@ mush_dependency() {
   local package_name
   local package_full_name
   local package_version_constraint
+  local dependency_type
 
   package_name=$1
   package_full_name=$2
   package_version_constraint=$3
+  dependency_type=$4
 
   exec_index_update
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
 
-  exec_install_from_index "${package_full_name}" "${package_version_constraint}"
+  exec_install_from_index "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
 }
 
 public github
@@ -1351,6 +1328,7 @@ public legacy_build
 public manifest_lookup
 public compile
 public publish
+public plugin
 public dependencies
 
 exec_build_debug() {
@@ -1380,7 +1358,7 @@ exec_build_debug() {
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
-  exec_feature_hook "build_debug_head_section"
+  exec_feature_hook "build_debug_head_section" "${build_file}"
 
   echo "## BP003: Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
@@ -1392,7 +1370,8 @@ exec_build_debug() {
   fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug_file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
+  echo "debug init" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
@@ -1558,24 +1537,43 @@ exec_build_test() {
 }
 
 exec_feature_hook() {
-  local feature_hook=$1
+  local feature
+  local feature_hook
+  local feature_name
+  local feature_value
+  local feature_function
+  local plugin
+  local plugin_name
+  local plugins
 
-  echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
-    local feature_package=${dependency%=*}
-    local feature_var="MUSH_FEATURE_$(echo "${feature_package}" | awk '{ print toupper($0) }')"
-    local feature_value=$(eval "echo \$$feature_var")
-    local feature_function="__feature_${feature_package}_hook_${feature_hook}"
+  feature_hook=$1
 
-    [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature '${feature_package}' with value '${feature_value}'"
+  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
 
-    if [ -n "$feature_value" ]; then
-      if [ "$(type -t "$feature_function")" = "function" ]; then
-          $feature_function "${feature_value}"
-      else
-          echo "Warning: Feature '${feature_package}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
-      fi
+  echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
+    feature_name=${feature%=*}
+    feature_value=${feature#*=}
+
+    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_DIR}")
+
+    if [ -n "${plugins}" ]; then
+      echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
+        local plugin_name=$(basename "${plugin}" .sh)
+        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
+
+        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
+
+        if [ -n "$feature_value" ]; then
+          source "${plugin}"
+          if [ "$(type -t "$feature_function" && true)" = "function" ]; then
+            $feature_function "${feature_value}" "${@:2}"
+          fi
+        fi
+      done
     fi
   done
+
+  #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
 
 
@@ -1709,9 +1707,11 @@ exec_install() {
 exec_install_from_index() {
   local package_name
   local package_version_constraint
+  local dependency_type
 
   package_name=$1
   package_version_constraint=$2
+  dependency_type=$3
 
   local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
@@ -1738,15 +1738,28 @@ exec_install_from_index() {
 
   local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
 
-  exec_install_from_src "${package_nested_src}"
+  exec_install_from_src "${package_nested_src}" "${dependency_type}"
 }
 
 exec_install_from_src() {
-  local package_src=$1
+  local package_src
+  local dependency_type
+
+  package_src=$1
+  dependency_type=$2
 
   exec_manifest_lookup "${package_src}"
+
+  [ "${VERBOSE}" -gt 6 ] && echo "Installing '${MUSH_PACKAGE_NAME}' from source '${package_src}' for '${dependency_type}'"
+
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ] && [ "${dependency_type}" = "prod" ]; then
+    console_error "cannot install plugin '${MUSH_PACKAGE_NAME}' as a non dev-dependency, move it from [dependencies] to [dev-dependencies] in your Manifest.toml file."
+    exit 101
+  fi
+
   exec_legacy_fetch "${package_src}/target/dist"
   exec_legacy_build "${package_src}/target/dist"
+
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -1799,6 +1812,8 @@ exec_install_lib_from_src() {
   local lib_file=${pwd}/lib/${lib_name}
   local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
+  local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
+  local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
   local final_file=${package_src}/target/dist/lib.sh
 
   local cp=cp
@@ -1815,6 +1830,12 @@ exec_install_lib_from_src() {
 
   ${chmod} +x "${lib_file}" "${lib_package_file}"
 
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+    mkdir -p "${lib_plugin_dir}"
+    ${cp} "${final_file}" "${lib_plugin_file}"
+    ${chmod} +x "${lib_plugin_file}"
+  fi
+
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
   if [ -f "${lib_file}" ]; then
@@ -1829,8 +1850,6 @@ exec_install_lib_from_src() {
 exec_legacy_fetch() {
   local target_dir=$1
   local legacy_dir="${target_dir}/legacy"
-
-  mkdir -p "${legacy_dir}"
 
   echo "${MUSH_LEGACY_FETCH}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
     package_name=${package%=*}
@@ -1850,6 +1869,7 @@ exec_legacy_fetch() {
         package_file=${legacy_dir}/${package_name}.sh
         if [ ! -f "${package_file}" ]; then
           console_status "Downloading" "$package_name => $package_url ($package_file)"
+          mkdir -p "${legacy_dir}"
           curl -s -L -X GET -o "${package_file}" "${package_url}"
           ln "${package_file}" "${package_bin}"
           chmod +x "${package_bin}"
@@ -1867,8 +1887,6 @@ exec_legacy_build() {
   local target_dir=$1
   local legacy_dir="${target_dir}/legacy"
 
-  mkdir -p "${legacy_dir}"
-
   [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
 
   echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
@@ -1880,6 +1898,7 @@ exec_legacy_build() {
 
     if [ ! -f "${package_file}" ]; then
       console_status "Compiling" "$package_name => $package_script ($package_file)"
+      mkdir -p "${legacy_dir}"
       local pwd=$PWD
       cd "$legacy_dir"
       eval "PATH=${PATH}:${PWD} ${package_script}"
@@ -1992,9 +2011,10 @@ manifest_parse() {
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
             MUSH_FEATURE)
-              field=$(echo "$line" | cut -d'=' -f1 | xargs | awk '{ print toupper($0) }')
+              feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
-              eval "${section}_${field}=\$value"
+              MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
+              #eval "${section}_${field}=\$value"
               ;;
             *)
               ;;
@@ -2265,6 +2285,20 @@ exec_publish() {
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
 
+exec_plugin_list() {
+  local plugins_dir
+  local plugin_file
+
+  plugins_dir="$1/plugins"
+
+  if [ -d "$plugins_dir" ]; then
+    find "$plugins_dir" -type f -name "*.sh" | while IFS=$'\n' read -r plugin_file; do
+      echo "Loading plugin: ${plugin_file}" >&2
+      echo "${plugin_file}"
+    done
+  fi
+}
+
 exec_dependencies() {
   process_dependencies dev
   process_dependencies_build dev
@@ -2297,13 +2331,13 @@ process_dependencies() {
 }
 
 process_dependency() {
-  local dependencies_type
+  local dependency_type
   local package_name
   local package_source
   local package_full_name
   local package_version_constraint
 
-  dependencies_type="$1"
+  dependency_type="$1"
   package_name="$2"
 
   if [ "$3" = "*" ]; then
@@ -2320,10 +2354,10 @@ process_dependency() {
 
   case "${package_source}" in
     git)
-      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
+      git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     mush)
-      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     *)
       console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
@@ -2359,38 +2393,26 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T15:09:23Z
+## @build_date: 2023-11-03T10:55:11Z
 set -e
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 # FATAL
 # ERROR

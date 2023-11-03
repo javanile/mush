@@ -1,3 +1,27 @@
+#!/usr/bin/env bash
+## BP010: Release metadata
+## @build_type: lib
+## @build_date: 2023-11-03T10:55:11Z
+set -e
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
+## BP004: Compile the entrypoint
 
 # FATAL
 # ERROR
@@ -42,6 +66,14 @@ console_status() {
 
 console_error() {
   echo -e "${ESCAPE}[1;31merror${ESCAPE}[0m: $1" >&2
+}
+
+console_error_code() {
+  echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[1;39m: $2${ESCAPE}[0m" >&2
+}
+
+console_hint() {
+  echo -e "${ESCAPE}[1;39m$1${ESCAPE}[0m" >&2
 }
 
 console_print() {
