@@ -23,7 +23,6 @@ main() {
 
 ```shell
 ## File: src/my_utils.sh
-
 my_utils_print() {
     echo "$1"
 }
@@ -37,7 +36,6 @@ accommodating both single-file and multi-file module structures. See the example
 
 ```shell
 ## File: src/main.sh
-
 module my_utils
 
 main() {
@@ -47,7 +45,6 @@ main() {
 
 ```shell
 ## File: src/my_utils/module.sh
-
 my_utils_print() {
     echo "$1"
 }
