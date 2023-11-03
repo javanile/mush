@@ -1,7 +1,7 @@
 ---
 layout: default
 title: module
-nav_order: 10
+nav_order: 1
 parent: Code Reference
 compliance: 1
 ---

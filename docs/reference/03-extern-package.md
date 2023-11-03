@@ -1,7 +1,7 @@
 ---
 layout: default
-title: module
-nav_order: 10
+title: extern package
+nav_order: 3
 parent: Code Reference
 compliance: 1
 ---
