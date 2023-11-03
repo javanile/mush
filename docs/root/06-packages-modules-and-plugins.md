@@ -5,22 +5,23 @@ nav_order: 06
 compliance: 1
 ---
 
-The npm registry contains packages, many of which are also Node modules, or contain Node modules. Read on to understand how they differ and how they interact.
+The Mush registry contains packages, many of which are also collection or modules, or contain just one module. 
+Read on to understand how they differ and how they interact.
 
-## About packages
+## About Packages
 
-A **package** is a file or directory that is described by a `package.json` file. A package must contain a `package.json` file in order to be published to the npm registry. For more information on creating a `package.json` file, see "[Creating a package.json file][pkg-json]".
+A **package** is a directory that is described by a `Manifest.toml` file. 
+A package must contain a `Manifest.toml` file in order to be published to the Mush registry. 
+For more information on creating a `Manifest.toml` file, see [Manifest reference](manifest).
 
-Packages can be unscoped or scoped to a user or organization, and scoped packages can be private or public. For more information, see
-- "[About scopes][about-scopes]"
-- "[About private packages][private-pkgs]"
-- "[Package scope, access level, and visibility][pkg-viz]"
+Packages can be unscoped or scoped to a user or organization, and scoped packages can be private or public. 
+It's worth noting that while these scenarios are envisioned, their implementation is planned for future development.
 
-### About package formats
+### Package formats
 
 A package is any of the following:
 
-* a) A folder containing a program described by a `package.json` file.
+* a) A folder containing a program described by a `Manifest.toml` file.
 * b) A gzipped tarball containing (a).
 * c) A URL that resolves to (b).
 * d) A `<name>@<version>` that is published on the registry with (c).
@@ -28,7 +29,7 @@ A package is any of the following:
 * f) A `<name>` that has a `latest` tag satisfying (e).
 * g) A `git` url that, when cloned, results in (a).
 
-### npm package git URL formats
+### Mush package git URL formats
 
 Git URLs used for npm packages can be formatted in the following ways:
 
@@ -38,60 +39,58 @@ Git URLs used for npm packages can be formatted in the following ways:
 - `git+https://user@hostname/project/blah.git#commit-ish`
 
 The `commit-ish` can be any tag, sha, or branch that can be supplied as
-an argument to `git checkout`. The default `commit-ish` is `master`.
+an argument to `git checkout`. The default `commit-ish` is `main`.
 
-## About modules
+## About Modules
 
-A **module** is any file or directory in the `node_modules` directory that can be loaded by the Node.js `require()` function.
+A **module** is any file or directory in the `src/` directory that can be loaded by the `module` keyword.
 
-To be loaded by the Node.js `require()` function, a module must be one of the following:
+To be loaded by the Mush `module` function, a module must be one of the following:
 
-* A folder with a `package.json` file containing a `"main"` field.
-* A JavaScript file.
+* A folder with a `module.sh` file.
+* A `.sh` file.
 
-<Note>
+## About Plugins
 
-**Note:** Since modules are not required to have a `package.json` file, not all modules are packages. Only modules that have a `package.json` file are also packages.
+Mush introduces a powerful plugin system that enables users to customize and extend the behavior of the Mush compiler. 
+This customization is achieved through the use of features and hooks. 
+Plugins can be used to encrypt the generated script, integrate control actions, 
+or even produce final programs that can be used as Git hooks.
 
-</Note>
+### Features
 
-In the context of a Node program, the `module` is also the thing that
-was loaded *from* a file. For example, in the following program:
+Features represent specific customizations or extensions to the Mush compiler. 
+They are defined and implemented as separate package, allowing for modularity and easy management. 
+To create a feature, follow these steps:
 
-    var req = require('request')
+1. Create a package with a set of function that follows the name pattern: `__plugin_{packagename}__feature_{featurename}__hook_{hookname}`.
+2. In the package manifest, set the `type` to "plugin" under the `[package]` section.
 
-we might say that "The variable `req` refers to the `request` module".
+### Hooks
 
+Hooks serve as entry points where a feature can extend or modify the compiler's behavior. 
+Mush provides a set of supported hooks that features can leverage for customization. 
+Here are some of the supported hooks:
 
-[about-scopes]: about-scopes
-[private-pkgs]: about-private-packages
-[pkg-json]: creating-a-package-json-file
-[pkg-viz]: package-scope-access-level-and-visibility
+- `pre_compile`: Executed before compilation begins.
+- `post_compile`: Executed after compilation is complete.
+- `pre_link`: Executed before linking modules.
+- `post_link`: Executed after linking is complete.
 
-## About plugins
+### Creating and using Plugins
 
-A **module** is any file or directory in the `node_modules` directory that can be loaded by the Node.js `require()` function.
+To create a custom plugin, follow these steps:
+ 
+1. Create a feature package as described above.
+2. Define the desired hook points and implement the necessary actions within your feature package.
 
-To be loaded by the Node.js `require()` function, a module must be one of the following:
+To use a plugin in your project, follow these steps:
+ 
+1. Add the plugin to the `[dev-dependencies]` section of your project's Mush configuration file.
+2. Enable the desired feature by setting `featurename = "true"` in the `[features]` section of your project's configuration.
 
-* A folder with a `package.json` file containing a `"main"` field.
-* A JavaScript file.
+### Conclusion
 
-<Note>
-
-**Note:** Since modules are not required to have a `package.json` file, not all modules are packages. Only modules that have a `package.json` file are also packages.
-
-</Note>
-
-In the context of a Node program, the `module` is also the thing that
-was loaded *from* a file. For example, in the following program:
-
-    var req = require('request')
-
-we might say that "The variable `req` refers to the `request` module".
-
-
-[about-scopes]: about-scopes
-[private-pkgs]: about-private-packages
-[pkg-json]: creating-a-package-json-file
-[pkg-viz]: package-scope-access-level-and-visibility
+Mush's plugin system, features and hooks, allows users to customize the compiler's behavior and extend its capabilities. 
+Whether you need to add encryption, control actions, or create unique Git hooks, 
+Mush's extensibility provides the tools to tailor your development process to your specific needs.
