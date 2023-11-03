@@ -1,6 +1,7 @@
 ---
 layout: default
 title: Code Reference
+permalink: /reference/
 nav_order: 04
 has_children: true
 has_toc: false

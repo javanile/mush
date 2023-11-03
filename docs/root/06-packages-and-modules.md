@@ -1,6 +1,7 @@
 ---
 layout: default
-title: Packages, modules and plugins
+title: Packages and Modules
+permalink: /packages-and-modules/
 nav_order: 06
 compliance: 1
 ---
