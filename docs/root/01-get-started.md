@@ -18,7 +18,8 @@ as public community’s package registry. You can contribute to this project on 
 
 ## Get Started
 
-The easiest way to get Mush is to install the current stable release from GitHub by using curl. Installing Mush using curl will also install libmush.
+The easiest way to get Mush is to install the current stable release from GitHub by using curl.
+Installing Mush using curl will also create a directory at `$HOME/.mush/bin` where you can host the scripts you'll install subsequently.
 
 On Linux and macOS systems, this is done as follows:
 
@@ -101,6 +102,6 @@ $ mush run
 Hello, world!
 ```
 
-### Going further
+## Going further
 
 For more details on using Mush, check out the [CLI Commands](/commands/)
