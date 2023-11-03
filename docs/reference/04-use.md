@@ -6,7 +6,6 @@ parent: Code Reference
 compliance: 1
 ---
 
-# Keyword: module
+# The 'use keyword
 
-https://doc.rust-lang.org/std/primitive.array.html
-
+The `use` keyword is reserved for plugins development.
