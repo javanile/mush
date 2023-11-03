@@ -15,7 +15,6 @@ Example:
 
 ```shell
 ## File: src/main.sh
-
 module my_utils
 
 main() {
@@ -25,13 +24,11 @@ main() {
 
 ```shell
 ## File: src/my_utils/module.sh
-
 public my_submodule_utils
 ```
 
 ```shell
 ## File: src/my_utils/my_submodule_utils.sh
-
 my_utils_print() {
     echo "$1"
 }
