@@ -71,36 +71,72 @@ my_utils_print() {
 }
 ```
 
+When a module is represented by a folder, the individual .sh files contained within that folder are referred to as 'submodules'. 
+This organizational structure allows for a logical grouping of code into separate files within the module, promoting modularity and codebase organization.
+
 ### `public`
 
-The `public` keyword marks items (such as variables or functions) as accessible from outside the module.
+The `public` keyword marks submodule as accessible from outside the module.
 
 Example:
-```mush
-module myModule {
-  public myFunction {
-    // Function code here
-  }
+
+```shell
+## File: src/main.sh
+
+module my_utils
+
+main() {
+  my_utils_print "Hello, world!"
+}
+```
+
+```shell
+## File: src/my_utils/module.sh
+
+public my_submodule_utils
+```
+
+```shell
+## File: src/my_utils/my_submodule_utils.sh
+
+my_utils_print() {
+    echo "$1"
 }
 ```
 
 ### `extern package`
+
 The `extern package` keyword specifies an external package or dependency to be used.
 
 Example:
-```mush
-extern package myPackage
+
+```shell
+## File: src/main.sh
+
+extern package my_extern_package
+
+main() {
+  my_package_print "Hello, world!"
+}
+```
+
+```toml
+## File: Manifest.toml
+
+[packages]
+name = "my_package"
+version = "0.1.0"
+
+[dependencies]
+my_extern_package = "0.1.0"
 ```
 
 ### `use`
-The `use` keyword imports modules and makes their contents available for use.
 
-Example:
-```mush
-use myModule
-```
+The `use` keyword is reserved for plugins development.
 
 ### `embed`
+
 The `embed` keyword includes external files or resources into the Mush codebase.
 
 Example:
@@ -109,9 +145,11 @@ embed "resource.js"
 ```
 
 ### `legacy`
+
 The `legacy` keyword allows backward compatibility with traditional shell scripting practices.
 
 Example:
+
 ```mush
 legacy {
   // Legacy shell script code here
@@ -119,12 +157,12 @@ legacy {
 ```
 
 ## Extensibility with Plugins
-Mush can be extended by writing plugins, enabling you to customize language rules and build processes to meet specific project requirements.
 
+Mush can be extended by writing plugins, enabling you to customize language rules and build processes to meet specific project requirements.
 For more information on writing plugins and extending Mush, please refer to the Mush documentation.
 
 ## Conclusion
-Mush provides a set of keywords to help organize codebases and manage dependencies efficiently. It combines the flexibility of shell scripting with the benefits of a modular, extensible approach to code organization and building.
-```
 
-This Markdown document provides an overview of Mush and explains each keyword with examples. You can customize it further to suit your needs or expand upon it in your documentation.
+Mush provides a set of keywords to help organize codebases and manage dependencies efficiently. 
+It combines the flexibility of shell scripting with the benefits of a modular, 
+extensible approach to code organization and building.
