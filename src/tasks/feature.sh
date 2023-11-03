@@ -1,34 +1,40 @@
 
 exec_feature_hook() {
-  local feature_hook=$1
+  local feature
+  local feature_hook
+  local feature_name
+  local feature_value
+  local feature_function
+  local plugin
+  local plugin_name
+  local plugins
+
+  feature_hook=$1
 
   [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
 
-  echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature_line && [ -n "$feature_line" ]; do
-    local feature_name=${feature_line%=*}
-    local feature_value=${feature_line#*=}
+  echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
+    feature_name=${feature%=*}
+    feature_value=${feature#*=}
 
-    echo "${MUSH_DEV_DEPS}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
-      local plugin_name=${dependency%=*}
-      local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
+    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_DIR}")
 
-      [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
+    if [ -n "${plugins}" ]; then
+      echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
+        local plugin_name=$(basename "${plugin}" .sh)
+        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
 
-      exec_plugin_load "${MUSH_TARGET_DIR}"
-      [ -f target/debug/plugins/error_trace.sh ] && source target/debug/plugins/error_trace.sh
-      echo "----"
-      type -t "${feature_function}" && true
-      type -t __plugin_error_trace__feature_error_dumper__hook_build_debug_head_section && true
-      ${feature_function} && true
-      echo "----"
+        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
 
-      if [ -n "$feature_value" ]; then
-        if [ "$(type -t "$feature_function" && true)" = "function" ]; then
-          $feature_function "${feature_value}"
-        else
-          echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
+        if [ -n "$feature_value" ]; then
+          source "${plugin}"
+          if [ "$(type -t "$feature_function" && true)" = "function" ]; then
+            $feature_function "${feature_value}" "$@"
+          fi
         fi
-      fi
-    done
+      done
+    fi
   done
+
+  #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
