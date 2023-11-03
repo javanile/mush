@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Packages and modules
+title: Packages, modules and plugins
 nav_order: 06
 compliance: 1
 ---
@@ -41,6 +41,34 @@ The `commit-ish` can be any tag, sha, or branch that can be supplied as
 an argument to `git checkout`. The default `commit-ish` is `master`.
 
 ## About modules
+
+A **module** is any file or directory in the `node_modules` directory that can be loaded by the Node.js `require()` function.
+
+To be loaded by the Node.js `require()` function, a module must be one of the following:
+
+* A folder with a `package.json` file containing a `"main"` field.
+* A JavaScript file.
+
+<Note>
+
+**Note:** Since modules are not required to have a `package.json` file, not all modules are packages. Only modules that have a `package.json` file are also packages.
+
+</Note>
+
+In the context of a Node program, the `module` is also the thing that
+was loaded *from* a file. For example, in the following program:
+
+    var req = require('request')
+
+we might say that "The variable `req` refers to the `request` module".
+
+
+[about-scopes]: about-scopes
+[private-pkgs]: about-private-packages
+[pkg-json]: creating-a-package-json-file
+[pkg-viz]: package-scope-access-level-and-visibility
+
+## About plugins
 
 A **module** is any file or directory in the `node_modules` directory that can be loaded by the Node.js `require()` function.
 
