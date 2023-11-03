@@ -1,6 +1,7 @@
 ---
 layout: default
 title: public
+permalink: /reference/public/
 nav_order: 2
 parent: Code Reference
 compliance: 1

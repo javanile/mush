@@ -1,6 +1,7 @@
 ---
 layout: default
 title: use
+permalink: /reference/use/
 nav_order: 4
 parent: Code Reference
 compliance: 1

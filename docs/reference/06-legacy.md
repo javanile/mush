@@ -1,6 +1,7 @@
 ---
 layout: default
 title: legacy
+permalink: /reference/legacy/
 nav_order: 6
 parent: Code Reference
 compliance: 1

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: module
+permalink: /reference/module/
 nav_order: 1
 parent: Code Reference
 compliance: 1

@@ -1,6 +1,7 @@
 ---
 layout: default
 title: embed
+permalink: /reference/embed/
 nav_order: 5
 parent: Code Reference
 compliance: 1

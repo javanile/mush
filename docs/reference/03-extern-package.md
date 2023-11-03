@@ -1,6 +1,7 @@
 ---
 layout: default
 title: extern package
+permalink: /reference/extern-package/
 nav_order: 3
 parent: Code Reference
 compliance: 1
