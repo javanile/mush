@@ -18,10 +18,9 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
-  #echo "INSTALL: '$PACKAGE_PATH'  $# "
-
   if [ -n "$PACKAGE_PATH" ]; then
     local package_path=$(realpath "$PACKAGE_PATH")
+    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_DIR=target/dist
