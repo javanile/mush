@@ -21,12 +21,14 @@ allowing the use of typical shell scripting practices.
 However, for better codebase organization, Mush encourages the use of Mush-specific keywords 
 for loading files and linking the final artifact.
 
-## Keywords
+### Keywords
 
 * [module](reference/module)
-
-
-
+* [public](reference/public)
+* [extern package](reference/extern-package)
+* [use](reference/use)
+* [embed](reference/embed)
+* [legacy](reference/legacy)
 
 ## Extensibility with Plugins
 
