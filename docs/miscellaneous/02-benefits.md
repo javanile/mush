@@ -1,8 +1,9 @@
 ---
 layout: default
-title: Mush Benefits
+title: Benefits
 permalink: /benefits/
-nav_order: 08
+nav_order: 02
+parent: Miscellaneous
 compliance: 1
 ---
 

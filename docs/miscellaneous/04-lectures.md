@@ -1,8 +1,9 @@
 ---
 layout: default
 title: Lectures
-parent: Contribute
-nav_order: 14
+permalink: /lectures/
+nav_order: 04
+parent: Miscellaneous
 ---
 
 # Lectures
