@@ -5,15 +5,15 @@ parent: CLI Commands
 nav_order: 40
 ---
 
-# cargo-publish(1)
+# cargo-publish
 
 ## NAME
 
-cargo-publish --- Upload a package to the registry
+mush publish --- Upload a package to the registry
 
 ## SYNOPSIS
 
-`cargo publish` [_options_]
+`mush publish` [_options_]
 
 ## DESCRIPTION
 
