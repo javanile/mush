@@ -22,7 +22,7 @@ exec_build_debug() {
   MUSH_DEBUG_PATH=${PWD}
   echo "## BP002: Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=${MUSH_PACKAGE_NAME}" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\$(dirname \"$0\")/../.." >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
 

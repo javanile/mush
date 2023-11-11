@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-03T10:55:11Z
+## @build_date: 2023-11-11T08:11:45Z
 set -e
 extern() {
   extern=$1
@@ -786,10 +786,9 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
-  #echo "INSTALL: '$PACKAGE_PATH'  $# "
-
   if [ -n "$PACKAGE_PATH" ]; then
     local package_path=$(realpath "$PACKAGE_PATH")
+    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_DIR=target/dist
@@ -1145,7 +1144,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-03T10:55:09Z
+## @build_date: 2023-11-11T08:11:40Z
 set -e
 extern() {
   extern=$1
@@ -1354,7 +1353,7 @@ exec_build_debug() {
   MUSH_DEBUG_PATH=${PWD}
   echo "## BP002: Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=${MUSH_PACKAGE_NAME}" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=${MUSH_DEBUG_PATH}" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\$(dirname \"$0\")/../.." >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
@@ -1588,7 +1587,7 @@ exec_index_update()
   console_status "Updating" "mush packages index"
 
   ## Rest index at moment just because it is too small
-  rm -fr "${MUSH_HOME}/registry/index"
+  #rm -fr "${MUSH_HOME}/registry/index"
 
   mkdir -p "${MUSH_HOME}/registry/index"
   > "${MUSH_REGISTRY_INDEX}"
@@ -2393,7 +2392,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-03T10:55:11Z
+## @build_date: 2023-11-11T08:11:45Z
 set -e
 extern() {
   extern=$1

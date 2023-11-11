@@ -11,7 +11,7 @@ exec_index_update()
   console_status "Updating" "mush packages index"
 
   ## Rest index at moment just because it is too small
-  rm -fr "${MUSH_HOME}/registry/index"
+  #rm -fr "${MUSH_HOME}/registry/index"
 
   mkdir -p "${MUSH_HOME}/registry/index"
   > "${MUSH_REGISTRY_INDEX}"
