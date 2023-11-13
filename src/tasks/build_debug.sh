@@ -19,11 +19,17 @@ exec_build_debug() {
   echo "set -e" >> "${build_file}"
   echo "" >> "${build_file}"
 
-  MUSH_DEBUG_PATH=${PWD}
+  MUSH_TARGET_FILE="${bin_file}"
+  MUSH_TARGET_PATH="$(dirname "${bin_file}")"
+  MUSH_DEBUG_TARGET_FILE="$(realpath "${bin_file}")"
+  MUSH_DEBUG_TARGET_PATH=${PWD}
+
   echo "## BP002: Package and debug variables " >> "${build_file}"
-  echo "MUSH_PACKAGE_NAME=${MUSH_PACKAGE_NAME}" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\$(dirname \"$0\")/../.." >> "${build_file}"
-  echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
+  echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
+  echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
+  echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
+  echo "MUSH_DEBUG_TARGET_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
   exec_feature_hook "build_debug_head_section" "${build_file}"
@@ -34,12 +40,12 @@ exec_build_debug() {
 
   if [ -n "${lib_file}" ]; then
     echo "## BP015: Appending library" >> "${build_file}"
-    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_TARGET_PATH}/${lib_file}\"" >> "${build_file}"
   fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug init" >> "${build_file}"
-  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_TARGET_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"

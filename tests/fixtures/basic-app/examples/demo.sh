@@ -1,4 +1,7 @@
 
+module my_utils
+
 main() {
-  echo "Example: demo.sh"
+  echo "main -> Example: demo.sh"
+  my_utils_print
 }

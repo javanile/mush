@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T17:16:00Z
+## @build_date: 2023-11-13T18:55:45Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1118,7 +1118,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T17:15:59Z
+## @build_date: 2023-11-13T18:55:44Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1286,8 +1286,11 @@ mush_registry_index_update()
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
-  ## Rest index at moment just because it is too small
-  #rm -fr "${MUSH_HOME}/registry/index"
+  local update_strategy="${1:-lazy}"
+
+  if [ "${update_strategy}" = "full" ]; then
+    rm -fr "${MUSH_HOME}/registry/index" && true
+  fi
 
   if [ ! -f "${MUSH_REGISTRY_INDEX}" ]; then
     console_status "Updating" "mush packages index"
@@ -1368,11 +1371,17 @@ exec_build_debug() {
   echo "set -e" >> "${build_file}"
   echo "" >> "${build_file}"
 
-  MUSH_DEBUG_PATH=${PWD}
+  MUSH_TARGET_FILE="${bin_file}"
+  MUSH_TARGET_PATH="$(dirname "${bin_file}")"
+  MUSH_DEBUG_TARGET_FILE="$(realpath "${bin_file}")"
+  MUSH_DEBUG_TARGET_PATH=${PWD}
+
   echo "## BP002: Package and debug variables " >> "${build_file}"
-  echo "MUSH_PACKAGE_NAME=${MUSH_PACKAGE_NAME}" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\$(dirname \"$0\")/../.." >> "${build_file}"
-  echo "MUSH_TARGET_PATH=\"\${MUSH_DEBUG_PATH}/target/debug\"" >> "${build_file}"
+  echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
+  echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
+  echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
+  echo "MUSH_DEBUG_TARGET_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
   exec_feature_hook "build_debug_head_section" "${build_file}"
@@ -1383,12 +1392,12 @@ exec_build_debug() {
 
   if [ -n "${lib_file}" ]; then
     echo "## BP015: Appending library" >> "${build_file}"
-    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_TARGET_PATH}/${lib_file}\"" >> "${build_file}"
   fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug init" >> "${build_file}"
-  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_TARGET_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
@@ -2061,17 +2070,29 @@ compile_scan_module() {
   local src_file=$1
   local build_file=$2
   local module_dir=$(dirname "$src_file")
+  local root_src_file
 
   grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    root_src_file=
+
     local module_name=$(echo "${line#*module}" | xargs)
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
+
+    if [ "${module_dir}" = "examples" ]; then
+      [ -f "src/${module_name}.sh" ] && root_src_file="src/${module_name}.sh"
+      [ -f "src/${module_name}/module.sh" ] && root_src_file="src/${module_name}/module.sh"
+    fi
+
     if [ -e "${module_file}" ]; then
       console_info "Import" "file '${module_file}' as module file"
       compile_file "${module_file}" "${build_file}"
     elif [ -e "${module_dir_file}" ]; then
       console_info "Import" "file '${module_dir_file}' as directory module file"
       compile_file "${module_dir_file}" "${build_file}"
+    elif [ -n "${root_src_file}" ]; then
+      console_info "Import" "file '${root_src_file}' as module file"
+      compile_file "${root_src_file}" "${build_file}"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
@@ -2351,7 +2372,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T17:16:00Z
+## @build_date: 2023-11-13T18:55:45Z
 set -e
 use() { return 0; }
 extern() { return 0; }

@@ -219,3 +219,6 @@ test-coverage:
 
 test-environment-variable-target-dir:
 	@bash tests/bare/environment_variables/target-dir-test.sh
+
+test-run-example:
+	@bash tests/bare/examples/run-example-test.sh

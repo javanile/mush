@@ -86,17 +86,29 @@ compile_scan_module() {
   local src_file=$1
   local build_file=$2
   local module_dir=$(dirname "$src_file")
+  local root_src_file
 
   grep -n '^module [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
+    root_src_file=
+
     local module_name=$(echo "${line#*module}" | xargs)
     local module_file="${module_dir}/${module_name}.sh"
     local module_dir_file="${module_dir}/${module_name}/module.sh"
+
+    if [ "${module_dir}" = "examples" ]; then
+      [ -f "src/${module_name}.sh" ] && root_src_file="src/${module_name}.sh"
+      [ -f "src/${module_name}/module.sh" ] && root_src_file="src/${module_name}/module.sh"
+    fi
+
     if [ -e "${module_file}" ]; then
       console_info "Import" "file '${module_file}' as module file"
       compile_file "${module_file}" "${build_file}"
     elif [ -e "${module_dir_file}" ]; then
       console_info "Import" "file '${module_dir_file}' as directory module file"
       compile_file "${module_dir_file}" "${build_file}"
+    elif [ -n "${root_src_file}" ]; then
+      console_info "Import" "file '${root_src_file}' as module file"
+      compile_file "${root_src_file}" "${build_file}"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."

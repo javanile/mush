@@ -1,8 +1,6 @@
 
-use rust_lib::rust_lib;
-
 fn main() {
-	rust_lib();
+	rust_lib_test2();
 
     println!("Hello World!");
 
