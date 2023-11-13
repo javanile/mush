@@ -7,8 +7,8 @@ exec_build_release() {
   local bin_file=bin/${name}
 
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=target/release${name}.tmp
-  local final_file=target/release${name}
+  local build_file=target/release/${name}.tmp
+  local final_file=target/release/${name}
 
   mkdir -p target/release
 
@@ -57,8 +57,8 @@ exec_build_bin_from_src() {
   #echo "NAME: $name"
   local bin_file=${package_src}/bin/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/release${package_name}.tmp
-  local final_file=${package_src}/target/release${package_name}
+  local build_file=${package_src}/target/release/${package_name}.tmp
+  local final_file=${package_src}/target/release/${package_name}
 
   mkdir -p "${package_src}/target/release"
 
@@ -108,7 +108,7 @@ exec_build_lib_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

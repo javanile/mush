@@ -3,7 +3,7 @@ set -e
 
 ## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME=mush
-MUSH_DEBUG_PATH=$(dirname "target/release/mush.sh")/../..
+MUSH_DEBUG_PATH=$(dirname "target/debug/mush.sh")/../..
 MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
 
 ## BP003: Embedding debug api

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-11T08:11:45Z
+## @build_date: 2023-11-13T12:07:50Z
 set -e
 extern() {
   extern=$1
@@ -662,7 +662,7 @@ run_build() {
   if [ -n "${BUILD_RELEASE}" ]; then
     exec_build_release "$@"
   else
-    if [ "$BUILD_TARGET" = "release ]; then
+    if [ "$BUILD_TARGET" = "release" ]; then
       exec_build_release "$@"
     else
       if [ -f "${lib_file}" ]; then
@@ -1142,7 +1142,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-11T08:11:40Z
+## @build_date: 2023-11-13T12:07:45Z
 set -e
 extern() {
   extern=$1
@@ -1383,8 +1383,8 @@ exec_build_release() {
   local bin_file=bin/${name}
 
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=target/release${name}.tmp
-  local final_file=target/release${name}
+  local build_file=target/release/${name}.tmp
+  local final_file=target/release/${name}
 
   mkdir -p target/release
 
@@ -1433,8 +1433,8 @@ exec_build_bin_from_src() {
   #echo "NAME: $name"
   local bin_file=${package_src}/bin/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/release${package_name}.tmp
-  local final_file=${package_src}/target/release${package_name}
+  local build_file=${package_src}/target/release/${package_name}.tmp
+  local final_file=${package_src}/target/release/${package_name}
 
   mkdir -p "${package_src}/target/release"
 
@@ -1484,7 +1484,7 @@ exec_build_lib_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -1678,7 +1678,7 @@ exec_install() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -1776,7 +1776,7 @@ exec_install_bin_from_src() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=${package_src}/target/release${bin_name}
+  local final_file=${package_src}/target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -2189,7 +2189,7 @@ compile_scan_embed() {
 exec_publish() {
   local bin_name=${MUSH_PACKAGE_NAME}
   local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
   local package_name="${MUSH_PACKAGE_NAME}"
   local release_tag="${MUSH_PACKAGE_VERSION}"
 
@@ -2390,7 +2390,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-11T08:11:45Z
+## @build_date: 2023-11-13T12:07:50Z
 set -e
 extern() {
   extern=$1

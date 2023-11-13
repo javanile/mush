@@ -5,7 +5,7 @@ exec_install() {
   local bin_name=$MUSH_PACKAGE_NAME
 
   local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod

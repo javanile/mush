@@ -6,7 +6,7 @@ exec_install() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -104,7 +104,7 @@ exec_install_bin_from_src() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=${package_src}/target/release${bin_name}
+  local final_file=${package_src}/target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod

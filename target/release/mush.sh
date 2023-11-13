@@ -1383,8 +1383,8 @@ exec_build_release() {
   local bin_file=bin/${name}
 
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=target/release${name}.tmp
-  local final_file=target/release${name}
+  local build_file=target/release/${name}.tmp
+  local final_file=target/release/${name}
 
   mkdir -p target/release
 
@@ -1433,8 +1433,8 @@ exec_build_bin_from_src() {
   #echo "NAME: $name"
   local bin_file=${package_src}/bin/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/release${package_name}.tmp
-  local final_file=${package_src}/target/release${package_name}
+  local build_file=${package_src}/target/release/${package_name}.tmp
+  local final_file=${package_src}/target/release/${package_name}
 
   mkdir -p "${package_src}/target/release"
 
@@ -1678,7 +1678,7 @@ exec_install() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -1776,7 +1776,7 @@ exec_install_bin_from_src() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=${package_src}/target/release${bin_name}
+  local final_file=${package_src}/target/release/${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -2189,7 +2189,7 @@ compile_scan_embed() {
 exec_publish() {
   local bin_name=${MUSH_PACKAGE_NAME}
   local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/release${bin_name}
+  local final_file=target/release/${bin_name}
   local package_name="${MUSH_PACKAGE_NAME}"
   local release_tag="${MUSH_PACKAGE_VERSION}"
 
