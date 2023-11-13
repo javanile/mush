@@ -6,7 +6,7 @@
 .DEFAULT:
 	@mush $@
 
-build-release
+build-release:
 	@mush build -v --target bash5
 
 release:
@@ -70,11 +70,11 @@ test-legacy-fetch-debug:
 test-build-debug:
 	@bash tests/bare/build/debug-test.sh
 
-test-build-release
+test-build-release:
 	@bash tests/bare/build/releasetest.sh
 
-test-task-build-release
-	@bash tests/bare/tasks/build-releasetest.sh
+test-task-build-release:
+	@bash tests/bare/tasks/build-release-test.sh
 
 test-task-manifest-lookup:
 	@bash tests/bare/tasks/manifest-lookup-test.sh
@@ -115,14 +115,14 @@ test-cross-build:
 test-auto-build-debug-debug:
 	@bash tests/bare/build/auto-debug-debug-test.sh
 
-test-auto-build-debug-release test-auto-build-debug-debug
+test-auto-build-debug-release: test-auto-build-debug-debug
 	@bash tests/bare/build/auto-debug-releasetest.sh
 
-test-auto-build-releasedebug:
-	@bash tests/bare/build/auto-releasedebug-test.sh
+test-auto-build-release-debug:
+	@bash tests/bare/build/auto-release-debug-test.sh
 
-test-auto-build-releaserelease
-	@bash tests/bare/build/auto-releasereleasetest.sh
+test-auto-build-release-release:
+	@bash tests/bare/build/auto-release-release-test.sh
 
 test-console:
 	@bash tests/bare/console-test.sh

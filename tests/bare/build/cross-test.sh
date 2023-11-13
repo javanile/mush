@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -e
 
-for from in debug release do
-  for to in debug release do
+for from in debug release; do
+  for to in debug release; do
     echo "Building from '${from}' to '${to}'..."
     echo "------------------------------------------------------------"
     cp "target/${from}/mush" "target/${from}/mush.sh"
