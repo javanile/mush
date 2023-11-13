@@ -10,7 +10,7 @@ mush_dependency() {
   package_version_constraint=$3
   dependency_type=$4
 
-  exec_index_update
+  mush_registry_index_update
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
 

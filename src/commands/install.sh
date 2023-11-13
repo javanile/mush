@@ -39,7 +39,7 @@ run_install() {
         console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source."
       fi
     else
-      exec_index_update
+      mush_registry_index_update
       exec_install_from_index "$1"
     fi
   fi

@@ -1,5 +1,17 @@
 
 exec_dependencies() {
+  ## TODO: Expected output
+  #  Downloaded syn v2.0.37
+  #  Downloaded 1 crate (243.2 KB) in 0.46s
+  #   Compiling proc-macro2 v1.0.67
+  #   Compiling unicode-ident v1.0.12
+  #   Compiling serde v1.0.188
+  #   Compiling quote v1.0.33
+  #   Compiling syn v2.0.37
+  #   Compiling serde_derive v1.0.188
+  #   Compiling rust-lib v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-lib)
+  #    Finished dev [unoptimized + debuginfo] target(s) in 4.65s
+
   process_dependencies dev
   process_dependencies_build dev
 

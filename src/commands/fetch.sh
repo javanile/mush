@@ -23,7 +23,7 @@ run_fetch() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
-  exec_index_update
+  mush_registry_index_update
 
   exec_dependencies
 }
