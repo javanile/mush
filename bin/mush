@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T12:07:50Z
+## @build_date: 2023-11-13T12:12:57Z
 set -e
 extern() {
   extern=$1
@@ -1142,7 +1142,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T12:07:45Z
+## @build_date: 2023-11-13T12:12:52Z
 set -e
 extern() {
   extern=$1
@@ -2390,7 +2390,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T12:07:50Z
+## @build_date: 2023-11-13T12:12:56Z
 set -e
 extern() {
   extern=$1

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-11T08:11:23Z
+## @build_date: 2023-11-13T12:12:35Z
 set -e
 extern() {
   extern=$1
@@ -538,7 +538,7 @@ debug() {
 }
 EOF
 }
-release2022() {
+release_2022() {
   cat <<'EOF'
 extern() {
   extern=$1
@@ -662,7 +662,7 @@ run_build() {
   if [ -n "${BUILD_RELEASE}" ]; then
     exec_build_release "$@"
   else
-    if [ "$BUILD_TARGET" = "release ]; then
+    if [ "$BUILD_TARGET" = "release" ]; then
       exec_build_release "$@"
     else
       if [ -f "${lib_file}" ]; then
@@ -1142,7 +1142,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-11T08:11:17Z
+## @build_date: 2023-11-13T12:12:30Z
 set -e
 extern() {
   extern=$1
@@ -1484,7 +1484,7 @@ exec_build_lib_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -2390,7 +2390,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-11T08:11:23Z
+## @build_date: 2023-11-13T12:12:35Z
 set -e
 extern() {
   extern=$1
