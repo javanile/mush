@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T18:55:22Z
+## @build_date: 2023-11-13T22:24:14Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1118,7 +1118,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T18:55:18Z
+## @build_date: 2023-11-13T22:24:11Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1373,8 +1373,8 @@ exec_build_debug() {
 
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
-  MUSH_DEBUG_TARGET_FILE="$(realpath "${bin_file}")"
-  MUSH_DEBUG_TARGET_PATH=${PWD}
+  MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
+  MUSH_DEBUG_TARGET_PATH="${PWD}"
 
   echo "## BP002: Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
@@ -1485,7 +1485,8 @@ exec_build_bin_from_src() {
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
-
+  rm -f "${build_file}"
+echo "AAAAAAA"
   ## Generate binary on root
   mkdir -p "${package_src}/bin/"
   cp "${final_file}" "${bin_file}"
@@ -2372,7 +2373,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T18:55:22Z
+## @build_date: 2023-11-13T22:24:14Z
 set -e
 use() { return 0; }
 extern() { return 0; }

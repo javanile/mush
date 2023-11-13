@@ -30,6 +30,7 @@ exec_build_release() {
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+  rm -f "${build_file}"
 
   ## Generate binary on root
   mkdir -p bin/
@@ -80,6 +81,7 @@ exec_build_bin_from_src() {
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+  rm -f "${build_file}"
 
   ## Generate binary on root
   mkdir -p "${package_src}/bin/"
