@@ -7,8 +7,11 @@ mush_registry_index_update()
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
-  ## Rest index at moment just because it is too small
-  #rm -fr "${MUSH_HOME}/registry/index"
+  local update_strategy="${1:-lazy}"
+
+  if [ "${update_strategy}" = "full" ]; then
+    rm -fr "${MUSH_HOME}/registry/index" && true
+  fi
 
   if [ ! -f "${MUSH_REGISTRY_INDEX}" ]; then
     console_status "Updating" "mush packages index"
