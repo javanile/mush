@@ -21,8 +21,7 @@ run_publish() {
   #echo "MODULE_NAME: $MODULE_NAME"
   echo "ALLOW_DIRTY: $ALLOW_DIRTY"
 
-  MUSH_TARGET_DIR=target/dist
-
+  MUSH_TARGET_DIR=target/release
   exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"

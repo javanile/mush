@@ -51,7 +51,7 @@ run_build() {
   if [ -n "${BUILD_RELEASE}" ]; then
     exec_build_release "$@"
   else
-    if [ "$BUILD_TARGET" = "dist" ]; then
+    if [ "$BUILD_TARGET" = "release ]; then
       exec_build_release "$@"
     else
       if [ -f "${lib_file}" ]; then

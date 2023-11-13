@@ -2,7 +2,7 @@
 set -e
 
 echo "==> Build: mush"
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build
 
-target/dist/mush install --help
+target/releasemush install --help

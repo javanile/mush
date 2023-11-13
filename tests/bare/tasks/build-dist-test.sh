@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 source src/console.sh
-source src/tasks/build_dist.sh
+source src/tasks/build_releasesh
 
 build_file=$(mktemp /tmp/build_file_XXXXXX)
 
-build_dist_parse "src/main.sh" "${build_file}"
+build_releaseparse "src/main.sh" "${build_file}"

@@ -7,10 +7,10 @@ exec_build_release() {
   local bin_file=bin/${name}
 
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=target/dist/${name}.tmp
-  local final_file=target/dist/${name}
+  local build_file=target/release${name}.tmp
+  local final_file=target/release${name}
 
-  mkdir -p target/dist/
+  mkdir -p target/release
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -19,7 +19,7 @@ exec_build_release() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "src/main.sh" "${build_file}"
@@ -57,10 +57,10 @@ exec_build_bin_from_src() {
   #echo "NAME: $name"
   local bin_file=${package_src}/bin/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/dist/${package_name}.tmp
-  local final_file=${package_src}/target/dist/${package_name}
+  local build_file=${package_src}/target/release${package_name}.tmp
+  local final_file=${package_src}/target/release${package_name}
 
-  mkdir -p "${package_src}/target/dist/"
+  mkdir -p "${package_src}/target/release"
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -69,7 +69,7 @@ exec_build_bin_from_src() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "${package_src}/src/main.sh" "${build_file}"
@@ -93,10 +93,10 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/dist/lib.sh.tmp
-  local final_file=${package_src}/target/dist/lib.sh
+  local build_file=${package_src}/target/releaselib.sh.tmp
+  local final_file=${package_src}/target/releaselib.sh
 
-  mkdir -p "${package_src}/target/dist/"
+  mkdir -p "${package_src}/target/release"
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -105,10 +105,10 @@ exec_build_lib_from_src() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "dist"
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

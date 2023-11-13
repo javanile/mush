@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 set -e
 
-mush_bin="$PWD/target/dist/mush"
+mush_bin="$PWD/target/releasemush"
 
 echo "==> Build: mush"
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build
 
 cd "$HOME"
 

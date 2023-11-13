@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-cp target/dist/mush target/dist/mush.sh
+cp target/releasemush target/releasemush.sh
 
-bash target/dist/mush.sh -vv build
+bash target/releasemush.sh -vv build
 
 mkdir -p tests/temp
 cd tests/temp
 rm -fr hello_world
 
-bash ../../target/dist/mush.sh -vv new hello_world
+bash ../../target/releasemush.sh -vv new hello_world
 
 cd hello_world
 

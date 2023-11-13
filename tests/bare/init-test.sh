@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -e
 
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build
 
 mkdir -p tests/tmp/init-test
 cd tests/tmp/init-test
 rm -fr Manifest.toml
 
-bash ../../../target/dist/mush.sh -vv init
+bash ../../../target/releasemush.sh -vv init
 
 cat Manifest.toml

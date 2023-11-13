@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 set -e
 
-FROM=dist
-TO=debug
+FROM=releaseTO=debug
 
 ## Build Mush
 cp target/${FROM}/mush target/${FROM}/mush.sh

@@ -1,13 +1,12 @@
 #!/usr/bin/env bash
 set -e
 
-cp target/dist/mush target/dist/mush.sh
+cp target/releasemush target/releasemush.sh
 
-bash target/dist/mush.sh -vv build --target dist
-
+bash target/releasemush.sh -vv build --target release
 ./bin/mush --version
 
 mkdir -p tests/temp
 cd tests/temp
 
-bash ../../target/dist/mush.sh -vv build
+bash ../../target/releasemush.sh -vv build

@@ -2,8 +2,7 @@
 set -e
 
 FROM=debug
-TO=dist
-
+TO=release
 ## Build Mush
 cp target/${FROM}/mush target/${FROM}/mush.sh
 bash target/${FROM}/mush.sh build --target ${TO}

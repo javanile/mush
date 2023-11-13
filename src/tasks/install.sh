@@ -6,7 +6,7 @@ exec_install() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/dist/${bin_name}
+  local final_file=target/release${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -82,8 +82,8 @@ exec_install_from_src() {
     exit 101
   fi
 
-  exec_legacy_fetch "${package_src}/target/dist"
-  exec_legacy_build "${package_src}/target/dist"
+  exec_legacy_fetch "${package_src}/target/release
+  exec_legacy_build "${package_src}/target/release
 
   exec_build_from_src "${package_src}"
 
@@ -104,7 +104,7 @@ exec_install_bin_from_src() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=${package_src}/target/dist/${bin_name}
+  local final_file=${package_src}/target/release${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -139,7 +139,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/dist/lib.sh
+  local final_file=${package_src}/target/releaselib.sh
 
   local cp=cp
   local chmod=chmod

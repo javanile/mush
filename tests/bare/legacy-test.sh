@@ -2,9 +2,9 @@
 set -e
 
 echo "==> Build: mush"
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build
 
 echo "==> Test: legacy"
 cd tests/fixtures/zsh-app
-bash ../../../target/dist/mush.sh legacy https://raw.githubusercontent.com/molovo/crash/master/crash
+bash ../../../target/releasemush.sh legacy https://raw.githubusercontent.com/molovo/crash/master/crash

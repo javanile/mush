@@ -2,18 +2,18 @@
 set -e
 
 echo "==> Build: mush"
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build --release
-bash target/dist/mush --version
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build --release
+bash target/releasemush --version
 
 echo "==> Test: install error outside of a package directory"
 mkdir -p tests/tmp
 cd tests/tmp
-bash ../../target/dist/mush install mush-demo
+bash ../../target/releasemush install mush-demo
 cd ../..
 
 #echo "==> Test: install command"
 #cd tests/fixtures/complex-app
-#bash ../../../target/dist/mush install
+#bash ../../../target/releasemush install
 #complex-app --version
 #cd ../../..

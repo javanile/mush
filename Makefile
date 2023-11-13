@@ -6,7 +6,7 @@
 .DEFAULT:
 	@mush $@
 
-build-dist:
+build-release
 	@mush build -v --target bash5
 
 release:
@@ -25,10 +25,10 @@ shellcheck:
 ## ====
 
 install:
-	@install -m 0755 target/dist/mush $(HOME)/.mush/bin/
+	@install -m 0755 target/releasemush $(HOME)/.mush/bin/
 
 sudo-install:
-	@sudo install -m 0755 target/dist/mush /usr/local/bin/
+	@sudo install -m 0755 target/releasemush /usr/local/bin/
 
 publish:
 	@git add .
@@ -70,11 +70,11 @@ test-legacy-fetch-debug:
 test-build-debug:
 	@bash tests/bare/build/debug-test.sh
 
-test-build-dist:
-	@bash tests/bare/build/dist-test.sh
+test-build-release
+	@bash tests/bare/build/releasetest.sh
 
-test-task-build-dist:
-	@bash tests/bare/tasks/build-dist-test.sh
+test-task-build-release
+	@bash tests/bare/tasks/build-releasetest.sh
 
 test-task-manifest-lookup:
 	@bash tests/bare/tasks/manifest-lookup-test.sh
@@ -115,14 +115,14 @@ test-cross-build:
 test-auto-build-debug-debug:
 	@bash tests/bare/build/auto-debug-debug-test.sh
 
-test-auto-build-debug-dist: test-auto-build-debug-debug
-	@bash tests/bare/build/auto-debug-dist-test.sh
+test-auto-build-debug-release test-auto-build-debug-debug
+	@bash tests/bare/build/auto-debug-releasetest.sh
 
-test-auto-build-dist-debug:
-	@bash tests/bare/build/auto-dist-debug-test.sh
+test-auto-build-releasedebug:
+	@bash tests/bare/build/auto-releasedebug-test.sh
 
-test-auto-build-dist-dist:
-	@bash tests/bare/build/auto-dist-dist-test.sh
+test-auto-build-releaserelease
+	@bash tests/bare/build/auto-releasereleasetest.sh
 
 test-console:
 	@bash tests/bare/console-test.sh
@@ -145,7 +145,7 @@ test-build-rust-app:
 test-build-rust-lib:
 	@bash tests/bare/build/rust-lib-test.sh
 
-test-build-console-lib: build-dist sudo-install
+test-build-console-lib: build-releasesudo-install
 	@cd packages/console && mush build --release --lib
 
 test-build-empty-app:

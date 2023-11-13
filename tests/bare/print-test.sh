@@ -2,10 +2,10 @@
 set -e
 
 echo "==> Build: mush"
-cp target/dist/mush target/dist/mush.sh
-bash target/dist/mush.sh -vv build --release
-bash target/dist/mush --version
+cp target/releasemush target/releasemush.sh
+bash target/releasemush.sh -vv build --release
+bash target/releasemush --version
 
 echo "==> Test: print"
 cd tests/fixtures/complex-app
-bash ../../../target/dist/mush --print b
+bash ../../../target/releasemush --print b

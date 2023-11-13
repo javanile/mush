@@ -419,7 +419,7 @@ getoptions_help() {
 public embed
 
 embed debug_2022
-embed dist_2022
+embed release2022
 embed test_2022
 
 embed_file() {
@@ -538,7 +538,7 @@ debug() {
 }
 EOF
 }
-dist_2022() {
+release2022() {
   cat <<'EOF'
 extern() {
   extern=$1
@@ -662,7 +662,7 @@ run_build() {
   if [ -n "${BUILD_RELEASE}" ]; then
     exec_build_release "$@"
   else
-    if [ "$BUILD_TARGET" = "dist" ]; then
+    if [ "$BUILD_TARGET" = "release ]; then
       exec_build_release "$@"
     else
       if [ -f "${lib_file}" ]; then
@@ -791,8 +791,7 @@ run_install() {
     [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_DIR=target/dist
-      exec_legacy_fetch "${MUSH_TARGET_DIR}"
+      MUSH_TARGET_DIR=target/release      exec_legacy_fetch "${MUSH_TARGET_DIR}"
       exec_legacy_build "${MUSH_TARGET_DIR}"
       exec_dependencies "${MUSH_TARGET_DIR}"
       exec_build_release "$@"
@@ -1000,8 +999,7 @@ run_publish() {
   #echo "MODULE_NAME: $MODULE_NAME"
   echo "ALLOW_DIRTY: $ALLOW_DIRTY"
 
-  MUSH_TARGET_DIR=target/dist
-
+  MUSH_TARGET_DIR=target/release
   exec_manifest_lookup "${PWD}"
 
   exec_legacy_fetch "${MUSH_TARGET_DIR}"
@@ -1385,10 +1383,10 @@ exec_build_release() {
   local bin_file=bin/${name}
 
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=target/dist/${name}.tmp
-  local final_file=target/dist/${name}
+  local build_file=target/release${name}.tmp
+  local final_file=target/release${name}
 
-  mkdir -p target/dist/
+  mkdir -p target/release
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -1397,7 +1395,7 @@ exec_build_release() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "src/main.sh" "${build_file}"
@@ -1435,10 +1433,10 @@ exec_build_bin_from_src() {
   #echo "NAME: $name"
   local bin_file=${package_src}/bin/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/dist/${package_name}.tmp
-  local final_file=${package_src}/target/dist/${package_name}
+  local build_file=${package_src}/target/release${package_name}.tmp
+  local final_file=${package_src}/target/release${package_name}
 
-  mkdir -p "${package_src}/target/dist/"
+  mkdir -p "${package_src}/target/release"
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -1447,7 +1445,7 @@ exec_build_bin_from_src() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "${package_src}/src/main.sh" "${build_file}"
@@ -1471,10 +1469,10 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/dist/lib.sh.tmp
-  local final_file=${package_src}/target/dist/lib.sh
+  local build_file=${package_src}/target/releaselib.sh.tmp
+  local final_file=${package_src}/target/releaselib.sh
 
-  mkdir -p "${package_src}/target/dist/"
+  mkdir -p "${package_src}/target/release"
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
@@ -1483,10 +1481,10 @@ exec_build_lib_from_src() {
 
   echo "set -e" >> $build_file
 
-  dist_2022 >> $build_file
+  release2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "dist"
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -1680,7 +1678,7 @@ exec_install() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/dist/${bin_name}
+  local final_file=target/release${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -1756,8 +1754,8 @@ exec_install_from_src() {
     exit 101
   fi
 
-  exec_legacy_fetch "${package_src}/target/dist"
-  exec_legacy_build "${package_src}/target/dist"
+  exec_legacy_fetch "${package_src}/target/release
+  exec_legacy_build "${package_src}/target/release
 
   exec_build_from_src "${package_src}"
 
@@ -1778,7 +1776,7 @@ exec_install_bin_from_src() {
   local pwd=$PWD
 
   local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=${package_src}/target/dist/${bin_name}
+  local final_file=${package_src}/target/release${bin_name}
 
   local cp=cp
   local chmod=chmod
@@ -1813,7 +1811,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/dist/lib.sh
+  local final_file=${package_src}/target/releaselib.sh
 
   local cp=cp
   local chmod=chmod
@@ -2191,7 +2189,7 @@ compile_scan_embed() {
 exec_publish() {
   local bin_name=${MUSH_PACKAGE_NAME}
   local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/dist/${bin_name}
+  local final_file=target/release${bin_name}
   local package_name="${MUSH_PACKAGE_NAME}"
   local release_tag="${MUSH_PACKAGE_VERSION}"
 

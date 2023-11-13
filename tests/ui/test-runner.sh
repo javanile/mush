@@ -2,7 +2,7 @@
 
 function mush_mock() {
   local pwd=$(pwd)
-  local mush_bin=$(realpath "${pwd}/target/dist/mush")
+  local mush_bin=$(realpath "${pwd}/target/releasemush")
   local testsuite=$1
   local testsuite_name=$(basename "${testsuite}")
   local testcase=$(basename "$2" .out)
