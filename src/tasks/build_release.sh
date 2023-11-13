@@ -19,7 +19,7 @@ exec_build_release() {
 
   echo "set -e" >> $build_file
 
-  release2022 >> $build_file
+  release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "src/main.sh" "${build_file}"
@@ -69,7 +69,7 @@ exec_build_bin_from_src() {
 
   echo "set -e" >> $build_file
 
-  release2022 >> $build_file
+  release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "${package_src}/src/main.sh" "${build_file}"
@@ -105,7 +105,7 @@ exec_build_lib_from_src() {
 
   echo "set -e" >> $build_file
 
-  release2022 >> $build_file
+  release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release
