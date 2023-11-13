@@ -1,46 +1,24 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-02T15:09:28Z
+## @build_date: 2023-11-13T12:39:39Z
 set -e
-if ! declare -F "extern" > /dev/null; then
-  extern() {
-    extern=$1
-  }
-fi
-if ! declare -F "legacy" > /dev/null; then
-  legacy() {
-    legacy=$1
-  }
-fi
-if ! declare -F "module" > /dev/null; then
-  module() {
-    module=$1
-  }
-fi
-if ! declare -F "public" > /dev/null; then
-  public() {
-    public=$1
-  }
-fi
-if ! declare -F "use" > /dev/null; then
-  use() {
-    use=$1
-  }
-fi
-if ! declare -F "embed" > /dev/null; then
-  embed() {
-    embed=$1
-  }
-fi
+use() { return 0; }
+extern() { return 0; }
+legacy() { return 0; }
+module() { return 0; }
+public() { return 0; }
+embed() { return 0; }
 ## BP004: Compile the entrypoint
 
-__feature_error_dumper__hook_build_debug_head_section() {
+__plugin_error_trace__feature_error_dumper__hook_build_debug_head_section() {
   local value
+  local build_file
 
   value=$1
+  build_file=$2
 
   if [ "${value}" = "true" ]; then
-    echo "Adding error dumper to the build"
+    echo "Adding error dumper to the build file: ${build_file}"
   fi
 }

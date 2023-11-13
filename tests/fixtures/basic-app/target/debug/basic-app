@@ -3,7 +3,7 @@ set -e
 
 ## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME=basic-app
-MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush/tests/fixtures/basic-app
+MUSH_DEBUG_PATH=$(dirname "../../../target/release/mush")/../..
 MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
 
 ## BP003: Embedding debug api

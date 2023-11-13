@@ -19,7 +19,7 @@
 //mod mod1;
 //mod notfound;
 
-mod mod2;
+//mod mod2;
 
 //extern crate cavallo;
 

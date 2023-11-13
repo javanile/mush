@@ -216,3 +216,6 @@ test-ui:
 
 test-coverage:
 	@bash tests/coverage/test-runner.sh
+
+test-environment-variable-target-dir:
+	@bash tests/bare/environment_variables/target-dir-test.sh
