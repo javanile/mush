@@ -1,6 +1,7 @@
 /.idea/
 /.vscode/
 /.bundles_cache/
+/.mush/
 /coverage/
 /tests/temp/
 /tests/tmp/
