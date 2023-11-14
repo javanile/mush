@@ -222,3 +222,6 @@ test-environment-variable-target-dir:
 
 test-run-example:
 	@bash tests/bare/examples/run-example-test.sh
+
+test-fix:
+	@bash tests/bare/fix-test.sh
