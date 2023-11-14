@@ -2,9 +2,11 @@
 set -e
 
 ## BP002: Package and debug variables 
-MUSH_PACKAGE_NAME=mush
-MUSH_DEBUG_PATH=$(dirname "target/release/mush.sh")/../..
-MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
+MUSH_PACKAGE_NAME="mush"
+MUSH_TARGET_FILE="target/debug/$(basename "$0")"
+MUSH_TARGET_PATH="target/debug"
+MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
+MUSH_DEBUG_TARGET_PATH="${MUSH_DEBUG_TARGET_FILE::-${#MUSH_TARGET_FILE}-1}"
 
 ## BP003: Embedding debug api
 debug() {
@@ -111,5 +113,5 @@ debug() {
 
 ## BP001: Appending entrypoint to debug build
 debug init
-debug file "${MUSH_DEBUG_PATH}/src/main.sh"
+debug file "${MUSH_DEBUG_TARGET_PATH}/src/main.sh"
 main "$@"

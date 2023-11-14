@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 set -e
 
-echo "==> Build Mush"
+echo "==> Build: mush"
 cp target/debug/mush target/debug/mush.sh
-bash target/debug/mush.sh build --target debug
+bash target/debug/mush.sh build
 
-echo "==> Build Fixtures"
+echo "==> Build: basic-app"
 cd tests/fixtures/basic-app
-bash ../../../target/debug/mush -vv build --target debug
+../../../target/debug/mush -vv build

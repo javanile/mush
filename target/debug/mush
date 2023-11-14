@@ -3,7 +3,7 @@ set -e
 
 ## BP002: Package and debug variables 
 MUSH_PACKAGE_NAME="mush"
-MUSH_TARGET_FILE="target/debug/mush"
+MUSH_TARGET_FILE="target/debug/$(basename "$0")"
 MUSH_TARGET_PATH="target/debug"
 MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
 MUSH_DEBUG_TARGET_PATH="${MUSH_DEBUG_TARGET_FILE::-${#MUSH_TARGET_FILE}-1}"
