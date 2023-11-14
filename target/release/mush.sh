@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T22:24:14Z
+## @build_date: 2023-11-13T22:25:37Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1118,7 +1118,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:24:11Z
+## @build_date: 2023-11-13T22:25:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1435,6 +1435,7 @@ exec_build_release() {
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+  rm -f "${build_file}"
 
   ## Generate binary on root
   mkdir -p bin/
@@ -1486,7 +1487,7 @@ exec_build_bin_from_src() {
   cp "${build_file}" "${final_file}"
   chmod +x "${final_file}"
   rm -f "${build_file}"
-echo "AAAAAAA"
+
   ## Generate binary on root
   mkdir -p "${package_src}/bin/"
   cp "${final_file}" "${bin_file}"
@@ -2373,7 +2374,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:24:14Z
+## @build_date: 2023-11-13T22:25:37Z
 set -e
 use() { return 0; }
 extern() { return 0; }

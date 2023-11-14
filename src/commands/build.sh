@@ -19,40 +19,32 @@ run_build() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_BUILD_MODE=debug
-  MUSH_TARGET_DIR=target/debug
-  if [ -n "${BUILD_RELEASE}" ]; then
-    MUSH_BUILD_MODE=release
-    MUSH_TARGET_DIR=target/release
-  fi
-
-  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  #mkdir -p "${MUSH_DEPS_DIR}"
-
   exec_manifest_lookup "${PWD}"
 
   exec_feature_hook "build"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  mush_build_profile_init "${BUILD_RELEASE}"
 
-  exec_dependencies "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
   local src_file=src/main.sh
-  local bin_file=${MUSH_TARGET_DIR}/${package_name}
+  local bin_file=${MUSH_TARGET_PATH}/${package_name}
   local lib_file=src/lib.sh
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ -n "${BUILD_RELEASE}" ]; then
-    exec_build_release "$@"
+    exec_build_release "${MUSH_TARGET_PATH}"
   else
     if [ "$BUILD_TARGET" = "release" ]; then
-      exec_build_release "$@"
+      exec_build_release "${MUSH_TARGET_PATH}"
     else
       if [ -f "${lib_file}" ]; then
         compile_file "${lib_file}"

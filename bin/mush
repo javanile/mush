@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T22:25:37Z
+## @build_date: 2023-11-13T22:52:44Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -551,6 +551,8 @@ mush_api_test_2022 () {
 EOF
 }
 
+public profile
+
 mush_build_print() {
     case "$1" in
         a)
@@ -566,6 +568,20 @@ mush_build_print() {
     esac
 }
 
+mush_build_profile_init() {
+  local profile
+  local target_dir
+
+  is_release=$1
+  target_dir=${MUSH_TARGET_DIR:-target}
+
+  MUSH_PROFILE=debug
+  if [ -n "${is_release}" ]; then
+    MUSH_PROFILE=release
+  fi
+
+  MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
+}
 mush_space_iterable() {
     echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
@@ -606,31 +622,23 @@ run_build() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_BUILD_MODE=debug
-  MUSH_TARGET_DIR=target/debug
-  if [ -n "${BUILD_RELEASE}" ]; then
-    MUSH_BUILD_MODE=release
-    MUSH_TARGET_DIR=target/release
-  fi
-
-  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  #mkdir -p "${MUSH_DEPS_DIR}"
-
   exec_manifest_lookup "${PWD}"
 
   exec_feature_hook "build"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  mush_build_profile_init "${BUILD_RELEASE}"
 
-  exec_dependencies "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
   local src_file=src/main.sh
-  local bin_file=${MUSH_TARGET_DIR}/${package_name}
+  local bin_file=${MUSH_TARGET_PATH}/${package_name}
   local lib_file=src/lib.sh
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
@@ -1118,7 +1126,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:25:34Z
+## @build_date: 2023-11-13T22:52:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2374,7 +2382,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:25:37Z
+## @build_date: 2023-11-13T22:52:44Z
 set -e
 use() { return 0; }
 extern() { return 0; }

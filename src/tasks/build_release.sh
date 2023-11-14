@@ -1,5 +1,9 @@
 
 exec_build_release() {
+  local target_path
+
+  target_path=${1:-target/release}
+
   name=$MUSH_PACKAGE_NAME
 
   #echo "NAME: $name"
