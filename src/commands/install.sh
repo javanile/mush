@@ -23,7 +23,8 @@ run_install() {
     [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_DIR=target/release      exec_legacy_fetch "${MUSH_TARGET_DIR}"
+      MUSH_TARGET_DIR=target/release
+      exec_legacy_fetch "${MUSH_TARGET_DIR}"
       exec_legacy_build "${MUSH_TARGET_DIR}"
       exec_dependencies "${MUSH_TARGET_DIR}"
       exec_build_release "$@"

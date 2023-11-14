@@ -124,7 +124,7 @@ compile_scan_extern_package() {
   local src_file=$1
   local build_file=$2
   local module_dir=$(dirname "${src_file}")
-  local extern_package_dir=${MUSH_TARGET_DIR}
+  local extern_package_dir=${MUSH_TARGET_PATH}
 
   grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local package_name=$(echo "${line#*package}" | xargs)
@@ -136,7 +136,7 @@ compile_scan_extern_package() {
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
-      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file}"
+      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file} (package_dir: ${extern_package_dir})"
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
       #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
       #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."

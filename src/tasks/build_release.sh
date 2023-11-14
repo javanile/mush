@@ -26,7 +26,7 @@ exec_build_release() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "src/main.sh" "${build_file}"
+  compile_file "src/main.sh" "${build_file}" "" "release"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
