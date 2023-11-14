@@ -40,10 +40,10 @@ run_run() {
 
   exec_manifest_lookup "${PWD}"
 
-  MUSH_TARGET_DIR=target/debug
+  MUSH_TARGET_PATH=target/debug
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
 
   if [ -z "${EXAMPLE_NAME}" ]; then
     local src_file=src/main.sh

@@ -17,7 +17,7 @@ exec_feature_hook() {
     feature_name=${feature%=*}
     feature_value=${feature#*=}
 
-    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_DIR}")
+    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
 
     if [ -n "${plugins}" ]; then
       echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do

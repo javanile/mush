@@ -6,10 +6,12 @@ mush_build_profile_init() {
   is_release=$1
   target_dir=${MUSH_TARGET_DIR:-target}
 
-  MUSH_PROFILE=debug
+  profile=debug
   if [ -n "${is_release}" ]; then
-    MUSH_PROFILE=release
+    profile=release
   fi
 
+  MUSH_PROFILE="${profile}"
+  MUSH_TARGET_DIR="${target_dir}"
   MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
 }

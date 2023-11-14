@@ -57,7 +57,7 @@ run_build() {
     fi
   fi
 
-  #printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
+  #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }

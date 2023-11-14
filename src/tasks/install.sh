@@ -135,9 +135,9 @@ exec_install_lib_from_src() {
   local pwd=$PWD
 
   local lib_file=${pwd}/lib/${lib_name}
-  local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
+  local lib_package_dir=${pwd}/${MUSH_TARGET_PATH}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
-  local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
+  local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
   local final_file=${package_src}/target/releaselib.sh
 

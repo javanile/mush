@@ -22,22 +22,14 @@ run_test() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_BUILD_MODE=debug
-  MUSH_TARGET_DIR=target/debug
-  if [ -n "${BUILD_RELEASE}" ]; then
-    MUSH_BUILD_MODE=release
-    MUSH_TARGET_DIR=target/release
-  fi
-
-  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  #mkdir -p "${MUSH_DEPS_DIR}"
-
   exec_manifest_lookup "${PWD}"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  mush_build_profile_init
 
-  exec_dependencies "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"

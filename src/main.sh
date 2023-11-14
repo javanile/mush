@@ -1,5 +1,6 @@
 
 extern package console
+extern package getoptions
 
 module api
 module build
@@ -9,8 +10,6 @@ module errors
 module package_managers
 module registry
 module tasks
-
-legacy getoptions
 
 VERSION="Mush 0.1.1 (2023-11-03)"
 

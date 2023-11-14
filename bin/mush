@@ -1,14 +1,26 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-13T22:52:44Z
+## @build_date: 2023-11-14T07:32:57Z
 set -e
-use() { return 0; }
-extern() { return 0; }
-legacy() { return 0; }
-module() { return 0; }
-public() { return 0; }
-embed() { return 0; }
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -575,13 +587,16 @@ mush_build_profile_init() {
   is_release=$1
   target_dir=${MUSH_TARGET_DIR:-target}
 
-  MUSH_PROFILE=debug
+  profile=debug
   if [ -n "${is_release}" ]; then
-    MUSH_PROFILE=release
+    profile=release
   fi
 
+  MUSH_PROFILE="${profile}"
+  MUSH_TARGET_DIR="${target_dir}"
   MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
 }
+
 mush_space_iterable() {
     echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
@@ -644,10 +659,10 @@ run_build() {
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
   if [ -n "${BUILD_RELEASE}" ]; then
-    exec_build_release "$@"
+    exec_build_release "${MUSH_TARGET_PATH}"
   else
     if [ "$BUILD_TARGET" = "release" ]; then
-      exec_build_release "$@"
+      exec_build_release "${MUSH_TARGET_PATH}"
     else
       if [ -f "${lib_file}" ]; then
         compile_file "${lib_file}"
@@ -660,7 +675,7 @@ run_build() {
     fi
   fi
 
-  #printenv | grep MUSH_ > "${MUSH_TARGET_DIR}/.vars"
+  #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
 
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
@@ -775,9 +790,10 @@ run_install() {
     [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_DIR=target/release      exec_legacy_fetch "${MUSH_TARGET_DIR}"
-      exec_legacy_build "${MUSH_TARGET_DIR}"
-      exec_dependencies "${MUSH_TARGET_DIR}"
+      MUSH_TARGET_PATH=target/release
+      exec_legacy_fetch "${MUSH_TARGET_PATH}"
+      exec_legacy_build "${MUSH_TARGET_PATH}"
+      exec_dependencies "${MUSH_TARGET_PATH}"
       exec_build_release "$@"
       exec_install
     else
@@ -922,10 +938,10 @@ run_run() {
 
   exec_manifest_lookup "${PWD}"
 
-  MUSH_TARGET_DIR=target/debug
+  MUSH_TARGET_PATH=target/debug
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
 
   if [ -z "${EXAMPLE_NAME}" ]; then
     local src_file=src/main.sh
@@ -983,11 +999,11 @@ run_publish() {
   #echo "MODULE_NAME: $MODULE_NAME"
   echo "ALLOW_DIRTY: $ALLOW_DIRTY"
 
-  MUSH_TARGET_DIR=target/release
+  MUSH_TARGET_PATH=target/release
   exec_manifest_lookup "${PWD}"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
 
   exec_build_release "$@"
 
@@ -1017,22 +1033,14 @@ run_test() {
   parse "$@"
   eval "set -- $REST"
 
-  MUSH_BUILD_MODE=debug
-  MUSH_TARGET_DIR=target/debug
-  if [ -n "${BUILD_RELEASE}" ]; then
-    MUSH_BUILD_MODE=release
-    MUSH_TARGET_DIR=target/release
-  fi
-
-  #MUSH_DEPS_DIR="${MUSH_TARGET_DIR}/deps"
-  #mkdir -p "${MUSH_DEPS_DIR}"
-
   exec_manifest_lookup "${PWD}"
 
-  exec_legacy_fetch "${MUSH_TARGET_DIR}"
-  exec_legacy_build "${MUSH_TARGET_DIR}"
+  mush_build_profile_init
 
-  exec_dependencies "${MUSH_TARGET_DIR}"
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
@@ -1126,14 +1134,26 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:52:40Z
+## @build_date: 2023-11-14T07:32:51Z
 set -e
-use() { return 0; }
-extern() { return 0; }
-legacy() { return 0; }
-module() { return 0; }
-public() { return 0; }
-embed() { return 0; }
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 code_dumper() {
   local file
@@ -1413,6 +1433,10 @@ exec_build_debug() {
 }
 
 exec_build_release() {
+  local target_path
+
+  target_path=${1:-target/release}
+
   name=$MUSH_PACKAGE_NAME
 
   #echo "NAME: $name"
@@ -1435,7 +1459,7 @@ exec_build_release() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
-  compile_file "src/main.sh" "${build_file}"
+  compile_file "src/main.sh" "${build_file}" "" "release"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -1590,7 +1614,7 @@ exec_feature_hook() {
     feature_name=${feature%=*}
     feature_value=${feature#*=}
 
-    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_DIR}")
+    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
 
     if [ -n "${plugins}" ]; then
       echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
@@ -1775,9 +1799,9 @@ exec_install_lib_from_src() {
   local pwd=$PWD
 
   local lib_file=${pwd}/lib/${lib_name}
-  local lib_package_dir=${pwd}/${MUSH_TARGET_DIR}/packages/${lib_name}
+  local lib_package_dir=${pwd}/${MUSH_TARGET_PATH}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
-  local lib_plugin_dir=${pwd}/${MUSH_TARGET_DIR}/plugins
+  local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
   local final_file=${package_src}/target/releaselib.sh
 
@@ -2118,7 +2142,7 @@ compile_scan_extern_package() {
   local src_file=$1
   local build_file=$2
   local module_dir=$(dirname "${src_file}")
-  local extern_package_dir=${MUSH_TARGET_DIR}
+  local extern_package_dir=${MUSH_TARGET_PATH}
 
   grep -n '^extern package [a-z][a-z0-9_]*$' "${src_file}" | while read -r line; do
     local package_name=$(echo "${line#*package}" | xargs)
@@ -2130,7 +2154,7 @@ compile_scan_extern_package() {
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
     else
-      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file}"
+      [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${package_file} (package_dir: ${extern_package_dir})"
       error_package_not_found "${package_name}" "${src_file}" "${line%:*}"
       #console_error "File not found for package '${package_name}'. Look at '${src_file}' on line ${line%:*}"
       #console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
@@ -2382,14 +2406,26 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-13T22:52:44Z
+## @build_date: 2023-11-14T07:32:57Z
 set -e
-use() { return 0; }
-extern() { return 0; }
-legacy() { return 0; }
-module() { return 0; }
-public() { return 0; }
-embed() { return 0; }
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 # FATAL
 # ERROR

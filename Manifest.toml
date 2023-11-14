@@ -8,7 +8,7 @@ edition = "2022"
 [dependencies]
 code_dumper = "*"
 console = "*"
-#getoptions = "mush javanile/mush/getoptions"
+getoptions = "*"
 
 [dev-dependencies]
 #shellcheck = "apt shellcheck"
