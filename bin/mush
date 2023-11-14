@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: bin
-## @build_date: 2023-11-14T08:09:24Z
+## @build_date: 2023-11-14T09:34:39Z
 set -e
 extern() {
   extern=$1
@@ -205,8 +205,8 @@ debug() {
           MUSH_RUNTIME_MODULE=$1
           source "${module_dir_file_path}"
         else
-          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-          echo "error[E0583]: file not found for module '${module_name}'"
+          console_error_code E0583 "file not found for module '${module_name}'"
+          [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
           echo " --> ${debug_file}:4:1"
           echo "  |"
           echo "4 | mod notfound;"
@@ -849,7 +849,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-14T08:09:16Z
+## @build_date: 2023-11-14T09:34:33Z
 set -e
 extern() {
   extern=$1
@@ -1117,14 +1117,14 @@ exec_build_debug() {
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
-  MUSH_DEBUG_TARGET_PATH="${PWD}"
+  MUSH_DEBUG_PATH="${PWD}"
 
   echo "## BP002: Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
   echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
   echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
-  echo "MUSH_DEBUG_TARGET_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
   exec_feature_hook "build_debug_head_section" "${build_file}"
@@ -1135,12 +1135,12 @@ exec_build_debug() {
 
   if [ -n "${lib_file}" ]; then
     echo "## BP015: Appending library" >> "${build_file}"
-    echo "debug_file \"\${MUSH_DEBUG_TARGET_PATH}/${lib_file}\"" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
   fi
 
   echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
   echo "debug init" >> "${build_file}"
-  echo "debug file \"\${MUSH_DEBUG_TARGET_PATH}/${src_file}\"" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
@@ -2121,7 +2121,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-14T08:09:19Z
+## @build_date: 2023-11-14T09:34:35Z
 set -e
 extern() {
   extern=$1
@@ -2192,7 +2192,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2023-11-14T08:09:24Z
+## @build_date: 2023-11-14T09:34:39Z
 set -e
 extern() {
   extern=$1

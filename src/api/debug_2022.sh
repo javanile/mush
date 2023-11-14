@@ -60,8 +60,8 @@ debug() {
           MUSH_RUNTIME_MODULE=$1
           source "${module_dir_file_path}"
         else
-          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-          echo "error[E0583]: file not found for module '${module_name}'"
+          console_error_code E0583 "file not found for module '${module_name}'"
+          [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
           echo " --> ${debug_file}:4:1"
           echo "  |"
           echo "4 | mod notfound;"
