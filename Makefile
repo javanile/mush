@@ -48,6 +48,9 @@ publish-stable:
 	@echo "========[ Publish Stable ]==================================="
 	@mush publish || true
 	@echo "============================================================="
+	@git add .
+	@git commit -am "Stable Release" || true
+	@git push
 	@git checkout main
 
 ## ====
