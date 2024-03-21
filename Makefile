@@ -42,7 +42,7 @@ publish:
 
 publish-stable:
 	@git add .
-	@git commit -am "Stable Release"
+	@git commit -am "Stable Release" || true
 	@git checkout stable
 	@git pull
 	@echo "========[ Publish Stable ]==================================="
