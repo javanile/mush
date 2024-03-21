@@ -41,6 +41,8 @@ publish:
 	@mush publish
 
 publish-stable: mush-install
+	@git add .
+	@git commit -am "Stable Release"
 	@git checkout stable
 	@git pull
 	@mush publish || true
