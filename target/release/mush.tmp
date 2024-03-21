@@ -1,0 +1,836 @@
+#!/usr/bin/env bash
+## BP010: Release metadata
+## @build_type: bin
+## @build_date: 2024-03-21T20:42:57Z
+set -e
+use() { return 0; }
+extern() { return 0; }
+legacy() { return 0; }
+module() { return 0; }
+public() { return 0; }
+embed() { return 0; }
+## BP004: Compile the entrypoint
+
+extern package console
+extern package getoptions
+
+module api
+module build
+module collections
+module commands
+module errors
+module package_managers
+module registry
+module tasks
+
+VERSION="Mush 0.1.1 (2023-11-03)"
+
+parser_definition() {
+  setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
+
+  msg   -- 'OPTIONS:'
+  disp  VERSION -V --version                      -- "Print version info and exit"
+  param PRINT      --print                        -- "Builder information to print on stdout"
+  param EXPLAIN    --explain                      -- "Provide a detailed explanation of an error message"
+  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage  -h --help                         -- "Print help information"
+
+  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build   -- "Compile the current package"
+  cmd   check   -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch   -- "Fetch dependencies of a package from the network"
+  cmd   init    -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new     -- "Create a new Mush package"
+  cmd   run     -- "Run a binary or example of the local package"
+  cmd   test    -- "Run the tests"
+  cmd   publish -- "Package and upload this package to the registry"
+}
+
+args_error() {
+  case "$2" in
+    notcmd)
+      console_error "no such command: '$3'\n\n\tView all available commands with 'mush --help'"
+      ;;
+    required)
+      console_error "argument to option '$3' missing."
+      ;;
+    *)
+      echo "ERROR: ($2 $3) $1"
+  esac
+  exit 101
+}
+
+main() {
+  if [ $# -eq 0 ]; then
+    eval "set -- --help"
+  fi
+
+  eval "$(getoptions parser_definition parse "$0") exit 1"
+  parse "$@"
+  eval "set -- $REST"
+
+  [ "${VERBOSE}" -gt 2 ] && echo "Verbosity level: ${VERBOSE}"
+
+  if [ -n "${PRINT}" ]; then
+    mush_build_print "${PRINT}"
+  elif [ -n "${EXPLAIN}" ]; then
+    mush_errors_explain "${EXPLAIN}"
+  elif [ $# -gt 0 ]; then
+    cmd=$1
+    shift
+    case $cmd in
+      build)
+        run_build "$@"
+        ;;
+      check)
+        run_check "$@"
+        ;;
+      fetch)
+        run_fetch "$@"
+        ;;
+      init)
+        run_init "$@"
+        ;;
+      install)
+        run_install "$@"
+        ;;
+      legacy)
+        run_legacy "$@"
+        ;;
+      new)
+        run_new "$@"
+        ;;
+      run)
+        run_run "$@"
+        ;;
+      test)
+        run_test "$@"
+        ;;
+      publish)
+        run_publish "$@"
+        ;;
+      --) # no subcommand, arguments only
+    esac
+  fi
+}
+
+public embed
+
+embed debug_2022
+embed release_2022
+embed test_2022
+
+embed_file() {
+  local module_name=$1
+  local module_file=$2
+
+  echo "${module_name}() {"
+  echo "  cat <<'EOF'"
+  #cat "$module_file" | tr -s '\n'
+  sed '/^[[:space:]]*$/d' "${module_file}"
+  echo "EOF"
+  echo "}"
+}
+debug_2022() {
+  cat <<'EOF'
+debug() {
+  local api
+  api=$1
+  case "${api}" in
+    init)
+      extern() {
+        local debug_file=$MUSH_DEBUG_FILE
+        if [ "$1" = "package" ]; then
+          local package_name=$MUSH_PACKAGE_NAME
+          local extern_package_name=$2
+          local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+          local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
+          if [ -d "${extern_package_path}" ]; then
+            debug file "${extern_package_lib_file}"
+            debug init
+          else
+            echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+            error_package_not_found "${extern_package_name}" "${debug_file}"
+            exit 1
+          fi
+        else
+          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+          echo "error: expected one of 'package' or '{', found '$1'"
+          echo " --> ${debug_file}:8:8"
+          echo "  |"
+          echo "8 | extern cavallo json;"
+          echo "  |        ^^^^^^^ expected one of 'package' or '{'"
+          echo ""
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      legacy() {
+        local legacy_file="target/debug/legacy/__$1.sh"
+        local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
+        if [ ! -f "$legacy_file_path" ]; then
+          echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
+          exit 101
+        fi
+        source "${legacy_file_path}"
+      }
+      module() {
+        local module_name=$1
+        local module_file="src/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        local debug_file=$MUSH_DEBUG_FILE
+        local package_name=$MUSH_PACKAGE_NAME
+        if [ -f "${module_file_path}" ]; then
+          source "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          MUSH_RUNTIME_MODULE=$1
+          source "${module_dir_file_path}"
+        else
+          console_error_code E0583 "file not found for module '${module_name}'"
+          [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
+          echo " --> ${debug_file}:4:1"
+          echo "  |"
+          echo "4 | mod notfound;"
+          echo "  | ^^^^^^^^^^^^^"
+          echo "  |"
+          echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
+          echo ""
+          echo "For more information about this error, try 'mush explain E0583'."
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      public() {
+        local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        if [ -f "${module_file_path}" ]; then
+          source "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          source "${module_dir_file_path}"
+        else
+          echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+          exit 101
+        fi
+      }
+      use() {
+        return 0
+      }
+      embed() {
+        local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        eval "$(embed_file "$1" "${module_file_path}")"
+      }
+      ;;
+    file)
+      local previous_debug_file=$MUSH_DEBUG_FILE
+      MUSH_DEBUG_FILE=$2
+      source "$2"
+      MUSH_DEBUG_FILE=$previous_debug_file
+      ;;
+    *)
+  esac
+}
+EOF
+}
+release_2022() {
+  cat <<'EOF'
+use() { return 0; }
+extern() { return 0; }
+legacy() { return 0; }
+module() { return 0; }
+public() { return 0; }
+embed() { return 0; }
+EOF
+}
+test_2022() {
+  cat <<'EOF'
+mush_api_test_2022 () {
+  echo "Filter: $1"
+  echo "Functions:"
+  declare -F | awk '{print $3}' | grep "test_$1" | while read -r unit_test; do
+    [ "${unit_test}" = "test_2022" ] && continue
+    [ "${unit_test}" = "mush_api_test_2022" ] && continue
+    echo "Testing: $unit_test"
+    eval "$unit_test"
+  done
+}
+EOF
+}
+
+public profile
+
+mush_build_print() {
+    case "$1" in
+        a)
+            echo "a"
+            ;;
+        *)
+            local print_options="
+            a   a
+            b   b
+            c   c
+            "
+            console_error "unknown print request '$1'\n\nAvailable print options:\n${print_options}"
+    esac
+}
+
+mush_build_profile_init() {
+  local profile
+  local target_dir
+
+  is_release=$1
+  target_dir=${MUSH_TARGET_DIR:-target}
+
+  profile=debug
+  if [ -n "${is_release}" ]; then
+    profile=release
+  fi
+
+  MUSH_PROFILE="${profile}"
+  MUSH_TARGET_DIR="${target_dir}"
+  MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
+}
+
+mush_space_iterable() {
+    echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+public add
+public build
+public check
+public fetch
+public init
+public install
+public legacy
+public new
+public run
+public publish
+public test
+public uninstall
+
+test0 () {
+  echo "TEST"
+}
+parser_definition_build() {
+  setup REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS]" ''
+
+  msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose "counter:true" "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+
+  flag  QUIET          -q --quiet       -- "Do not print mush log messages"
+  flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
+
+  param BUILD_TARGET   -t --target      -- "Build for the specific target"
+  disp  :usage         -h --help        -- "Print help information"
+}
+
+run_build() {
+  eval "$(getoptions parser_definition_build parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup "${PWD}"
+
+  exec_feature_hook "build"
+
+  mush_build_profile_init "${BUILD_RELEASE}"
+
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  local src_file=src/main.sh
+  local bin_file=${MUSH_TARGET_PATH}/${package_name}
+  local lib_file=src/lib.sh
+
+  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+
+  if [ -n "${BUILD_RELEASE}" ]; then
+    exec_build_release "${MUSH_TARGET_PATH}"
+  else
+    if [ "$BUILD_TARGET" = "release" ]; then
+      exec_build_release "${MUSH_TARGET_PATH}"
+    else
+      if [ -f "${lib_file}" ]; then
+        compile_file "${lib_file}"
+      else
+        local lib_file=
+      fi
+      if [ -f "${src_file}" ]; then
+        exec_build_debug "src/main.sh" "${bin_file}" "${lib_file}"
+      fi
+    fi
+  fi
+
+  #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
+}
+
+parser_definition_check() {
+	setup   REST help:usage abbr:true -- "Check a local package and all of its dependencies for errors" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} check [OPTIONS]" ''
+
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Check artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Check for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_check() {
+  eval "$(getoptions parser_definition_check parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup "${PWD}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Checking" "${package_name} v${package_version} (${pwd})"
+
+  console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
+}
+
+parser_definition_fetch() {
+  setup   REST help:usage abbr:true -- "Fetch dependencies of a package from the network" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} fetch [OPTIONS]" ''
+
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+
+  param  BUILD_TARGET   -t --target                       -- "Check for the specific target"
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_fetch() {
+  eval "$(getoptions parser_definition_fetch parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup "${PWD}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  mush_registry_index_update
+
+  exec_dependencies
+}
+
+parser_definition_init() {
+	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} init [OPTIONS] [path]" ''
+
+	msg -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_init() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "Manifest.toml" ]; then
+    console_error "'cargo init' cannot be run on existing Mush packages"
+    exit 101
+  fi
+
+  exec_init
+}
+
+parser_definition_install() {
+  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
+
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+
+  param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_install() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  if [ -n "$PACKAGE_PATH" ]; then
+    local package_path=$(realpath "$PACKAGE_PATH")
+    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
+    if [ -f "${package_path}/Manifest.toml" ]; then
+      exec_manifest_lookup "${package_path}"
+      MUSH_TARGET_PATH=target/release
+      exec_legacy_fetch "${MUSH_TARGET_PATH}"
+      exec_legacy_build "${MUSH_TARGET_PATH}"
+      exec_dependencies "${MUSH_TARGET_PATH}"
+      exec_build_release "$@"
+      exec_install
+    else
+      console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
+    fi
+  else
+    if [ "$#" -eq 0 ]; then
+      if [ -f "Manifest.toml" ]; then
+        console_error "Using 'mush install' to install the binaries for the package in current working directory is not supported, use 'mush install --path .' instead. Use 'mush build' if you want to simply build the package."
+      else
+        console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source."
+      fi
+    else
+      mush_registry_index_update
+      exec_install_from_index "$1"
+    fi
+  fi
+}
+
+parser_definition_legacy() {
+  setup   REST help:usage abbr:true -- \
+    "Usage: ${2##*/} legacy [options...] [arguments...]"
+  msg -- '' 'Add legacy dependencies to a Manifest.toml file' ''
+  msg -- 'Options:'
+  flag    FLAG_C       -c --flag-c
+  param   MODULE_NAME  -n --name
+  disp    :usage       -h --help
+}
+
+run_legacy() {
+  eval "$(getoptions parser_definition_legacy parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+
+  exec_manifest_lookup "${PWD}"
+
+  echo "GLOBAL: $GLOBAL"
+  echo "MANIFEST: $MUSH_MANIFEST_DIR"
+
+  i=0
+  while [ $# -gt 0 ] && i=$((i + 1)); do
+    module_url=$1
+    module_name=$(basename "$1")
+    module_file=target/debug/legacy/$module_name
+    echo "$i Downloading '$module_name' from $1"
+    curl -sL "${module_url}" -o "${module_file}"
+    chmod +x "${module_file}"
+
+    if grep -q "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml"; then
+        legacy_line=$(grep -n -m 1 "\[legacy\]" "$MUSH_MANIFEST_DIR/Manifest.toml" | cut -d: -f1)
+        legacy_tail=$((legacy_line + 1))
+        echo "The section '[legacy]' exists in the INI file at ${legacy_line}."
+        head -n "${legacy_line}" "$MUSH_MANIFEST_DIR/Manifest.toml" > "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        tail -n +"${legacy_line}" "$MUSH_MANIFEST_DIR/Manifest.toml.tmp"
+        mv "$MUSH_MANIFEST_DIR/Manifest.toml.tmp" "$MUSH_MANIFEST_DIR/Manifest.toml"
+    else
+      echo "[legacy]" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
+      echo "${module_name} = \"${module_url}\"" >> "$MUSH_MANIFEST_DIR/Manifest.toml"
+    fi
+
+    echo "OK!"
+    shift
+  done
+
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions -o target/debug/legacy/getoptions
+  #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
+}
+
+parser_definition_new() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_new() {
+  eval "$(getoptions parser_definition_new parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  if [ -e "$1" ]; then
+    console_error "Destination '$1' already exists"
+    exit 101
+  fi
+
+  mkdir -p "$1"
+
+  cd "$1" || exit 101
+
+  exec_init
+}
+
+parser_definition_run() {
+  setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} run [OPTIONS] [--] [args]..." ''
+
+  msg -- 'OPTIONS:'
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_args_error() {
+  case "$2" in
+    unknown)
+      echo -e "\e[1m\e[31merror:\e[0m unexpected argument '\e[33m-${3}\e[0m' found"
+      echo -e ""
+      echo -e "\e[32m  tip:\e[0m to pass '\e[33m${3}\e[0m' as a value, use '\e[32m-- ${3}\e[0m'"
+      echo -e ""
+      echo -e "\e[1m\e[4mUsage:\e[0m \e[1mmush run\e[0m [OPTIONS] [args]..."
+      echo -e ""
+      echo -e "For more information, try '\e[1m--help\e[0m'."
+      ;;
+    *)
+      echo "ERROR: ($2,$3) $1"
+      ;;
+  esac
+  exit 101
+}
+
+run_run() {
+  eval "$(getoptions parser_definition_run parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup "${PWD}"
+
+  MUSH_TARGET_PATH=target/debug
+
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  if [ -z "${EXAMPLE_NAME}" ]; then
+    local src_file=src/main.sh
+    local bin_file=target/debug/$MUSH_PACKAGE_NAME
+  else
+    local src_file=examples/$EXAMPLE_NAME.sh
+    local bin_file=target/debug/examples/$EXAMPLE_NAME
+
+    if [ ! -f "${src_file}" ]; then
+      console_error "no example target named '${EXAMPLE_NAME}'."
+      echo ""
+      local examples=$(find examples/ -type f -name '*.sh' -exec basename {} .sh \; 2>/dev/null | sed 's/^/    /')
+      [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
+      exit 101
+    fi
+  fi
+
+  console_status "Compiling" "'${bin_file}'"
+
+  local lib_file=src/lib.sh
+  if [ -f "${lib_file}" ]; then
+    compile_file "${lib_file}"
+  else
+    local lib_file=
+  fi
+
+  exec_build_debug "${src_file}" "${bin_file}" "${lib_file}"
+
+  compile_file "${src_file}"
+
+  console_status "Running" "'${bin_file}'"
+
+  exec "${bin_file}" "$@"
+}
+
+parser_definition_publish() {
+	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
+
+  msg     -- 'USAGE:' "  ${2##*/} publish [OPTIONS]" ''
+
+	msg     -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	flag    ALLOW_DIRTY  --allow-dirty  -- "Build artifacts in release mode, with optimizations"
+	param   MODULE_NAME  -n --name
+
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_publish() {
+  eval "$(getoptions parser_definition_publish parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  echo "ALLOW_DIRTY: $ALLOW_DIRTY"
+
+  MUSH_TARGET_PATH=target/release
+  exec_manifest_lookup "${PWD}"
+
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_build_release "$@"
+
+  exec_publish
+}
+
+parser_definition_test() {
+	setup   REST help:usage abbr:true -- "Execute all unit and integration tests and build examples of a local package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} test [OPTIONS] [TESTNAME] [-- [args]...]" ''
+
+  # Arguments:
+  #   [TESTNAME]  If specified, only run tests containing this string in their names
+  #   [args]...   Arguments for the test binary
+
+	msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   BUILD_RELEASE  -r --release                      -- "Build artifacts in release mode, with optimizations"
+
+  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_test() {
+  eval "$(getoptions parser_definition_test parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup "${PWD}"
+
+  mush_build_profile_init
+
+  exec_legacy_fetch "${MUSH_TARGET_PATH}"
+  exec_legacy_build "${MUSH_TARGET_PATH}"
+
+  exec_dependencies "${MUSH_TARGET_PATH}"
+
+  local package_name="${MUSH_PACKAGE_NAME}"
+  local package_version="${MUSH_PACKAGE_VERSION}"
+  local pwd=${PWD}
+
+  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+
+  exec_build_test
+
+  bin_file=target/debug/bin/test/$MUSH_PACKAGE_NAME
+
+  console_status "Compiling" "'${bin_file}'"
+
+  exec "$bin_file" "$@"
+}
+
+parser_definition_uninstall() {
+	setup   REST help:usage abbr:true -- "Compile the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+
+	msg -- 'OPTIONS:'
+	flag    FLAG_C       -c --flag-c
+	param   MODULE_NAME  -n --name
+	param   BUILD_TARGET -t --target
+	disp    :usage       -h --help
+}
+
+run_uninstall() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+
+  cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
+}
+
+extern package code_dumper
+
+mush_errors_explain() {
+    echo "Explain: $1"
+}
+
+error_package_not_found() {
+  local package_name=$MUSH_PACKAGE_NAME
+  local extern_package_name=$1
+  local debug_file=$2
+  local debug_line
+
+  debug_line=$(awk "/extern package ${extern_package_name}/{ print NR; exit }" "${debug_file}")
+  [ -z "${debug_line}" ] && debug_line=$(awk "/${extern_package_name}/{ print NR; exit }" "${debug_file}")
+  [ -z "${debug_line}" ] && debug_line=1
+
+  console_error_code "E0463" "can't find package for '${extern_package_name}'"
+  code_dumper "${debug_file}" "${debug_line}" "${extern_package_name}" "can't find package"
+
+  console_hint "For more information about this error, try 'mush --explain E0463'."
+  console_error "could not compile '${package_name}' due to previous error"
+}
+
+error_E0583_file_not_found() {
+  local package_name
+  local module_name
+  local debug_file
+  local debug_line
+  local help
+
+  package_name=$MUSH_PACKAGE_NAME
+  module_name=$1
+  debug_file=$2
+  debug_line=$3
+  help="module not found" "to create the module '${module_name}', create file 'src/mod2.rs' or 'src/mod2/mod.rs'"
+
+  console_error_code "E0583" "file not found for module '${module_name}'"
+  code_dumper "${debug_file}" "${debug_line}" "${module_name}" "${help}"
+
+  console_hint "For more information about this error, try 'mush --explain E0463'."
+  console_error "could not compile '${package_name}' due to previous error"
+}
+
+console_error_code() {
+   echo -e "${ESCAPE}[1;31merror[$1]${ESCAPE}[1;39m: $2${ESCAPE}[0m" >&2
+}
+
+console_hint() {
+  echo -e "${ESCAPE}[1;39m$1${ESCAPE}[0m" >&2
+}
