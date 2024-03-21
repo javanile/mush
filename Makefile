@@ -45,11 +45,11 @@ publish-stable:
 	@git commit -am "Stable Release" || true
 	@git checkout stable
 	@git pull
-	@rm -fr bin lib target
 	@echo "========[ Publish Stable ]==================================="
 	@mush build --release || true
 	@mush publish --allow-dirty || true
 	@echo "============================================================="
+	@rm -fr bin lib target
 	@git add .
 	@git commit -am "Stable Release" || true
 	@git push
