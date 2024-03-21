@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
+## @package: mush
 ## @build_type: bin
-## @build_date: 2024-03-21T20:48:32Z
+## @build_date: 2024-03-21T21:01:45Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -837,7 +838,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T20:47:43Z
+## @build_date: 2024-03-21T21:01:28Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1142,6 +1143,7 @@ exec_build_release() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @package: ${name}" >> "${build_file}"
   echo "## @build_type: bin" >> "${build_file}"
   echo "## @build_date: ${build_date}" >> "${build_file}"
 
@@ -2097,7 +2099,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T20:47:50Z
+## @build_date: 2024-03-21T21:01:36Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2156,7 +2158,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T20:47:59Z
+## @build_date: 2024-03-21T21:01:45Z
 set -e
 use() { return 0; }
 extern() { return 0; }
