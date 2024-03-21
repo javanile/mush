@@ -47,7 +47,7 @@ publish-stable:
 	@git pull
 	@echo "========[ Publish Stable ]==================================="
 	@mush build --release || true
-	@mush publish || true
+	@mush publish --allow-dirty || true
 	@echo "============================================================="
 	@git add .
 	@git commit -am "Stable Release" || true
