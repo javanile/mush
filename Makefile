@@ -30,11 +30,21 @@ install:
 sudo-install:
 	@sudo install -m 0755 target/releasemush /usr/local/bin/
 
+mush-install:
+	@bash ./bin/mush build --release
+	@bash ./bin/mush install --path .
+
 publish:
 	@git add .
 	@git commit -am "Nightly Release" || true
 	@git push
 	@mush publish
+
+publish-stable: mush-install
+	@git checkout stable
+	@git pull
+	@mush publish || true
+	@git checkout main
 
 ## ====
 ## Docs
