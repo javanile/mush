@@ -38,7 +38,7 @@ publish:
 	@git add .
 	@git commit -am "Nightly Release" || true
 	@git push
-	@mush publish
+	@mush publish --allow-dirty
 
 publish-stable:
 	@git add .
