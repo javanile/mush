@@ -2,7 +2,10 @@
 /.vscode/
 /.bundles_cache/
 /.mush/
+/bin/
 /coverage/
+/lib/
+/target/
 /tests/temp/
 /tests/tmp/
 /docs/_site/
