@@ -46,7 +46,7 @@ publish-stable:
 	@git checkout stable
 	@git pull
 	@echo "========[ Publish Stable ]==================================="
-	@mush install || true
+	@mush build --release || true
 	@mush publish || true
 	@echo "============================================================="
 	@git add .
