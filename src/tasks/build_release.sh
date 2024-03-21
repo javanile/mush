@@ -18,6 +18,7 @@ exec_build_release() {
 
   echo "#!/usr/bin/env bash" > $build_file
   echo "## BP010: Release metadata" >> "${build_file}"
+  echo "## @package: ${name}" >> "${build_file}"
   echo "## @build_type: bin" >> "${build_file}"
   echo "## @build_date: ${build_date}" >> "${build_file}"
 
