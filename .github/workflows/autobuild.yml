@@ -14,7 +14,8 @@ jobs:
       matrix:
         public_copy:
           - https://raw.githubusercontent.com/javanile/mush/main/bin/mush
-          - https://raw.githubusercontent.com/javanile/mush/stable/bin/mush
+          - https://github.com/javanile/mush/releases/download/0.2.0/mush
+          - https://github.com/javanile/mush/releases/download/0.1.1/mush
     steps:
       - uses: actions/checkout@v4
       - run: curl -sL ${{ matrix.public_copy }} > /usr/local/bin/mush && chmod +x /usr/local/bin/mush && mush --version
