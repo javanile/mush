@@ -1,17 +1,20 @@
 on:
+  push:
+    branches: ['main']
   workflow_dispatch:
 
-name: "autobuild"
+name: autobuild
 permissions: {}
 
 jobs:
-  build:
-    name: ShellCheck
+  autobuild:
+    name: autobuild
     runs-on: ubuntu-latest
     strategy:
       matrix:
         public_copy:
           - https://raw.githubusercontent.com/javanile/mush/main/bin/mush
+          - https://raw.githubusercontent.com/javanile/mush/stable/bin/mush
     steps:
       - uses: actions/checkout@v4
       - run: curl -sL ${{ matrix.public_copy }} > /usr/local/bin/mush && chmod +x /usr/local/bin/mush && mush --version
