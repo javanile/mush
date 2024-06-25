@@ -30,11 +30,30 @@ install:
 sudo-install:
 	@sudo install -m 0755 target/releasemush /usr/local/bin/
 
+mush-install:
+	@bash ./bin/mush build --release
+	@bash ./bin/mush install --path .
+
 publish:
 	@git add .
 	@git commit -am "Nightly Release" || true
 	@git push
-	@mush publish
+	@mush publish --allow-dirty
+
+publish-stable:
+	@git add .
+	@git commit -am "Stable Release" || true
+	@git checkout stable
+	@git pull
+	@rm -fr bin lib target
+	@echo "========[ Publish Stable ]==================================="
+	@mush build --release || true
+	@mush publish --allow-dirty || true
+	@echo "============================================================="
+	@git add .
+	@git commit -am "Stable Release" || true
+	@git push
+	@git checkout main
 
 ## ====
 ## Docs

@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🎉 **Exciting News** 🎉<br>**Release 0.2.0 on March 14, 2024!** 
+# 🎉 **Exciting News** 🎉<br>**Release 0.3.0 on March 14, 2025!** 
 
 </div>
 
 Dear users and enthusiasts of our project,
 
-We are thrilled to announce that the release 0.2.0 of our project is on its way, and there's a special reason to celebrate it! 🚀
+We are thrilled to announce that the release 0.3.0 of our project is on its way, and there's a special reason to celebrate it! 🚀
 
 ✨ **Release Date:** March 14th, on **Pi Day** (3.14) 🥳
 

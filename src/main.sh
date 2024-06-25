@@ -11,7 +11,7 @@ module package_managers
 module registry
 module tasks
 
-VERSION="Mush 0.1.1 (2023-11-03)"
+VERSION="Mush 0.2.0 (2024-03-21)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
