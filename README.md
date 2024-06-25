@@ -22,6 +22,7 @@ Stay tuned!
 
 # 🍄 Mush
 
+[![autobuild](https://github.com/javanile/mush/actions/workflows/autobuild.yml/badge.svg)](https://github.com/javanile/mush/actions/workflows/autobuild.yml)
 [![ShellCheck](https://github.com/javanile/mush/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/javanile/mush/actions/workflows/shellcheck.yml)
 [![License](https://img.shields.io/github/license/javanile/mush.svg)](https://github.com/javanile/mush/blob/main/LICENSE)
 
