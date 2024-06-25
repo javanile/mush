@@ -23,7 +23,7 @@ jobs:
           #  url: https://github.com/javanile/mush/releases/download/0.1.0/mush
     steps:
       - uses: actions/checkout@v4
-      - run: curl -sL ${{ matrix.public_copy.url }} > public_copy && chmod +x public_copy && public_copy --version
+      - run: curl -sL ${{ matrix.public_copy.url }} > public_copy && chmod +x public_copy && ./public_copy --version
       - run: ./public_copy build && cp ./target/debug/mush debug0_copy
       - run: ./public_copy build --release && cp ./bin/mush release0_copy
       - run: ./debug0_copy build && cp ./target/debug/mush debug1_copy
