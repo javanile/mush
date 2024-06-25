@@ -79,10 +79,17 @@ TODO...
 
 See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CONTRIBUTING.md), obviously pull-request are welcome.
 
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Francesco Bianco via bianco@javanile.org. All security vulnerabilities will be promptly addressed.
+
 ## Community & Questions
 
-- [GitHub Issues](https://github.com/javanile/mush/issues): report a bug or raise a feature request to the Mush core team
-- [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): see existing Q&A for `BASH` and `Unit Testing`. We look at them often
+To interact with us, you can find us in the following ways:
+
+- [GitHub Issues](https://github.com/javanile/mush/issues): Report a bug or raise a feature request to the Mush core team
+- [Mush on Discord](https://discord.com/invite/SVx7JHjAcY): Join the `#mush` channel on the Javanile Discord community 
+- [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): See existing Q&A for `BASH` and `Unit Testing`. We look at them often
 
 ## License
 
