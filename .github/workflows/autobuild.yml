@@ -19,10 +19,22 @@ jobs:
             url: https://github.com/javanile/mush/releases/download/0.2.0/mush
           - name: "0.1.1"
             url: https://github.com/javanile/mush/releases/download/0.1.1/mush
-          - name: "0.1.0"
-            url: https://github.com/javanile/mush/releases/download/0.1.0/mush
+          #- name: "0.1.0"
+          #  url: https://github.com/javanile/mush/releases/download/0.1.0/mush
     steps:
       - uses: actions/checkout@v4
-      - run: curl -sL ${{ matrix.public_copy.url }} > /usr/local/bin/mush && chmod +x /usr/local/bin/mush && mush --version
-      - run: /usr/local/bin/mush build
-      - run: /usr/local/bin/mush build --release
+      - run: curl -sL ${{ matrix.public_copy.url }} > public_copy && chmod +x public_copy && public_copy --version
+      - run: ./public_copy build && cp ./target/debug/mush debug0_copy
+      - run: ./public_copy build --release && cp ./bin/mush release0_copy
+      - run: ./debug0_copy build && cp ./target/debug/mush debug1_copy
+      - run: ./debug0_copy build --release && cp ./bin/mush debug2_copy
+      - run: ./debug1_copy build
+      - run: ./debug1_copy build --release
+      - run: ./debug2_copy build
+      - run: ./debug2_copy build --release
+      - run: ./release0_copy build && cp ./target/debug/mush release1_copy
+      - run: ./release0_copy build --release && cp ./bin/mush release2_copy
+      - run: ./release1_copy build
+      - run: ./release1_copy build --release
+      - run: ./release2_copy build
+      - run: ./release2_copy build --release
