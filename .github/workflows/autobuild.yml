@@ -13,11 +13,16 @@ jobs:
     strategy:
       matrix:
         public_copy:
-          - https://raw.githubusercontent.com/javanile/mush/main/bin/mush
-          - https://github.com/javanile/mush/releases/download/0.2.0/mush
-          - https://github.com/javanile/mush/releases/download/0.1.1/mush
+          - name: "main"
+            url: https://raw.githubusercontent.com/javanile/mush/main/bin/mush
+          - name: "0.2.0"
+            url: https://github.com/javanile/mush/releases/download/0.2.0/mush
+          - name: "0.1.1"
+            url: https://github.com/javanile/mush/releases/download/0.1.1/mush
+          - name: "0.1.0"
+            url: https://github.com/javanile/mush/releases/download/0.1.0/mush
     steps:
       - uses: actions/checkout@v4
-      - run: curl -sL ${{ matrix.public_copy }} > /usr/local/bin/mush && chmod +x /usr/local/bin/mush && mush --version
+      - run: curl -sL ${{ matrix.public_copy.url }} > /usr/local/bin/mush && chmod +x /usr/local/bin/mush && mush --version
       - run: /usr/local/bin/mush build
       - run: /usr/local/bin/mush build --release
