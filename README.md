@@ -74,7 +74,18 @@ cd demo && ./bin/mush build --release
 
 ## Cheat Sheet
 
-TODO...
+This cheatsheet provides an overview of essential keywords used in the Mush scripting language and their purposes.
+
+- **`module`**: Loads a module, encapsulating code and allowing for modularity. A module can be a single file or a folder containing a `module.sh` file.
+
+- **`public`**: Marks a submodule as accessible from outside the module.
+
+- **`extern package`**: Specifies an external package or dependency to be used.
+
+- **`embed`**: Includes external files or resources into the Mush codebase.
+
+For further details, please consult the [Reference documentation](https://mush.javanile.org/reference/).
+
 
 ## Contributing
 
