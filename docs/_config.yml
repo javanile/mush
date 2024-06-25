@@ -1,5 +1,6 @@
 title: "🍄 Mush"
-remote_theme: just-the-docs/just-the-docs@main
+remote_theme: "just-the-docs/just-the-docs@main"
+url: "https://mush.javanile.org"
 
 plugins:
   - jekyll-sitemap
@@ -9,3 +10,15 @@ aux_links:
     - "https://github.com/javanile/mush"
   "<img src='/assets/img/discord.svg'/>":
     - "https://discord.gg/SVx7JHjAcY"
+
+footer_content: >
+  © 2024 Francesco Bianco. All rights reserved.
+  <style>
+    div.site-header sup { 
+      background: red; 
+      font-size: 12px;
+      padding: 2px 4px 1px;
+      line-height: 14px; color: #fff;
+     font-weight: bold; }
+  </style>
+  <script>document.querySelector('div.site-header a').appendChild(document.createElement('sup')).innerHTML = 'ALPHA';</script>
