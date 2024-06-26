@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush run
-permalink: /commands/run.html
+permalink: /commands/run/
 parent: CLI Commands
 nav_order: 04
 ---

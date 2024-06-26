@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush
-permalink: /commands/mush.html
+permalink: /commands/mush/
 parent: CLI Commands
 nav_order: 01
 ---

@@ -16,3 +16,34 @@
 .main-content .options-table th {
   display: none;
 }
+
+div.site-header sup {
+  background: red;
+  font-size: 12px;
+  padding: 2px 4px 1px;
+  line-height: 14px;
+  color: #fff;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.site-title {
+  font-weight: bold;
+  font-family: sans-serif;
+}
+
+.nav-list .nav-list-item .nav-list-link.active {
+  color: red;
+}
+
+.nav-list .nav-list-item>.nav-list .nav-list-item .nav-list-link.active {
+  color: red;
+}
+
+.main-content h1:first-of-type {
+  border-bottom: 2px solid red;
+}
+
+.main-content h1#mush:first-of-type {
+  border-bottom: none;
+}

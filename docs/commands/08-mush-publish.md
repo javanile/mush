@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush publish
-permalink: /commands/publish.html
+permalink: /commands/publish/
 parent: CLI Commands
 nav_order: 08
 ---

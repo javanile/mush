@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush build
-permalink: /commands/build.html
+permalink: /commands/build/
 parent: CLI Commands
 nav_order: 02
 ---

@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush new
-permalink: /commands/new.html
+permalink: /commands/new/
 parent: CLI Commands
 nav_order: 07
 ---

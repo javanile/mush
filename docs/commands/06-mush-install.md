@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush install
-permalink: /commands/install.html
+permalink: /commands/install/
 parent: CLI Commands
 nav_order: 06
 ---

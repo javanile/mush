@@ -10,7 +10,7 @@ compliance: 1
 
 ![Huge Amount of Mud](assets/img/memes/meme-02.jpg)
 
-Mush is the shell package builder. Mush downloads your shell package's dependencies, 
+Mush is the shell package builder. Mush downloads your [shell package's](/glossary/#shell-package) dependencies, 
 compiles your packages, makes distributable packages, and uploads them to GitHub, 
 as public community’s package registry. You can contribute to this project on GitHub.
 

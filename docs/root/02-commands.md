@@ -14,15 +14,15 @@ Explore the powerful capabilities of Mush by utilizing its versatile set of comm
 Whether you're building, running, adding, or installing components, Mush streamlines your workflow 
 for efficient development. Discover the following commands at your disposal:
 
-- [mush](commands/mush.md)
-- [mush build](commands/mush-build.md)
-- [mush check](commands/mush-check.md)
-- [mush run](commands/mush-run.md)
-- [mush init](commands/mush-init.md)
-- [mush install](commands/mush-install.md)
-- [mush new](commands/mush-new.md)
-- [mush publish](commands/mush-publish.md)
-- [mush legacy](commands/mush-legacy.md)
+- [mush](/commands/mush/)
+- [mush build](/commands/build/)
+- [mush check](/commands/check/)
+- [mush run](/commands/run/)
+- [mush init](/commands/init/)
+- [mush install](/commands/install/)
+- [mush new](/commands/new/)
+- [mush publish](/commands/publish/)
+- [mush legacy](/commands/legacy/)
 
 With Mush, harness the full potential of your development journey with these intuitive and essential commands.
 
