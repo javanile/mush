@@ -74,9 +74,9 @@ index https://github.com/another-registry/mush-packages
 index https://github.com/yet-another-registry/mush-packages
 
 ## Example 4: Mixed packages and version constraints
-package toolA https://github.com/devops/toolA.git
-package toolB^1.0.0 https://github.com/devops/toolB.git packages/toolB_v1
-package toolB^2.0.0 https://github.com/devops/toolB.git packages/toolB_v2
+package tool_a https://github.com/devops/tool_a.git
+package tool_b^1.0.0 https://github.com/devops/tool_b.git packages/tool_b_v1
+package tool_b^2.0.0 https://github.com/devops/tool_b.git packages/tool_b_v2
 ```
 
 ## Benefits of a Distributed Registry
