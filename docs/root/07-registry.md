@@ -16,7 +16,7 @@ The `.packages` file is the cornerstone of the Mush distributed registry. It ena
 
 ## The Root Node
 
-The `.packages` file lists all the packages that will be installed or updated using `mush install`. The main file is hosted at [Mush Repository](https://github.com/javanile/mush/blob/main/.packages), and everyone can request a pull to this file to add their packages or registries.
+The `.packages` file lists all the packages that will be installed or updated using `mush install` command. The main file is hosted at [Mush Repository](https://github.com/javanile/mush/blob/main/.packages), and everyone can request a pull to this file to add their packages or registries.
 
 Here is an example content of the `.packages` file:
 
