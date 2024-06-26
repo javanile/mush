@@ -14,7 +14,7 @@ Just like modern development environments, Mush is equipped with a registry wher
 
 The `.packages` file is the cornerstone of the Mush distributed registry. It enables a decentralized system where anyone can contribute and maintain packages. Here's a breakdown of how it works and the benefits it offers.
 
-## How It Works
+## The Root Node
 
 The `.packages` file lists all the packages that will be installed or updated during usage. The main file is hosted at [Mush Repository](https://github.com/javanile/mush/blob/main/.packages), and everyone can request a pull to this file to add their packages or registries.
 
@@ -37,6 +37,8 @@ package test_with_bashunit https://github.com/javanile/mush.git packages/test_wi
 ```
 
 ## Creating Your Registry
+
+To create your registry and add your packages to the main index, follow these steps:
 
 1. **Create Your Repository**: Anyone can create their repository anywhere they like.
 2. **Add a `.packages` File**: In the root of your repository, create a `.packages` file that describes the packages it contains. For example:
@@ -78,6 +80,8 @@ package toolB^2.0.0 https://github.com/devops/toolB.git packages/toolB_v2
 ```
 
 ## Benefits of a Distributed Registry
+
+We believe that a distributed registry offers several advantages over a centralized one:
 
 1. **Decentralization**: A distributed registry removes the need for a single point of failure. Multiple users can maintain their own package lists.
 2. **Scalability**: The registry can grow organically as new users add their packages, without requiring centralized management.
