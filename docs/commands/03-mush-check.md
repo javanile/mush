@@ -1,8 +1,9 @@
 ---
 layout: default
 title: mush check
+permalink: /commands/check.html
 parent: CLI Commands
-nav_order: 11
+nav_order: 03
 ---
 
 # mush check(1)

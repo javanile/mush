@@ -1,8 +1,9 @@
 ---
 layout: default
 title: mush legacy
+permalink: /commands/legacy.html
 parent: CLI Commands
-nav_order: 20
+nav_order: 09
 ---
 
 # mush-legacy

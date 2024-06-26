@@ -14,9 +14,10 @@ Mush is the shell package builder. Mush downloads your shell package's dependenc
 compiles your packages, makes distributable packages, and uploads them to GitHub, 
 as public community’s package registry. You can contribute to this project on GitHub.
 
-> This project is mostly inspired by Rust and Cargo!
+> **📜 This project is mostly inspired by Rust and Cargo!**    
+> _We would like to acknowledge and credit the authors of Rust and Cargo for the majority of the work in this project. Much of the technical solutions, developer experience, content, and documentation are heavily inspired by and borrowed from the Rust and Cargo codebases. We extend our gratitude and give full credit to them for their invaluable contributions._
 
-## Get Started
+## Get Started!
 
 The easiest way to get Mush is to install the current stable release from GitHub by using curl.
 Installing Mush using curl will also create a directory at `$HOME/.mush/bin` where you can host the scripts you'll install subsequently.
@@ -27,7 +28,7 @@ On Linux and macOS systems, this is done as follows:
 $ curl get.javanile.org/mush | sh
 ```
 
-## First Steps with Mush
+## First steps with Mush
 
 This section provides a quick sense for the `mush` command line tool. We
 demonstrate its ability to generate a new package for us,

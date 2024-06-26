@@ -18,11 +18,11 @@ for efficient development. Discover the following commands at your disposal:
 - [mush build](commands/mush-build.md)
 - [mush check](commands/mush-check.md)
 - [mush run](commands/mush-run.md)
-- [mush legacy](commands/mush-legacy.md)
 - [mush init](commands/mush-init.md)
 - [mush install](commands/mush-install.md)
 - [mush new](commands/mush-new.md)
 - [mush publish](commands/mush-publish.md)
+- [mush legacy](commands/mush-legacy.md)
 
 With Mush, harness the full potential of your development journey with these intuitive and essential commands.
 

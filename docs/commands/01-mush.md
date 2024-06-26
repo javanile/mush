@@ -1,11 +1,12 @@
 ---
 layout: default
 title: mush
+permalink: /commands/mush.html
 parent: CLI Commands
-nav_order: 0
+nav_order: 01
 ---
 
-# mush(1)
+# mush
 
 ## NAME
 
@@ -21,12 +22,11 @@ mush --- The shell package manager
 
 ## DESCRIPTION
 
-This program is a package manager and build tool for the Rust language,
-available at <https://rust-lang.org>.
+This program is a package manager and build tool for the shell scripting language.
 
 ## COMMANDS
 
-### Build Commands
+### Build commands
 
 <!--
 [cargo-bench(1)](cargo-bench.html)\
