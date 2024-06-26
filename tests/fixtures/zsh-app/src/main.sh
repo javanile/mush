@@ -10,10 +10,14 @@ function do_something() {
 
 # A function to handle any caught exceptions
 function error_handler() {
-  local exception="$1" message="${(@)@:2}"
+  local exception
+  local message
 
-  echo $exception # RainbowException
-  echo $message   # Unicorns!
+  exception="$1"
+  message="${(@)@:2}"
+
+  echo "$exception" # RainbowException
+  echo "$message"   # Unicorns!
 }
 
 main() {
