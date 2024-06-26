@@ -1,14 +1,26 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T21:09:01Z
+## @build_date: 2023-11-14T09:34:39Z
 set -e
-use() { return 0; }
-extern() { return 0; }
-legacy() { return 0; }
-module() { return 0; }
-public() { return 0; }
-embed() { return 0; }
+extern() {
+  extern=$1
+}
+legacy() {
+  legacy=$1
+}
+module() {
+  module=$1
+}
+public() {
+  public=$1
+}
+use() {
+  use=$1
+}
+embed() {
+  embed=$1
+}
 ## BP004: Compile the entrypoint
 
 legacy getoptions

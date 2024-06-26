@@ -1,19 +1,23 @@
 ---
 layout: default
-title: mush install
+title: mush legacy
+permalink: /commands/legacy/
 parent: CLI Commands
-nav_order: 31
+nav_order: 09
 ---
 
-# mush install
+# mush-legacy
 
 ## NAME
-cargo-init - Create a new Cargo package in an existing directory
+
+cargo-legacy - Create a new Cargo package in an existing directory
 
 ## SYNOPSIS
-cargo init [options] [path]
+
+cargo legacy [options] [url]
 
 ## DESCRIPTION
+
 This command will create a new Cargo manifest in the current directory. Give a path as an argument to create in the given directory.
 
 If there are typically-named Rust source files already in the directory, those will be used. If not, then a sample src/main.rs file will be created, or src/lib.rs if --lib is passed.
@@ -23,6 +27,7 @@ If the directory is not already in a VCS repository, then a new repository is cr
 See cargo-new(1) for a similar command which will create a new package in a new directory.
 
 ## OPTIONS
+
 Init Options
 --bin
 Create a package with a binary target (src/main.rs). This is the default behavior.
@@ -39,6 +44,7 @@ This sets the publish field in Cargo.toml to the given registry name which will 
 Registry names are defined in Cargo config files. If not specified, the default registry defined by the registry.default config key is used. If the default registry is not set and --registry is not used, the publish field will not be set which means that publishing will not be restricted.
 
 ### Display Options
+
 -v
 --verbose
 Use verbose output. May be specified twice for "very verbose" output which includes extra output such as dependency warnings and build script output. May also be specified with the term.verbose config value.
@@ -53,6 +59,7 @@ never: Never display colors.
 May also be specified with the term.color config value.
 
 ### Common Options
+
 +toolchain
 If Cargo has been installed with rustup, and the first argument to cargo begins with +, it will be interpreted as a rustup toolchain name (such as +stable or +nightly). See the rustup documentation for more information about how toolchain overrides work.
 --config KEY=VALUE or PATH
@@ -64,9 +71,11 @@ Prints help information.
 Unstable (nightly-only) flags to Cargo. Run cargo -Z help for details.
 
 ## ENVIRONMENT
+
 See the reference for details on environment variables that Cargo reads.
 
 ## EXIT STATUS
+
 0: Cargo succeeded.
 101: Cargo failed to complete.
 EXAMPLES
@@ -75,4 +84,5 @@ Create a binary Cargo package in the current directory:
 cargo init
 
 ## SEE ALSO
+
 cargo(1), cargo-new(1)

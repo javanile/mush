@@ -2,7 +2,7 @@
 layout: default
 title: Contribute
 permalink: /contribute/
-nav_order: 08
+nav_order: 10
 has_children: true
 has_toc: false
 ---

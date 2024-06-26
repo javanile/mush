@@ -1,8 +1,9 @@
 ---
 layout: default
 title: mush publish
+permalink: /commands/publish/
 parent: CLI Commands
-nav_order: 40
+nav_order: 08
 ---
 
 # cargo-publish

@@ -64,16 +64,16 @@ serve-docs:
 	@echo 'gem "github-pages", "~> 219", group: :jekyll_plugins' >> docs/Gemfile
 	@echo 'gem "kramdown-parser-gfm"' >> docs/Gemfile
 	@echo 'gem "jekyll-include-cache"' >> docs/Gemfile
+	@echo 'gem "jekyll-sitemap"' >> docs/Gemfile
 	@echo 'baseurl: ""' > docs/_config_dev.yml
 	@echo 'repository: "javanile/mush"' >> docs/_config_dev.yml
-	@mkdir -p "docs/.bundles_cache"
 	@docker run --rm -it \
 		-v $$PWD/docs:/srv/jekyll \
 		-v $$PWD/.bundles_cache:/tmp/.bundles_cache \
 		-e BUNDLE_PATH=/tmp/.bundles_cache \
 		-p 4000:4000 \
 		jekyll/builder:3.8 bash -c "\
-			gem install bundler && bundle install && \
+			gem install bundler -v 2.4.22 && bundle install && \
 			bundle exec jekyll serve --host 0.0.0.0 --verbose --config _config.yml,_config_dev.yml"
 
 ## ====

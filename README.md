@@ -1,12 +1,12 @@
 <div align="center">
 
-# 🎉 **Exciting News** 🎉<br>**Release 0.2.0 on March 14, 2024!** 
+# 🎉 **Exciting News** 🎉<br>**Release 0.3.0 on March 14, 2025!** 
 
 </div>
 
 Dear users and enthusiasts of our project,
 
-We are thrilled to announce that the release 0.2.0 of our project is on its way, and there's a special reason to celebrate it! 🚀
+We are thrilled to announce that the release 0.3.0 of our project is on its way, and there's a special reason to celebrate it! 🚀
 
 ✨ **Release Date:** March 14th, on **Pi Day** (3.14) 🥳
 
@@ -22,8 +22,8 @@ Stay tuned!
 
 # 🍄 Mush
 
-[![Build Status](https://travis-ci.com/javanile/pipetest.svg?branch=main)](https://travis-ci.com/javanile/pipetest)
-[![License](https://img.shields.io/github/license/javanile/mush.svg)](https://github.com/javanile/mush/blob/main/LICENSE)
+[![autobuild](https://github.com/javanile/mush/actions/workflows/autobuild.yml/badge.svg)](https://github.com/javanile/mush/actions/workflows/autobuild.yml)
+[![ShellCheck](https://github.com/javanile/mush/actions/workflows/shellcheck.yml/badge.svg)](https://github.com/javanile/mush/actions/workflows/shellcheck.yml)
 
 Mush is the shell package builder. Mush downloads your shell package’s dependencies, compiles your packages, makes distributable packages, and uploads them to GitHub, as public community’s package registry.
 
@@ -73,16 +73,34 @@ cd demo && ./bin/mush build --release
 
 ## Cheat Sheet
 
-TODO...
+This cheatsheet provides an overview of essential keywords used in the Mush scripting language and their purposes.
+
+- **`module`**: Loads a module, encapsulating code and allowing for modularity. A module can be a single file or a folder containing a `module.sh` file.
+
+- **`public`**: Marks a submodule as accessible from outside the module.
+
+- **`extern package`**: Specifies an external package or dependency to be used.
+
+- **`embed`**: Includes external files or resources into the Mush codebase.
+
+For further details, please consult the [Reference documentation](https://mush.javanile.org/reference/).
+
 
 ## Contributing
 
 See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CONTRIBUTING.md), obviously pull-request are welcome.
 
+## Security Vulnerabilities
+
+If you discover a security vulnerability within Laravel, please send an e-mail to Francesco Bianco via bianco@javanile.org. All security vulnerabilities will be promptly addressed.
+
 ## Community & Questions
 
-- [GitHub Issues](https://github.com/javanile/mush/issues): report a bug or raise a feature request to the Mush core team
-- [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): see existing Q&A for `BASH` and `Unit Testing`. We look at them often
+To interact with us, you can find us in the following ways:
+
+- [GitHub Issues](https://github.com/javanile/mush/issues): Report a bug or raise a feature request to the Mush core team
+- [Mush on Discord](https://discord.com/invite/SVx7JHjAcY): Join the `#mush` channel on the Javanile Discord community 
+- [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): See existing Q&A for `BASH` and `Unit Testing`. We look at them often
 
 ## License
 
