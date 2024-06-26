@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Examples
+title: Guidelines
 permalink: /guidelines/
 nav_order: 05
 parent: Miscellaneous
