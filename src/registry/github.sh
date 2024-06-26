@@ -1,6 +1,8 @@
 
 github_get_repository() {
-  local repository_url=$(git config --get remote.origin.url)
+  local repository_url
+
+  repository_url=$(git config --get remote.origin.url)
 
   case "${repository_url}" in
     http*)
@@ -13,8 +15,11 @@ github_get_repository() {
 }
 
 github_create_release() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_tag="$1"
+  local repository
+  local release_tag
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_tag="$1"
 
   curl \
      -s -X POST \
@@ -26,13 +31,20 @@ github_create_release() {
 }
 
 github_upload_release_asset() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_id="$1"
-  local asset_file="$2"
-  local asset_name=$(basename "$asset_file")
-  local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
+  local repository
+  local release_id
+  local asset_file
+  local asset_name
+  local upload_url
+  local upload_result
 
-  local upload_result=$(curl -s -X POST "${upload_url}" \
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_id="$1"
+  asset_file="$2"
+  asset_name=$(basename "$asset_file")
+  upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
+
+  upload_result=$(curl -s -X POST "${upload_url}" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     --data-binary @"$asset_file")
@@ -43,8 +55,11 @@ github_upload_release_asset() {
 }
 
 github_delete_release_asset() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local asset_id="$1"
+  local repository
+  local asset_id
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  asset_id="$1"
 
   curl \
     -s -X DELETE \
@@ -54,9 +69,13 @@ github_delete_release_asset() {
 }
 
 github_get_release_asset_id() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_id="$1"
-  local asset_name="$(basename "$2")"
+  local repository
+  local release_id
+  local asset_name
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_id="$1"
+  asset_name="$(basename "$2")"
 
   curl \
     -s -X GET \
@@ -67,8 +86,11 @@ github_get_release_asset_id() {
 }
 
 github_get_release_id() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_tag="$1"
+  local repository
+  local release_tag
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_tag="$1"
 
   curl \
     -s -X GET \
