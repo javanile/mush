@@ -12,7 +12,10 @@ nav_order: 06
 cargo-init - Create a new Cargo package in an existing directory
 
 ## SYNOPSIS
+
+```console
 cargo init [options] [path]
+```
 
 ## DESCRIPTION
 This command will create a new Cargo manifest in the current directory. Give a path as an argument to create in the given directory.
