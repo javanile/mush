@@ -74,7 +74,6 @@ serve-docs:
 		-p 4000:4000 \
 		jekyll/builder:3.8 bash -c "\
 			gem install bundler -v 2.4.22 && bundle install && \
-			bundle exec rougify style monokai > /srv/jekyll/assets/css/syntax.css && \
 			bundle exec jekyll serve --host 0.0.0.0 --verbose --config _config.yml,_config_dev.yml"
 
 ## ====
