@@ -18,7 +18,7 @@
 ##    - <url> specifies the repository where the package is hosted.
 ##    - [subdirectory] (optional) specifies the directory within the repository where the package files are located.
 ##    - Example: package mush https://github.com/javanile/mush.git
-##              package console https://github.com/javanile/mush.git packages/console
+##               package console https://github.com/javanile/mush.git packages/console
 ##
 
 index https://github.com/francescobianco/mush-packages
