@@ -6,7 +6,7 @@ parent: CLI Commands
 nav_order: 03
 ---
 
-# mush check(1)
+# mush check
 
 ## NAME
 
@@ -14,18 +14,22 @@ mush check --- Check the current package
 
 ## SYNOPSIS
 
-`cargo check` [_options_]
+```console
+mush check [OPTIONS]
+```
 
 ## DESCRIPTION
 
 Check a local package and all of its dependencies for errors. This will
 essentially compile the packages without performing the final step of code
-generation, which is faster than running `cargo build`. The compiler will save
+generation, which is faster than running `mush build`. The compiler will save
 metadata files to disk so that future runs will reuse them if the source has
 not been modified. Some diagnostics and errors are only emitted during code
-generation, so they inherently won't be reported with `cargo check`.
+generation, so they inherently won't be reported with `mush check`.
 
 ## OPTIONS
+
+<!---
 
 ### Package Selection
 
@@ -249,61 +253,31 @@ Defaults to <code>target</code> in the root of the workspace.</dd>
 
 </dl>
 
+--->
+
 ### Display Options
 
-<dl>
-<dt class="option-term" id="option-cargo-check--v"><a class="option-anchor" href="#option-cargo-check--v"></a><code>-v</code></dt>
-<dt class="option-term" id="option-cargo-check---verbose"><a class="option-anchor" href="#option-cargo-check---verbose"></a><code>--verbose</code></dt>
-<dd class="option-desc">Use verbose output. May be specified twice for “very verbose” output which
-includes extra output such as dependency warnings and build script output.
-May also be specified with the <code>term.verbose</code>
-<a href="../reference/config.html">config value</a>.</dd>
-
-
-<dt class="option-term" id="option-cargo-check--q"><a class="option-anchor" href="#option-cargo-check--q"></a><code>-q</code></dt>
-<dt class="option-term" id="option-cargo-check---quiet"><a class="option-anchor" href="#option-cargo-check---quiet"></a><code>--quiet</code></dt>
-<dd class="option-desc">Do not print cargo log messages.
-May also be specified with the <code>term.quiet</code>
-<a href="../reference/config.html">config value</a>.</dd>
-
-
-<dt class="option-term" id="option-cargo-check---color"><a class="option-anchor" href="#option-cargo-check---color"></a><code>--color</code> <em>when</em></dt>
-<dd class="option-desc">Control when colored output is used. Valid values:</p>
-<ul>
-<li><code>auto</code> (default): Automatically detect if color support is available on the
-terminal.</li>
-<li><code>always</code>: Always display colors.</li>
-<li><code>never</code>: Never display colors.</li>
-</ul>
-<p>May also be specified with the <code>term.color</code>
-<a href="../reference/config.html">config value</a>.</dd>
+|                               Option | Description                                                                                                                                                                                                                                                      |
+|-------------------------------------:|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+|                                 `-v` | Use verbose output. May be specified twice for “very verbose” output which includes extra output such as dependency warnings and build script output. May also be specified with the `term.verbose` [config value](../reference/config.html).                                                                                                      |
+|                                 `-q` | Do not print cargo log messages. May also be specified with the `term.quiet` [config value](../reference/config.html).                                                                                                                                              |
+|                     `--color` *when* | Control when colored output is used. Valid values:                                                                                                                                                                                                                |
+|                                      | - `auto` (default): Automatically detect if color support is available on the terminal.                                                                                                                                                                            |
+|                                      | - `always`: Always display colors.                                                                                                                                                                                                                                |
+|                                      | - `never`: Never display colors.                                                                                                                                                                                                                                  |
+|                                      | May also be specified with the `term.color` [config value](../reference/config.html).                                                                                                                                                                               |
+|             `--message-format` *fmt* | The output format for diagnostic messages. Can be specified multiple times and consists of comma-separated values. Valid values:                                                                                                                                 |
+|                                      | - `human` (default): Display in a human-readable text format. Conflicts with `short` and `json`.                                                                                                                                                                   |
+|                                      | - `short`: Emit shorter, human-readable text messages. Conflicts with `human` and `json`.                                                                                                                                                                           |
+|                                      | - `json`: Emit JSON messages to stdout. See [the reference](../reference/external-tools.html#json-messages) for more details. Conflicts with `human` and `short`.                                                                                                   |
+|                                      | - `json-diagnostic-short`: Ensure the `rendered` field of JSON messages contains the “short” rendering from rustc. Cannot be used with `human` or `short`.                                                                                                          |
+|                                      | - `json-diagnostic-rendered-ansi`: Ensure the `rendered` field of JSON messages contains embedded ANSI color codes for respecting rustc’s default color scheme. Cannot be used with `human` or `short`.                                                             |
+|                                      | - `json-render-diagnostics`: Instruct Cargo to not include rustc diagnostics in JSON messages printed, but instead Cargo itself should render the JSON diagnostics coming from rustc. Cargo’s own JSON diagnostics and others coming from rustc are still emitted. Cannot be used with `human` or `short`. |
+{: .options-table }
 
 
 
-<dt class="option-term" id="option-cargo-check---message-format"><a class="option-anchor" href="#option-cargo-check---message-format"></a><code>--message-format</code> <em>fmt</em></dt>
-<dd class="option-desc">The output format for diagnostic messages. Can be specified multiple times
-and consists of comma-separated values. Valid values:</p>
-<ul>
-<li><code>human</code> (default): Display in a human-readable text format. Conflicts with
-<code>short</code> and <code>json</code>.</li>
-<li><code>short</code>: Emit shorter, human-readable text messages. Conflicts with <code>human</code>
-and <code>json</code>.</li>
-<li><code>json</code>: Emit JSON messages to stdout. See
-<a href="../reference/external-tools.html#json-messages">the reference</a>
-for more details. Conflicts with <code>human</code> and <code>short</code>.</li>
-<li><code>json-diagnostic-short</code>: Ensure the <code>rendered</code> field of JSON messages contains
-the “short” rendering from rustc. Cannot be used with <code>human</code> or <code>short</code>.</li>
-<li><code>json-diagnostic-rendered-ansi</code>: Ensure the <code>rendered</code> field of JSON messages
-contains embedded ANSI color codes for respecting rustc’s default color
-scheme. Cannot be used with <code>human</code> or <code>short</code>.</li>
-<li><code>json-render-diagnostics</code>: Instruct Cargo to not include rustc diagnostics
-in JSON messages printed, but instead Cargo itself should render the
-JSON diagnostics coming from rustc. Cargo’s own JSON diagnostics and others
-coming from rustc are still emitted. Cannot be used with <code>human</code> or <code>short</code>.</li>
-</ul></dd>
-
-
-</dl>
+<!----
 
 ### Manifest Options
 
@@ -412,6 +386,11 @@ produced during execution of this command</p>
 
 </dl>
 
+---->
+
+
+
+
 ## ENVIRONMENT
 
 See [the reference](../reference/environment-variables.html) for
@@ -420,20 +399,20 @@ details on environment variables that Cargo reads.
 
 ## EXIT STATUS
 
-* `0`: Cargo succeeded.
-* `101`: Cargo failed to complete.
+* `0` - Cargo succeeded.
+* `101` - Cargo failed to complete.
 
 
 ## EXAMPLES
 
 1. Check the local package for errors:
 
-       cargo check
+       mush check
 
 2. Check all targets, including unit tests:
 
-       cargo check --all-targets --profile=test
+       mush check --all-targets --profile=test
 
 ## SEE ALSO
 
-[mush(1)](cargo.html), [cargo-build(1)](cargo-build.html)
+[mush](/commands/mush/), [mush build](/commands/build/)

@@ -14,11 +14,13 @@ mush --- The shell package manager
 
 ## SYNOPSIS
 
-`mush` [_options_] _command_ [_args_]\
-`mush` [_options_] `--version`\
-`mush` [_options_] `--list`\
-`mush` [_options_] `--help`\
-`mush` [_options_] `--explain` _code_
+```console
+mush [OPTIONS] COMMAND [ARGS]
+mush [OPTIONS] --version
+mush [OPTIONS] --list
+mush [OPTIONS] --help
+mush [OPTIONS] --explain CODE
+```
 
 ## DESCRIPTION
 
@@ -33,10 +35,10 @@ This program is a package manager and build tool for the shell scripting languag
 &nbsp;&nbsp;&nbsp;&nbsp;Execute benchmarks of a package.
 -->
 
-[cargo-build(1)](cargo-build.html)\
+[mush build](/commands/build/)\
 &nbsp;&nbsp;&nbsp;&nbsp;Compile a package.
 
-[cargo-check(1)](cargo-check.html)\
+[mush check](/commands/check)\
 &nbsp;&nbsp;&nbsp;&nbsp;Check a local package and all of its dependencies for errors.
 
 <!--
@@ -51,10 +53,12 @@ This program is a package manager and build tool for the shell scripting languag
 
 [cargo-fix(1)](cargo-fix.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Automatically fix lint warnings reported by rustc.
+--->
 
-[cargo-run(1)](cargo-run.html)\
+[mush run](/commands/run/)\
 &nbsp;&nbsp;&nbsp;&nbsp;Run a binary or example of the local package.
 
+<!--
 [cargo-rustc(1)](cargo-rustc.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Compile a package, and pass extra options to the compiler.
 
@@ -89,26 +93,30 @@ This program is a package manager and build tool for the shell scripting languag
 
 [cargo-verify-project(1)](cargo-verify-project.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Check correctness of crate manifest.
+--->
 
 ### Package Commands
 
-[cargo-init(1)](cargo-init.html)\
-&nbsp;&nbsp;&nbsp;&nbsp;Create a new Cargo package in an existing directory.
+[mush init](/commands/init/)\
+&nbsp;&nbsp;&nbsp;&nbsp;Create a new Mush package in an existing directory.
 
-[cargo-install(1)](cargo-install.html)\
-&nbsp;&nbsp;&nbsp;&nbsp;Build and install a Rust binary.
+[mush install](/commands/install/)\
+&nbsp;&nbsp;&nbsp;&nbsp;Build and install a Mush binary.
 
-[cargo-new(1)](cargo-new.html)\
-&nbsp;&nbsp;&nbsp;&nbsp;Create a new Cargo package.
+[mush new](/commands/new/)\
+&nbsp;&nbsp;&nbsp;&nbsp;Create a new Mush package.
 
+<!--
 [cargo-search(1)](cargo-search.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Search packages in crates.io.
 
 [cargo-uninstall(1)](cargo-uninstall.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Remove a Rust binary.
+-->
 
 ### Publishing Commands
 
+<!--
 [cargo-login(1)](cargo-login.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Save an API token from the registry locally.
 
@@ -120,10 +128,12 @@ This program is a package manager and build tool for the shell scripting languag
 
 [cargo-package(1)](cargo-package.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Assemble the local package into a distributable tarball.
+-->
 
 [cargo-publish(1)](cargo-publish.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Upload a package to the registry.
 
+<!--
 [cargo-yank(1)](cargo-yank.html)\
 &nbsp;&nbsp;&nbsp;&nbsp;Remove a pushed crate from the index.
 
@@ -174,21 +184,22 @@ details on environment variables that Cargo reads.
 
 ## EXIT STATUS
 
-* `0`: Mush succeeded.
-* `101`: Mush failed to complete.
+* `0` - Mush succeeded.
+* `101` - Mush failed to complete.
 
 
 ## FILES
 
-`~/.cargo/`\
+`~/.mush/`\
 &nbsp;&nbsp;&nbsp;&nbsp;Default location for Cargo's "home" directory where it
-stores various files. The location can be changed with the `CARGO_HOME`
+stores various files. The location can be changed with the `$MUSH_HOME`
 environment variable.
 
 `$CARGO_HOME/bin/`\
-&nbsp;&nbsp;&nbsp;&nbsp;Binaries installed by [cargo-install(1)](cargo-install.html) will be located here. If using
+&nbsp;&nbsp;&nbsp;&nbsp;Binaries installed by [mush install](cargo-install.html) will be located here. If using
 [rustup], executables distributed with Rust are also located here.
 
+<!----
 `$CARGO_HOME/config.toml`\
 &nbsp;&nbsp;&nbsp;&nbsp;The global configuration file. See [the reference](../reference/config.html)
 for more information about configuration files.
@@ -200,6 +211,7 @@ will be merged with the global configuration file.
 
 `$CARGO_HOME/credentials.toml`\
 &nbsp;&nbsp;&nbsp;&nbsp;Private authentication information for logging in to a registry.
+------>
 
 `$CARGO_HOME/registry/`\
 &nbsp;&nbsp;&nbsp;&nbsp;This directory contains cached downloads of the registry index and any
@@ -208,37 +220,35 @@ downloaded dependencies.
 `$CARGO_HOME/git/`\
 &nbsp;&nbsp;&nbsp;&nbsp;This directory contains cached downloads of git dependencies.
 
-Please note that the internal structure of the `$CARGO_HOME` directory is not
+Please note that the internal structure of the `$MUSH_HOME` directory is not
 stable yet and may be subject to change.
-
-[rustup]: https://rust-lang.github.io/rustup/
 
 ## EXAMPLES
 
 1. Build a local package and all of its dependencies:
 
-       cargo build
+       mush build
 
 2. Build a package with optimizations:
 
-       cargo build --release
+       mush build --release
 
 3. Run tests for a cross-compiled target:
 
-       cargo test --target i686-unknown-linux-gnu
+       mush test --target zsh
 
 4. Create a new package that builds an executable:
 
-       cargo new foobar
+       mush new foobar
 
 5. Create a package in the current directory:
 
        mkdir foo && cd foo
-       cargo init .
+       mush init .
 
 6. Learn about a command's options and usage:
 
-       cargo help clean
+       mush --help install
 
 ## BUGS
 
@@ -246,4 +256,4 @@ See <https://github.com/javanile/mush/issues> for issues.
 
 ## SEE ALSO
 
-[rustc(1)](https://doc.rust-lang.org/rustc/index.html), [rustdoc(1)](https://doc.rust-lang.org/rustdoc/index.html)
+[The Manifest File](/manifest/), [Environment Variables](/environment-variables/)

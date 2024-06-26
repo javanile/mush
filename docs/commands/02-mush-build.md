@@ -24,7 +24,10 @@ Compile local packages and all of their dependencies.
 
 ## OPTIONS
 
+<!--
+
 ### Package Selection
+
 
 By default, when no package selection options are given, the packages selected
 depend on the selected manifest file (based on the current working directory if
@@ -177,51 +180,30 @@ be specified multiple times, which enables all specified features.</dd>
 
 </dl>
 
+-->
+
 ### Compilation Options
 
-<dl>
 
-<dt class="option-term" id="option-cargo-build---target"><a class="option-anchor" href="#option-cargo-build---target"></a><code>--target</code> <em>triple</em></dt>
-<dd class="option-desc">Build for the given architecture. The default is the host architecture. The general format of the triple is
-<code>&lt;arch&gt;&lt;sub&gt;-&lt;vendor&gt;-&lt;sys&gt;-&lt;abi&gt;</code>. Run <code>rustc --print target-list</code> for a
-list of supported targets. This flag may be specified multiple times.</p>
-<p>This may also be specified with the <code>build.target</code>
-<a href="../reference/config.html">config value</a>.</p>
-<p>Note that specifying this flag makes Cargo run in a different mode where the
-target artifacts are placed in a separate directory. See the
-<a href="../guide/build-cache.html">build cache</a> documentation for more details.</dd>
-
-
-<dt class="option-term" id="option-cargo-build--r"><a class="option-anchor" href="#option-cargo-build--r"></a><code>-r</code></dt>
-<dt class="option-term" id="option-cargo-build---release"><a class="option-anchor" href="#option-cargo-build---release"></a><code>--release</code></dt>
-<dd class="option-desc">Build optimized artifacts with the <code>release</code> profile.
-See also the <code>--profile</code> option for choosing a specific profile by name.</dd>
-
-
-<dt class="option-term" id="option-cargo-build---profile"><a class="option-anchor" href="#option-cargo-build---profile"></a><code>--profile</code> <em>name</em></dt>
-<dd class="option-desc">Build with the given profile.
-See <a href="../reference/profiles.html">the reference</a> for more details on profiles.</dd>
-
-
-<dt class="option-term" id="option-cargo-build---timings=fmts"><a class="option-anchor" href="#option-cargo-build---timings=fmts"></a><code>--timings=</code><em>fmts</em></dt>
-<dd class="option-desc">Output information how long each compilation takes, and track concurrency
-information over time. Accepts an optional comma-separated list of output
-formats; <code>--timings</code> without an argument will default to <code>--timings=html</code>.
-Specifying an output format (rather than the default) is unstable and requires
-<code>-Zunstable-options</code>. Valid output formats:</p>
-<ul>
-<li><code>html</code> (unstable, requires <code>-Zunstable-options</code>): Write a human-readable file <code>cargo-timing.html</code> to the
-<code>target/cargo-timings</code> directory with a report of the compilation. Also write
-a report to the same directory with a timestamp in the filename if you want
-to look at older runs. HTML output is suitable for human consumption only,
-and does not provide machine-readable timing data.</li>
-<li><code>json</code> (unstable, requires <code>-Zunstable-options</code>): Emit machine-readable JSON
-information about timing information.</li>
-</ul></dd>
+|              Option | Description                                                                                                                                                                                                                                                                                                  |
+|--------------------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `--target` *triple* | Build for the given architecture. The default is the host architecture. The general format of the triple is `<arch><sub>-<vendor>-<sys>-<abi>`. Run `rustc --print target-list` for a list of supported targets. This flag may be specified multiple times.                                                   |
+|                     | This may also be specified with the `build.target` [config value](../reference/config.html).                                                                                                                                                                                                               |
+|                     | Note that specifying this flag makes Cargo run in a different mode where the target artifacts are placed in a separate directory. See the [build cache](../guide/build-cache.html) documentation for more details.                                                                                      |
+|   `-r`, `--release` | Build optimized artifacts with the `release` profile. See also the `--profile` option for choosing a specific profile by name.                                                                                                                                                                             |
+|  `--profile` *name* | Build with the given profile. See [the reference](../reference/profiles.html) for more details on profiles.                                                                                                                                                                                                 |
+| `--timings=` *fmts* | Output information how long each compilation takes, and track concurrency information over time. Accepts an optional comma-separated list of output formats; `--timings` without an argument will default to `--timings=html`. Specifying an output format (rather than the default) is unstable and requires `-Zunstable-options`. |
+|                     | Valid output formats:                                                                                                                                                                                                                                                                                       |
+|                     | - `html` (unstable, requires `-Zunstable-options`): Write a human-readable file `cargo-timing.html` to the `target/cargo-timings` directory with a report of the compilation. Also write a report to the same directory with a timestamp in the filename if you want to look at older runs. HTML output is suitable for human consumption only, and does not provide machine-readable timing data. |
+|                     | - `json` (unstable, requires `-Zunstable-options`): Emit machine-readable JSON information about timing information.                                                                                                                                                                                        |
+{: .options-table }
 
 
 
-</dl>
+
+
+<!---
+
 
 ### Output Options
 
@@ -416,25 +398,27 @@ produced during execution of this command</p>
 
 </dl>
 
+-->
+
 ## ENVIRONMENT
 
-See [the reference](../reference/environment-variables.html) for
-details on environment variables that Cargo reads.
+See [the reference](/environment-variables/) for
+details on environment variables that Mush reads.
 
 ## EXIT STATUS
 
-* `0`: Cargo succeeded.
-* `101`: Cargo failed to complete.
+* `0` - Mush succeeded.
+* `101` - Mush failed to complete.
 
 ## EXAMPLES
 
 1. Build the local package and all of its dependencies:
 
-       cargo build
+       mush build
 
 2. Build with optimizations:
 
-       cargo build --release
+       mush build --release
 
 ## SEE ALSO
-[cargo(1)](cargo.html), [cargo-rustc(1)](cargo-rustc.html)
+[mush](/commands/mush/), [mush check](/commands/check/)
