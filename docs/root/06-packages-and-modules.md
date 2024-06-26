@@ -2,7 +2,7 @@
 layout: default
 title: Packages and Modules
 permalink: /packages-and-modules/
-nav_order: 06
+nav_order: 6
 compliance: 1
 ---
 

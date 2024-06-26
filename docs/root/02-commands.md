@@ -2,7 +2,7 @@
 layout: default
 title: CLI Commands
 permalink: /commands/
-nav_order: 02
+nav_order: 2
 has_children: true
 has_toc: false
 compliance: 1

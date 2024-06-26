@@ -2,7 +2,7 @@
 layout: default
 title: Manifest File
 permalink: /manifest/
-nav_order: 03
+nav_order: 3
 compliance: 1
 ---
 

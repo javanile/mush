@@ -2,7 +2,7 @@
 layout: default
 title: Environment Variables
 permalink: /environment-variables/
-nav_order: 05
+nav_order: 5
 compliance: 1
 ---
 

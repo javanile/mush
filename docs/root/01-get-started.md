@@ -2,11 +2,11 @@
 layout: default
 title: Get Started
 permalink: /
-nav_order: 01
+nav_order: 1
 compliance: 1
 ---
 
-# Mush
+# Build with Mush
 
 ![Huge Amount of Mud](/assets/img/memes/meme-02.jpg)
 

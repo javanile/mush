@@ -2,7 +2,7 @@
 layout: default
 title: Writa a Plugin
 permalink: /plugins/
-nav_order: 07
+nav_order: 8
 compliance: 1
 ---
 

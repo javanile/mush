@@ -2,7 +2,24 @@
 ## Packages file
 ## =============
 ##
-## This file lists all the packages that will be installed or updated during
+## This file lists all the nodes and packages that contribute to building the package registry index.
+##
+## Key Definitions:
+## ----------------
+##
+## index <url>
+##    - This key points to another .packages file hosted in a different repository.
+##    - Each `index` entry expands the overall package registry by including the packages listed in the specified URL.
+##    - Example: index https://github.com/francescobianco/mush-packages
+##
+## package <name> <url> [subdirectory]
+##    - This key defines a package and its source location.
+##    - <name> specifies the package name.
+##    - <url> specifies the repository where the package is hosted.
+##    - [subdirectory] (optional) specifies the directory within the repository where the package files are located.
+##    - Example: package mush https://github.com/javanile/mush.git
+##              package console https://github.com/javanile/mush.git packages/console
+##
 
 index https://github.com/francescobianco/mush-packages
 
