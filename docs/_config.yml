@@ -15,3 +15,11 @@ footer_content: >
   © 2024 Francesco Bianco. All rights reserved.
   <style>div.site-header sup { background: red; font-size: 12px; padding: 2px 4px 1px; line-height: 14px; color: #fff; font-weight: bold; }</style>
   <script>document.querySelector('div.site-header a').innerHTML = '🍄 Mush<sup>ALPHA</sup>';</script>
+
+color_scheme: mush
+
+markdown: kramdown
+
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
