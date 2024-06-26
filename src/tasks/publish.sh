@@ -1,10 +1,16 @@
 
 exec_publish() {
-  local bin_name=${MUSH_PACKAGE_NAME}
-  local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/release/${bin_name}
-  local package_name="${MUSH_PACKAGE_NAME}"
-  local release_tag="${MUSH_PACKAGE_VERSION}"
+  local bin_name
+  local bin_file
+  local final_file
+  local package_name
+  local release_tag
+
+  bin_name=${MUSH_PACKAGE_NAME}
+  bin_file=/usr/local/bin/${bin_name}
+  final_file=target/release/${bin_name}
+  package_name="${MUSH_PACKAGE_NAME}"
+  release_tag="${MUSH_PACKAGE_VERSION}"
 
   MUSH_GITHUB_REPOSITORY="$(github_get_repository)"
 
