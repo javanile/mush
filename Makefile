@@ -81,7 +81,7 @@ serve-docs:
 ## =====
 
 ci-shellcheck:
-	@rm -fr lib/shellspec target/release/packages/getoptions
+	@rm -fr lib/shellspec target/release/packages/getoptions target/debug/packages/getoptions
 	@git add .
 	@git commit -am "shellcheck"
 	@git push
