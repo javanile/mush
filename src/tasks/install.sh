@@ -1,4 +1,35 @@
 
+exec_install_binaries() {
+  echo "${MUSH_BINARIES}"
+
+  local binaries
+  local bin_name
+  local bin_path
+
+  binaries="${MUSH_BINARIES}"
+
+  IFS=$'\n'
+  for bin in $binaries; do
+    bin_name=""
+    bin_path=""
+
+    IFS=',' read -r -a fields <<< "$bin"
+    for field in "${fields[@]}"; do
+      case "$field" in
+        name=*)
+          bin_name="${field#name=}"
+          ;;
+        path=*)
+          bin_path="${field#path=}"
+          ;;
+      esac
+    done
+
+    echo "name: $bin_name, path: $bin_path"
+  done
+}
+
+
 exec_install() {
   local package_name
   local package_version

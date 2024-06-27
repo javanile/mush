@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2024-03-21)
-# @build_date: 2024-06-27T13:59:42Z
+# @build_date: 2024-06-27T14:49:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -508,7 +508,9 @@ run_install() {
 
   if [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
+
     [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
+
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_PATH=target/release
@@ -516,6 +518,7 @@ run_install() {
       exec_legacy_build "${MUSH_TARGET_PATH}"
       exec_dependencies "${MUSH_TARGET_PATH}"
       exec_build_release "$@"
+      exec_install_binaries
       exec_install
     else
       console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
@@ -922,7 +925,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:59:38Z
+## @build_date: 2024-06-27T14:49:29Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1468,6 +1471,37 @@ exec_init() {
   console_status "Created" "binary (application) package"
 }
 
+exec_install_binaries() {
+  echo "${MUSH_BINARIES}"
+
+  local binaries
+  local bin_name
+  local bin_path
+
+  binaries="${MUSH_BINARIES}"
+
+  IFS=$'\n'
+  for bin in $binaries; do
+    bin_name=""
+    bin_path=""
+
+    IFS=',' read -r -a fields <<< "$bin"
+    for field in "${fields[@]}"; do
+      case "$field" in
+        name=*)
+          bin_name="${field#name=}"
+          ;;
+        path=*)
+          bin_path="${field#path=}"
+          ;;
+      esac
+    done
+
+    echo "name: $bin_name, path: $bin_path"
+  done
+}
+
+
 exec_install() {
   local package_name
   local package_version
@@ -1743,7 +1777,7 @@ manifest_parse() {
     #echo "S:"
     newline=$'\n'
     section=MUSH_USTABLE
-    while IFS= read line || [[ -n "${line}" ]]; do
+    while IFS= read -r line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
       line="${line%"${line##*[![:space:]]}"}"
       line_number=$((line_number + 1))
@@ -1779,6 +1813,10 @@ manifest_parse() {
           ;;
         "[features]")
           section=MUSH_FEATURE
+          ;;
+        "[[bin]]")
+          section=MUSH_BINARIES
+          MUSH_BINARIES="${MUSH_BINARIES}${newline}"
           ;;
         [a-z]*)
           case $section in
@@ -1821,6 +1859,12 @@ manifest_parse() {
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
+              #eval "${section}_${field}=\$value"
+              ;;
+            MUSH_BINARIES)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_BINARIES="${MUSH_BINARIES}${field}=${value},"
               #eval "${section}_${field}=\$value"
               ;;
             *)
@@ -2230,7 +2274,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:59:39Z
+## @build_date: 2024-06-27T14:49:30Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2289,7 +2333,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:59:42Z
+## @build_date: 2024-06-27T14:49:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }

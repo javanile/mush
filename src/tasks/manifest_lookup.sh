@@ -119,7 +119,7 @@ manifest_parse() {
             MUSH_BINARIES)
               field=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
-              MUSH_FEATURES="${MUSH_FEATURES}${field}=${value},"
+              MUSH_BINARIES="${MUSH_BINARIES}${field}=${value},"
               #eval "${section}_${field}=\$value"
               ;;
             *)
