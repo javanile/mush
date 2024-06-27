@@ -1,6 +1,8 @@
 
 exec_manifest_lookup() {
-  local manifest_dir=$1
+  local manifest_dir
+
+  manifest_dir=$1
 
   if [ ! -f "${manifest_dir}/Manifest.toml" ]; then
     console_error "could not find 'Manifest.toml' in '${manifest_dir}' or any parent directory"
@@ -20,6 +22,8 @@ exec_manifest_lookup() {
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
+
+  MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
 }
 
 manifest_parse() {

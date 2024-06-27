@@ -18,9 +18,11 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
+  local package_path
+
   if [ -n "$PACKAGE_PATH" ]; then
-    local package_path=$(realpath "$PACKAGE_PATH")
-    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
+    package_path=$(realpath "$PACKAGE_PATH")
+    [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_PATH=target/release

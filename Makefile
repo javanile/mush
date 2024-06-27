@@ -258,3 +258,6 @@ test-fix:
 
 test-metadata:
 	@bash tests/bare/info/metadata-test.sh
+
+test-install-plugin:
+	@bash tests/bare/plugins/install-test.sh

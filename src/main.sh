@@ -63,7 +63,8 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
-  [ "${VERBOSE}" -gt 2 ] && echo "Verbosity level: ${VERBOSE}"
+  [ "${VERBOSE}" -gt 2 ] && console_info "Verbosity" "level=${VERBOSE}"
+  [ "${VERBOSE}" -gt 3 ] && console_info "Directory" "home=${MUSH_HOME} pwd=${PWD}"
 
   if [ -n "${PRINT}" ]; then
     mush_build_print "${PRINT}"

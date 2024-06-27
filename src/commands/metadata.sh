@@ -15,6 +15,9 @@ run_metadata() {
   parse "$@"
   eval "set -- $REST"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
+  echo "Package: ${MUSH_PACKAGE_NAME}"
+  echo "Version: ${MUSH_PACKAGE_VERSION}"
+  echo "Type:    ${MUSH_PACKAGE_TYPE}"
 }

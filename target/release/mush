@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2024-03-21)
-# @build_date: 2024-06-27T13:05:13Z
+# @build_date: 2024-06-27T13:59:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -47,8 +47,8 @@ parser_definition() {
   cmd   init     -- "Create a new package in an existing directory"
   cmd   install  -- "Build and install a Mush binary"
   cmd   legacy   -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new      -- "Create a new Mush package"
   cmd   metadata -- "Print package metadata"
+  cmd   new      -- "Create a new Mush package"
   cmd   run      -- "Run a binary or example of the local package"
   cmd   test     -- "Run the tests"
   cmd   publish  -- "Package and upload this package to the registry"
@@ -77,7 +77,8 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
-  [ "${VERBOSE}" -gt 2 ] && echo "Verbosity level: ${VERBOSE}"
+  [ "${VERBOSE}" -gt 2 ] && console_info "Verbosity" "level=${VERBOSE}"
+  [ "${VERBOSE}" -gt 3 ] && console_info "Directory" "home=${MUSH_HOME} pwd=${PWD}"
 
   if [ -n "${PRINT}" ]; then
     mush_build_print "${PRINT}"
@@ -503,9 +504,11 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
+  local package_path
+
   if [ -n "$PACKAGE_PATH" ]; then
-    local package_path=$(realpath "$PACKAGE_PATH")
-    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
+    package_path=$(realpath "$PACKAGE_PATH")
+    [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_PATH=target/release
@@ -599,8 +602,11 @@ run_metadata() {
   parse "$@"
   eval "set -- $REST"
 
-  exec_manifest_lookup
+  exec_manifest_lookup "${PWD}"
 
+  echo "Package: ${MUSH_PACKAGE_NAME}"
+  echo "Version: ${MUSH_PACKAGE_VERSION}"
+  echo "Type:    ${MUSH_PACKAGE_TYPE}"
 }
 
 parser_definition_new() {
@@ -916,7 +922,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:05:09Z
+## @build_date: 2024-06-27T13:59:38Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1463,21 +1469,30 @@ exec_init() {
 }
 
 exec_install() {
-  local package_name=$MUSH_PACKAGE_NAME
-  local package_version=$MUSH_PACKAGE_VERSION
-  local bin_name=$MUSH_PACKAGE_NAME
+  local package_name
+  local package_version
+  local bin_name
   local pwd=$PWD
+  local bin_file
+  local final_file
+  local cp
+  local chmod
 
-  local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/release/${bin_name}
+  package_name=$MUSH_PACKAGE_NAME
+  package_version=$MUSH_PACKAGE_VERSION
+  bin_name=$MUSH_PACKAGE_NAME
+  pwd="${PWD}"
+  bin_file="${MUSH_HOME}/bin/${bin_name}"
+  final_file=target/release/${bin_name}
+  cp="cp"
+  chmod="chmod"
 
-  local cp=cp
-  local chmod=chmod
   #if [[ $EUID -ne 0 ]]; then
   #    cp="sudo ${cp}"
   #    chmod="sudo ${chmod}"
   #fi
 
+  mkdir -p "${MUSH_HOME}/bin"
   ${cp} "${final_file}" "${bin_file}"
   ${chmod} +x "${bin_file}"
 
@@ -1696,7 +1711,9 @@ exec_legacy_build() {
 }
 
 exec_manifest_lookup() {
-  local manifest_dir=$1
+  local manifest_dir
+
+  manifest_dir=$1
 
   if [ ! -f "${manifest_dir}/Manifest.toml" ]; then
     console_error "could not find 'Manifest.toml' in '${manifest_dir}' or any parent directory"
@@ -1716,6 +1733,8 @@ exec_manifest_lookup() {
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
+
+  MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
 }
 
 manifest_parse() {
@@ -2211,7 +2230,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:05:10Z
+## @build_date: 2024-06-27T13:59:39Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2270,7 +2289,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T13:05:13Z
+## @build_date: 2024-06-27T13:59:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
