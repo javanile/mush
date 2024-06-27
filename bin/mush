@@ -73,6 +73,11 @@ main() {
     eval "set -- --help"
   fi
 
+  if [ "${1:0:1}" != "-" ] && command -v "mush-$1" >/dev/null 2>&1; then
+    "mush-$1" "$@"
+    exit $?
+  fi
+
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
   eval "set -- $REST"

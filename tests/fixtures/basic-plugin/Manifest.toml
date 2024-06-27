@@ -4,6 +4,14 @@ type = "plugin"
 version = "0.1.0"
 edition = "2022"
 
+[[bin]]
+name = "mush-plugin-command-1"
+path = "src/main.rs"
+
+[[bin]]
+name = "mush-plugin-command-2"
+path = "src/other_command/main.rs"
+
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [dev-dependencies]
