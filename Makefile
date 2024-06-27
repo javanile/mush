@@ -255,3 +255,6 @@ test-run-example:
 
 test-fix:
 	@bash tests/bare/fix-test.sh
+
+test-metadata:
+	@bash tests/bare/info/metadata-test.sh

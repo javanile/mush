@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2024-03-21)
-# @build_date: 2024-03-21T21:09:01Z
+# @build_date: 2024-06-27T13:05:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -40,17 +40,18 @@ parser_definition() {
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
 
-  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build   -- "Compile the current package"
-  cmd   check   -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch   -- "Fetch dependencies of a package from the network"
-  cmd   init    -- "Create a new package in an existing directory"
-  cmd   install -- "Build and install a Mush binary"
-  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new     -- "Create a new Mush package"
-  cmd   run     -- "Run a binary or example of the local package"
-  cmd   test    -- "Run the tests"
-  cmd   publish -- "Package and upload this package to the registry"
+  msg            -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build    -- "Compile the current package"
+  cmd   check    -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch    -- "Fetch dependencies of a package from the network"
+  cmd   init     -- "Create a new package in an existing directory"
+  cmd   install  -- "Build and install a Mush binary"
+  cmd   legacy   -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new      -- "Create a new Mush package"
+  cmd   metadata -- "Print package metadata"
+  cmd   run      -- "Run a binary or example of the local package"
+  cmd   test     -- "Run the tests"
+  cmd   publish  -- "Package and upload this package to the registry"
 }
 
 args_error() {
@@ -115,6 +116,15 @@ main() {
         ;;
       publish)
         run_publish "$@"
+        ;;
+      metadata)
+        run_metadata "$@"
+        ;;
+      read-manifest)
+        run_read_manifest "$@"
+        ;;
+      pkgid)
+        run_pkgid "$@"
         ;;
       --) # no subcommand, arguments only
     esac
@@ -313,9 +323,12 @@ public fetch
 public init
 public install
 public legacy
+public metadata
 public new
 public run
+public pkgid
 public publish
+public read_manifest
 public test
 public uninstall
 
@@ -570,6 +583,26 @@ run_legacy() {
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
 }
 
+parser_definition_metadata() {
+	setup REST help:usage abbr:true -- "Output the resolved dependencies of a package, the concrete used versions including overrides" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} metadata [OPTIONS] [path]" ''
+
+	msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp  :usage         -h --help                         -- "Print help information"
+}
+
+run_metadata() {
+  eval "$(getoptions parser_definition_metadata parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  exec_manifest_lookup
+
+}
+
 parser_definition_new() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
@@ -682,6 +715,28 @@ run_run() {
   exec "${bin_file}" "$@"
 }
 
+parser_definition_pkgid() {
+	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} pkgid [OPTIONS] [path]" ''
+
+	msg -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_pkgid() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+
+}
+
 parser_definition_publish() {
 	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
 
@@ -713,6 +768,28 @@ run_publish() {
   exec_build_release "$@"
 
   exec_publish
+}
+
+parser_definition_read_manifest() {
+	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} init [OPTIONS] [path]" ''
+
+	msg -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_read_manifest() {
+  eval "$(getoptions parser_definition_init parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  #echo "FLAG_C: $FLAG_C"
+  #echo "MODULE_NAME: $MODULE_NAME"
+  #echo "BUILD_TARGET: $BUILD_TARGET"
+
+  exec_manifest_lookup
 }
 
 parser_definition_test() {
@@ -839,7 +916,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T21:08:48Z
+## @build_date: 2024-06-27T13:05:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -921,7 +998,9 @@ public github
 public index
 
 github_get_repository() {
-  local repository_url=$(git config --get remote.origin.url)
+  local repository_url
+
+  repository_url=$(git config --get remote.origin.url)
 
   case "${repository_url}" in
     http*)
@@ -934,8 +1013,11 @@ github_get_repository() {
 }
 
 github_create_release() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_tag="$1"
+  local repository
+  local release_tag
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_tag="$1"
 
   curl \
      -s -X POST \
@@ -947,13 +1029,20 @@ github_create_release() {
 }
 
 github_upload_release_asset() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_id="$1"
-  local asset_file="$2"
-  local asset_name=$(basename "$asset_file")
-  local upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
+  local repository
+  local release_id
+  local asset_file
+  local asset_name
+  local upload_url
+  local upload_result
 
-  local upload_result=$(curl -s -X POST "${upload_url}" \
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_id="$1"
+  asset_file="$2"
+  asset_name=$(basename "$asset_file")
+  upload_url=https://uploads.github.com/repos/${repository}/releases/$release_id/assets?name=${asset_name}
+
+  upload_result=$(curl -s -X POST "${upload_url}" \
     -H "Authorization: Bearer ${GITHUB_TOKEN}" \
     -H "Content-Type: application/octet-stream" \
     --data-binary @"$asset_file")
@@ -964,8 +1053,11 @@ github_upload_release_asset() {
 }
 
 github_delete_release_asset() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local asset_id="$1"
+  local repository
+  local asset_id
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  asset_id="$1"
 
   curl \
     -s -X DELETE \
@@ -975,9 +1067,13 @@ github_delete_release_asset() {
 }
 
 github_get_release_asset_id() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_id="$1"
-  local asset_name="$(basename "$2")"
+  local repository
+  local release_id
+  local asset_name
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_id="$1"
+  asset_name="$(basename "$2")"
 
   curl \
     -s -X GET \
@@ -988,8 +1084,11 @@ github_get_release_asset_id() {
 }
 
 github_get_release_id() {
-  local repository="${MUSH_GITHUB_REPOSITORY}"
-  local release_tag="$1"
+  local repository
+  local release_tag
+
+  repository="${MUSH_GITHUB_REPOSITORY}"
+  release_tag="$1"
 
   curl \
     -s -X GET \
@@ -1022,9 +1121,14 @@ mush_registry_index_update()
 }
 
 mush_registry_index_parse() {
-  local packages_file=$1
-  local packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
-  local packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  local packages_file
+  local packages_local_file
+  local packages_index
+
+  packages_file=$1
+  packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+
   curl -s -L -H 'Cache-Control: no-cache, no-store' "${packages_file}" > "${packages_local_file}"
 
   #sort -t "|" -k 1,1 -o "${packages_local_file}" "${packages_local_file}"
@@ -1886,11 +1990,17 @@ compile_scan_embed() {
 }
 
 exec_publish() {
-  local bin_name=${MUSH_PACKAGE_NAME}
-  local bin_file=/usr/local/bin/${bin_name}
-  local final_file=target/release/${bin_name}
-  local package_name="${MUSH_PACKAGE_NAME}"
-  local release_tag="${MUSH_PACKAGE_VERSION}"
+  local bin_name
+  local bin_file
+  local final_file
+  local package_name
+  local release_tag
+
+  bin_name=${MUSH_PACKAGE_NAME}
+  bin_file=/usr/local/bin/${bin_name}
+  final_file=target/release/${bin_name}
+  package_name="${MUSH_PACKAGE_NAME}"
+  release_tag="${MUSH_PACKAGE_VERSION}"
 
   MUSH_GITHUB_REPOSITORY="$(github_get_repository)"
 
@@ -2101,7 +2211,7 @@ process_dependencies_build() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T21:08:53Z
+## @build_date: 2024-06-27T13:05:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2160,7 +2270,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-03-21T21:09:01Z
+## @build_date: 2024-06-27T13:05:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
