@@ -32,7 +32,7 @@ manifest_parse() {
     #echo "S:"
     newline=$'\n'
     section=MUSH_USTABLE
-    while IFS= read line || [[ -n "${line}" ]]; do
+    while IFS= read -r line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
       line="${line%"${line##*[![:space:]]}"}"
       line_number=$((line_number + 1))
@@ -68,6 +68,10 @@ manifest_parse() {
           ;;
         "[features]")
           section=MUSH_FEATURE
+          ;;
+        "[[bin]]")
+          section=MUSH_BINARIES
+          MUSH_BINARIES="${MUSH_BINARIES}${newline}"
           ;;
         [a-z]*)
           case $section in
@@ -110,6 +114,12 @@ manifest_parse() {
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
+              #eval "${section}_${field}=\$value"
+              ;;
+            MUSH_BINARIES)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_FEATURES="${MUSH_FEATURES}${field}=${value},"
               #eval "${section}_${field}=\$value"
               ;;
             *)
