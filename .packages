@@ -30,3 +30,5 @@ package code_dumper https://github.com/javanile/mush.git packages/code_dumper
 package error_trace https://github.com/javanile/mush.git packages/error_trace
 package build_logger https://github.com/javanile/mush.git packages/build_logger
 package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit
+
+package linkedin.sh https://github.com/francescobianco/linkedin.sh.git
