@@ -255,3 +255,7 @@ test-run-example:
 
 test-fix:
 	@bash tests/bare/fix-test.sh
+
+test-registry:
+	@bash tests/bare/registry-test.sh
+	
