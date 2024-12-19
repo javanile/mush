@@ -1,6 +1,8 @@
 
 exec_manifest_lookup() {
-  local manifest_dir=$1
+  local manifest_dir
+
+  manifest_dir=$1
 
   if [ ! -f "${manifest_dir}/Manifest.toml" ]; then
     console_error "could not find 'Manifest.toml' in '${manifest_dir}' or any parent directory"
@@ -20,6 +22,8 @@ exec_manifest_lookup() {
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
+
+  MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
 }
 
 manifest_parse() {
@@ -28,7 +32,7 @@ manifest_parse() {
     #echo "S:"
     newline=$'\n'
     section=MUSH_USTABLE
-    while IFS= read line || [[ -n "${line}" ]]; do
+    while IFS= read -r line || [[ -n "${line}" ]]; do
       line="${line#"${line%%[![:space:]]*}"}"
       line="${line%"${line##*[![:space:]]}"}"
       line_number=$((line_number + 1))
@@ -64,6 +68,10 @@ manifest_parse() {
           ;;
         "[features]")
           section=MUSH_FEATURE
+          ;;
+        "[[bin]]")
+          section=MUSH_BINARIES
+          MUSH_BINARIES="${MUSH_BINARIES}${newline}"
           ;;
         [a-z]*)
           case $section in
@@ -106,6 +114,12 @@ manifest_parse() {
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
+              #eval "${section}_${field}=\$value"
+              ;;
+            MUSH_BINARIES)
+              field=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
+              value=$(echo "$line" | cut -d'=' -f2 | xargs)
+              MUSH_BINARIES="${MUSH_BINARIES}${field}=${value},"
               #eval "${section}_${field}=\$value"
               ;;
             *)

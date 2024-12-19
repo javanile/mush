@@ -256,6 +256,14 @@ test-run-example:
 test-fix:
 	@bash tests/bare/fix-test.sh
 
+<<<<<<< HEAD
 test-registry:
 	@bash tests/bare/registry-test.sh
 	
+=======
+test-metadata:
+	@bash tests/bare/info/metadata-test.sh
+
+test-install-plugin:
+	@bash tests/bare/plugins/install-test.sh
+>>>>>>> 389b623fb1bad4d21870d4f448bd3a1c2f6d20b9

@@ -18,9 +18,13 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
+  local package_path
+
   if [ -n "$PACKAGE_PATH" ]; then
-    local package_path=$(realpath "$PACKAGE_PATH")
-    [ "${VERBOSE}" -gt 5 ] && echo "Installing from source path '$PACKAGE_PATH'"
+    package_path=$(realpath "$PACKAGE_PATH")
+
+    [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
+
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
       MUSH_TARGET_PATH=target/release
@@ -28,6 +32,7 @@ run_install() {
       exec_legacy_build "${MUSH_TARGET_PATH}"
       exec_dependencies "${MUSH_TARGET_PATH}"
       exec_build_release "$@"
+      exec_install_binaries
       exec_install
     else
       console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."

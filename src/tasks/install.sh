@@ -1,20 +1,60 @@
 
+exec_install_binaries() {
+  echo "${MUSH_BINARIES}"
+
+  local binaries
+  local bin_name
+  local bin_path
+
+  binaries="${MUSH_BINARIES}"
+
+  IFS=$'\n'
+  for bin in $binaries; do
+    bin_name=""
+    bin_path=""
+
+    IFS=',' read -r -a fields <<< "$bin"
+    for field in "${fields[@]}"; do
+      case "$field" in
+        name=*)
+          bin_name="${field#name=}"
+          ;;
+        path=*)
+          bin_path="${field#path=}"
+          ;;
+      esac
+    done
+
+    echo "name: $bin_name, path: $bin_path"
+  done
+}
+
+
 exec_install() {
-  local package_name=$MUSH_PACKAGE_NAME
-  local package_version=$MUSH_PACKAGE_VERSION
-  local bin_name=$MUSH_PACKAGE_NAME
+  local package_name
+  local package_version
+  local bin_name
   local pwd=$PWD
+  local bin_file
+  local final_file
+  local cp
+  local chmod
 
-  local bin_file=$HOME/.mush/bin/${bin_name}
-  local final_file=target/release/${bin_name}
+  package_name=$MUSH_PACKAGE_NAME
+  package_version=$MUSH_PACKAGE_VERSION
+  bin_name=$MUSH_PACKAGE_NAME
+  pwd="${PWD}"
+  bin_file="${MUSH_HOME}/bin/${bin_name}"
+  final_file=target/release/${bin_name}
+  cp="cp"
+  chmod="chmod"
 
-  local cp=cp
-  local chmod=chmod
   #if [[ $EUID -ne 0 ]]; then
   #    cp="sudo ${cp}"
   #    chmod="sudo ${chmod}"
   #fi
 
+  mkdir -p "${MUSH_HOME}/bin"
   ${cp} "${final_file}" "${bin_file}"
   ${chmod} +x "${bin_file}"
 

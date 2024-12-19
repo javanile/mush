@@ -12,6 +12,10 @@ edition = "2021"
 name = "mush-test"
 path = "src/main.rs"
 
+[[bin]]
+name = "mush-test-2"
+path = "src/main2.rs"
+
 #[build-dependencies]
 #build-target = "0.4.0"
 #bindgen = "0.60.1"
