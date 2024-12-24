@@ -86,6 +86,14 @@ ci-shellcheck:
 	@git commit -am "shellcheck"
 	@git push
 
+## ===========
+## Development
+## ===========
+
+dev-commit:
+	@git add .
+	@git commit -am "Development Commit"
+	@git push
 
 ## ====
 ## Test
@@ -265,3 +273,6 @@ test-metadata:
 
 test-install-plugin:
 	@bash tests/bare/plugins/install-test.sh
+
+test-posix-exec-install-binaries:
+	@sh tests/posix/exec-install-binaries-test.sh

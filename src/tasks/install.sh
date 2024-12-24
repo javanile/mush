@@ -5,16 +5,17 @@ exec_install_binaries() {
   local binaries
   local bin_name
   local bin_path
+  local tmp_ifs
 
   binaries="${MUSH_BINARIES}"
 
-  IFS=$'\n'
   for bin in $binaries; do
     bin_name=""
     bin_path=""
 
-    IFS=',' read -r -a fields <<< "$bin"
-    for field in "${fields[@]}"; do
+    tmp_ifs=$IFS
+    IFS=','
+    for field in ${bin}; do
       case "$field" in
         name=*)
           bin_name="${field#name=}"
@@ -24,6 +25,7 @@ exec_install_binaries() {
           ;;
       esac
     done
+    IFS=$tmp_ifs
 
     echo "name: $bin_name, path: $bin_path"
   done

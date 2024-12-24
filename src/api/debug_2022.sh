@@ -43,7 +43,7 @@ debug() {
           exit 101
         fi
 
-        source "${legacy_file_path}"
+        . "${legacy_file_path}"
       }
       module() {
         local module_name=$1
@@ -55,10 +55,10 @@ debug() {
         local package_name=$MUSH_PACKAGE_NAME
 
         if [ -f "${module_file_path}" ]; then
-          source "${module_file_path}"
+          . "${module_file_path}"
         elif [ -f "${module_dir_file_path}" ]; then
           MUSH_RUNTIME_MODULE=$1
-          source "${module_dir_file_path}"
+          . "${module_dir_file_path}"
         else
           console_error_code E0583 "file not found for module '${module_name}'"
           [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
@@ -81,9 +81,9 @@ debug() {
         local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
 
         if [ -f "${module_file_path}" ]; then
-          source "${module_file_path}"
+          . "${module_file_path}"
         elif [ -f "${module_dir_file_path}" ]; then
-          source "${module_dir_file_path}"
+          . "${module_dir_file_path}"
         else
           echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
           exit 101
@@ -102,7 +102,7 @@ debug() {
     file)
       local previous_debug_file=$MUSH_DEBUG_FILE
       MUSH_DEBUG_FILE=$2
-      source "$2"
+      . "$2"
       MUSH_DEBUG_FILE=$previous_debug_file
       ;;
     *)

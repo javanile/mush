@@ -1,29 +1,3 @@
-#!/usr/bin/env bash
-## BP010: Release metadata
-## @build_type: lib
-## @build_date: 2024-12-24T09:14:43Z
-set -e
-extern() {
-  extern=$1
-}
-legacy() {
-  legacy=$1
-}
-module() {
-  module=$1
-}
-public() {
-  public=$1
-}
-use() {
-  use=$1
-}
-embed() {
-  embed=$1
-}
-## BP004: Compile the entrypoint
-
-legacy getoptions
 # [getoptions] License: Creative Commons Zero v1.0 Universal
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions() {
@@ -31,8 +5,10 @@ getoptions() {
 	_flags='' _nflags='' _opts='' _help='' _abbr='' _cmds='' _init=@empty IFS=' '
 	[ $# -lt 2 ] && set -- "${1:?No parser definition}" -
 	[ "$2" = - ] && _def=getoptions_parse
+
 	i='					'
 	while eval "_${#i}() { echo \"$i\$@\"; }"; [ "$i" ]; do i=${i#?}; done
+
 	quote() {
 		q="$2'" r=''
 		while [ "$q" ]; do r="$r${q%%\'*}'\''" && q=${q#*\'}; done
@@ -46,11 +22,13 @@ getoptions() {
 	sw() { sw="$sw${sw:+|}$1"; }
 	kv() { eval "${2-}${1%%:*}=\${1#*:}"; }
 	loop() { [ $# -gt 1 ] && [ "$2" != -- ]; }
+
 	invoke() { eval '"_$@"'; }
 	prehook() { invoke "$@"; }
 	for i in setup flag param option disp msg; do
 		eval "$i() { prehook $i \"\$@\"; }"
 	done
+
 	args() {
 		on=$_on no=$_no export=$_export init=$_init _hasarg=$1 && shift
 		while loop "$@" && shift; do
@@ -83,14 +61,17 @@ getoptions() {
 	_option() { args 1 "$@"; defvar "$@"; }
 	_disp() { args '' "$@"; }
 	_msg() { args '' _ "$@"; }
+
 	cmd() { _mode=@ _cmds="$_cmds${_cmds:+|}'$1'"; }
 	"$@"
 	cmd() { :; }
 	_0 "${_rest:?}=''"
+
 	_0 "${_def:-$2}() {"
 	_1 'OPTIND=$(($#+1))'
 	_1 'while OPTARG= && [ $# -gt 0 ]; do'
 	[ "$_abbr" ] && getoptions_abbr "$@"
+
 	args() {
 		sw='' validate='' pattern='' counter='' on=$_on no=$_no export=$_export
 		while loop "$@" && shift; do
@@ -150,6 +131,7 @@ getoptions() {
 		_4 'exit 0 ;;'
 	}
 	_msg() { :; }
+
 	[ "$_alt" ] && _2 'case $1 in -[!-]?*) set -- "-$@"; esac'
 	_2 'case $1 in'
 	_wa() { _4 "eval 'set -- $1' \${1+'\"\$@\"'}"; }
@@ -210,6 +192,7 @@ getoptions() {
 	_1 'echo "$1" >&2'
 	_1 'exit 1'
 	_0 '}'
+
 	[ "$_help" ] && eval "shift 2; getoptions_help $1 $_help" ${3+'"$@"'}
 	[ "$_def" ] && _0 "eval $_def \${1+'\"\$@\"'}; eval set -- \"\${$_rest}\""
 	_0 '# Do not execute' # exit 1
@@ -233,6 +216,7 @@ getoptions_abbr() {
 			esac
 		done
 		[ "$abbr" ] || return 0
+
 		for i; do
 			case $i in
 				--) break ;;
@@ -272,9 +256,11 @@ getoptions_abbr() {
 # https://github.com/ko1nksm/getoptions (v3.3.0)
 getoptions_help() {
 	_width='30,12' _plus='' _leading='  '
+
 	pad() { p=$2; while [ ${#p} -lt "$3" ]; do p="$p "; done; eval "$1=\$p"; }
 	kv() { eval "${2-}${1%%:*}=\${1#*:}"; }
 	sw() { pad sw "$sw${sw:+, }" "$1"; sw="$sw$2"; }
+
 	args() {
 		_type=$1 var=${2%% *} sw='' label='' hidden='' && shift 2
 		while [ $# -gt 0 ] && i=$1 && shift && [ "$i" != -- ]; do
@@ -286,6 +272,7 @@ getoptions_help() {
 			esac
 		done
 		[ "$hidden" ] && return 0 || len=${_width%,*}
+
 		[ "$label" ] || case $_type in
 			setup | msg) label='' len=0 ;;
 			flag | disp) label="$sw " ;;
@@ -299,9 +286,11 @@ getoptions_help() {
 		pad label '' "$len"
 		for i; do echo "$label$i"; done
 	}
+
 	for i in setup flag param option disp 'msg -' cmd; do
 		eval "${i% *}() { args $i \"\$@\"; }"
 	done
+
 	echo "$2() {"
 	echo "cat<<'GETOPTIONSHERE'"
 	"$@"

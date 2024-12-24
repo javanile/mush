@@ -2,8 +2,6 @@
 set -e
 
 ## Build Mush
-rm target/debug/mush
-mush build
 cp target/debug/mush target/debug/mush.sh
 sh target/debug/mush.sh build
 exit
