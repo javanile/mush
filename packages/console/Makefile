@@ -2,4 +2,4 @@
 
 
 test-macos:
-	@sh tests/macos-test.sh
+	@zsh tests/macos-test.sh
