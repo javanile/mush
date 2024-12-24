@@ -30,14 +30,15 @@ manifest_parse() {
   local manifest_file=$1
 
     #echo "S:"
-    newline=$'\n'
+    newline='
+'
     section=MUSH_USTABLE
-    while IFS= read -r line || [[ -n "${line}" ]]; do
+    while IFS= read -r line || [ -n "${line}" ]; do
       line="${line#"${line%%[![:space:]]*}"}"
       line="${line%"${line##*[![:space:]]}"}"
       line_number=$((line_number + 1))
-      [[ -z "${line}" ]] && continue
-      [[ "${line::1}" == "#" ]] && continue
+      [ -z "${line}" ] && continue
+      [ "$(printf '%s' "$line" | cut -c1)" = "#" ] && continue
       case $line in
         "[package]")
           section=MUSH_PACKAGE

@@ -22,6 +22,8 @@ exec_dependencies() {
 process_dependencies() {
   local dependencies_type
   local dependencies_list
+  local package_name
+  local package_signature
 
   dependencies_type=$1
   if [ "${dependencies_type}" = "prod" ]; then
@@ -33,8 +35,8 @@ process_dependencies() {
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
 
-    local package_name=${dependency%=*}
-    local package_signature=${dependency#*=}
+    package_name="${dependency%=*}"
+    package_signature="${dependency#*=}"
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}"

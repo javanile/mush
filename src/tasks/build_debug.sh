@@ -1,8 +1,12 @@
 
 exec_build_debug() {
-  local src_file=$1
-  local bin_file=$2
-  local lib_file=$3
+  local src_file
+  local bin_file
+  local lib_file
+
+  src_file=$1
+  bin_file=$2
+  lib_file=$3
 
   mkdir -p "$(dirname "${bin_file}")"
 
@@ -29,7 +33,7 @@ exec_build_debug() {
   echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
   echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
   exec_feature_hook "build_debug_head_section" "${build_file}"

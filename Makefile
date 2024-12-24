@@ -266,7 +266,6 @@ test-fix:
 
 test-registry:
 	@bash tests/bare/registry-test.sh
-	
 
 test-metadata:
 	@bash tests/bare/info/metadata-test.sh

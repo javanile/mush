@@ -2,9 +2,11 @@
 set -e
 
 ## BP002: Package and debug variables 
-MUSH_PACKAGE_NAME=mush
-MUSH_DEBUG_PATH=/home/francesco/Develop/Javanile/mush
-MUSH_TARGET_PATH="${MUSH_DEBUG_PATH}/target/debug"
+MUSH_PACKAGE_NAME="mush"
+MUSH_TARGET_FILE="target/debug/mush"
+MUSH_TARGET_PATH="target/debug"
+MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
+MUSH_DEBUG_PATH="$(realpath "$(dirname "$0")/../..")"
 
 ## BP003: Embedding debug api
 debug() {
@@ -62,8 +64,8 @@ debug() {
           MUSH_RUNTIME_MODULE=$1
           . "${module_dir_file_path}"
         else
-          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
-          echo "error[E0583]: file not found for module '${module_name}'"
+          console_error_code E0583 "file not found for module '${module_name}'"
+          [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
           echo " --> ${debug_file}:4:1"
           echo "  |"
           echo "4 | mod notfound;"
