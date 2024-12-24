@@ -92,7 +92,7 @@ ci-shellcheck:
 
 dev-commit:
 	@git add .
-	@git commit -am "Development Commit"
+	@git commit -am "Development Commit" || true
 	@git push
 
 ## ====
