@@ -29,7 +29,7 @@ console_print() {
 }
 
 console_log() {
-  console_print "$1" "$2"
+  console_print "${ESCAPE}[1;39m$1${ESCAPE}[0m" "$2"
 }
 
 console_info() {
