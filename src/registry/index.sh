@@ -12,6 +12,14 @@ mush_registry_index_update()
 
   echo "Updating strategy: $update_strategy"
 
+  if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
+    while read -r line; do
+      echo "Entry cache: ${line}"
+      [ -z "${line}" ] && continue
+      [ "${line:0:1}" = "#" ] && continue
+    done < "${MUSH_REGISTRY_CACHE}"
+  fi
+
   if [ "${update_strategy}" = "full" ]; then
     rm -fr "${MUSH_HOME}/registry/index" && true
   fi
