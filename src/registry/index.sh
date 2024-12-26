@@ -14,9 +14,15 @@ mush_registry_index_update()
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
-      echo "Entry cache: ${line}"
+      #echo "Entry cache: ${line}"
       [ -z "${line}" ] && continue
       [ "${line:0:1}" = "#" ] && continue
+      local packages_file_url="$(echo "${line}" | awk '{print $1}')"
+      local packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
+      local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+      if [ "${packages_cache_hash}" != "${packages_hash}" ]; then
+         rm -fr "${MUSH_HOME}/registry/index" && true
+      fi
     done < "${MUSH_REGISTRY_CACHE}"
   fi
 
