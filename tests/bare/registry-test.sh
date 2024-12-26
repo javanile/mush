@@ -8,5 +8,7 @@ set -e
 ## Build Basic App
 cd tests/fixtures/empty-dir
 rm -fr target lib && true
-sh -x ../../../target/debug/mush -vvv install demo
+rm -fr $HOME/.mush/registry/index && true
+sh -x ../../../target/debug/mush -vvv install demo && true
 #bash ../../../target/debug/mush -vvv install demo
+cat $HOME/.mush/registry/index/https-github-com-javanile-mush.cache

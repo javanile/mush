@@ -5,9 +5,12 @@ mush_registry_index_update()
   MUSH_REGISTRY_URL=https://github.com/javanile/mush
   MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
   local update_strategy="${1:-lazy}"
+
+  echo "Updating strategy: $update_strategy"
 
   if [ "${update_strategy}" = "full" ]; then
     rm -fr "${MUSH_HOME}/registry/index" && true
@@ -17,7 +20,12 @@ mush_registry_index_update()
     console_status "Updating" "mush packages index"
     mkdir -p "${MUSH_HOME}/registry/index"
     > "${MUSH_REGISTRY_INDEX}"
-    mush_registry_index_parse "${MUSH_REGISTRY_URL}/raw/main/.packages"
+    local packages_file_url="${MUSH_REGISTRY_URL}/raw/main/.packages"
+    local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+    echo "${packages_file_url} ${packages_hash}" > "${MUSH_REGISTRY_CACHE}"
+    mush_registry_index_parse "${packages_file_url}"
+  else
+    echo "Lazy update_strategy"
   fi
 }
 
@@ -47,7 +55,10 @@ mush_registry_index_parse() {
     case "${entry_type}" in
       "index")
         local entry_url=$(echo "${line}" | awk '{print $2}')
-        mush_registry_index_parse "${entry_url}/raw/main/.packages"
+        local packages_file_url="${entry_url}/raw/main/.packages"
+        local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+        mush_registry_index_parse "${packages_file_url}"
+        echo "${packages_file_url} ${packages_hash}" >> "${MUSH_REGISTRY_CACHE}"
         ;;
       "package")
         local package_name=$(echo "${line}" | awk '{print $2}')
