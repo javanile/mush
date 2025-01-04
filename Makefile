@@ -86,6 +86,14 @@ ci-shellcheck:
 	@git commit -am "shellcheck"
 	@git push
 
+## =======
+## Develop
+## =======
+
+dev-push:
+	@git add .
+	@git commit -am "Small fix" || true
+	@git push
 
 ## ====
 ## Test
