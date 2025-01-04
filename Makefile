@@ -95,6 +95,11 @@ dev-commit:
 	@git commit -am "Development Commit" || true
 	@git push
 
+dev-push:
+	@git add .
+	@git commit -am "Small fix" || true
+	@git push
+
 ## ====
 ## Test
 ## ====

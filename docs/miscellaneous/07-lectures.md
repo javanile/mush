@@ -2,7 +2,7 @@
 layout: default
 title: Lectures
 permalink: /lectures/
-nav_order: 04
+nav_order: 7
 parent: Miscellaneous
 ---
 

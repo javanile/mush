@@ -2,7 +2,7 @@
 layout: default
 title: Memes
 permalink: /memes/
-nav_order: 07
+nav_order: 8
 parent: Miscellaneous
 ---
 
