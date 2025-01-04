@@ -7,7 +7,7 @@ parent: Miscellaneous
 compliance: 1
 ---
 
-# Installation Guide
+# Installation
 
 The installation of the stable version of Mush follows a standard approach, which is straightforward and ideal for most users. Installing the stable release ensures a reliable and tested version suitable for general use. Here’s the standard method:
 
