@@ -2,7 +2,7 @@
 layout: default
 title: Guidelines
 permalink: /guidelines/
-nav_order: 05
+nav_order: 06
 parent: Miscellaneous
 compliance: 1
 ---
