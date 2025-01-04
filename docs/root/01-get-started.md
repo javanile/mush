@@ -28,7 +28,7 @@ On Linux and macOS systems, this is done as follows:
 $ curl get.javanile.org/mush | sh
 ```
 
-For other installation methods, please visit the [installation](/installation).
+For other installation methods, please visit the [installation page](/installation).
 
 ## First steps with Mush
 
