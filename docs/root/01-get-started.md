@@ -8,7 +8,7 @@ compliance: 1
 
 # Build with Mush
 
-![Huge Amount of Mud](/assets/img/memes/meme-02.jpg)
+![Huge Amount of Mud](/assets/img/memes/meme-03.jpg)
 
 Mush is the shell package builder. Mush downloads your [shell package's](/glossary/#shell-package) dependencies, 
 compiles your packages, makes distributable packages, and uploads them to GitHub, 
