@@ -2,9 +2,11 @@
 set -e
 
 ## Build Mush
+echo "====[ Build: Mush ]======================================================="
 cp target/debug/mush target/debug/mush.sh
-sh -x target/debug/mush.sh build
+sh target/debug/mush.sh build
 
 ## Build Basic App
-rm -fr "$HOME/.mush/registry/"
-sh target/debug/mush -vvv search amazing
+echo "====[ Test: Search ]======================================================="
+#rm -fr "$HOME/.mush/registry/"
+sh target/debug/mush search amazing

@@ -16,7 +16,6 @@ run_search() {
   parse "$@"
   eval "set -- $REST"
 
-  echo "AA"
   mush_registry_index_update
 
   local query
