@@ -8,18 +8,22 @@ mush_registry_index_update()
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
+  local packages_file_url
+  local packages_cache_hash
+  local packages_hash
+
   local update_strategy="${1:-lazy}"
 
   echo "Updating strategy: $update_strategy"
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
-      #echo "Entry cache: ${line}"
+      echo "Entry cache: ${line}"
       [ -z "${line}" ] && continue
-      [ "${line:0:1}" = "#" ] && continue
-      local packages_file_url="$(echo "${line}" | awk '{print $1}')"
-      local packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
-      local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+      [ "$(echo "$line" | cut -c1)" = "#" ] && continue
+      packages_file_url="$(echo "${line}" | awk '{print $1}')"
+      packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
+      packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
       if [ "${packages_cache_hash}" != "${packages_hash}" ]; then
          rm -fr "${MUSH_HOME}/registry/index" && true
       fi
@@ -63,7 +67,7 @@ mush_registry_index_parse() {
   while read -r line; do
     #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
-    [ "${line:0:1}" = "#" ] && continue
+    [ "$(echo "$line" | cut -c1)" = "#" ] && continue
 
     local entry_type=$(echo "${line}" | awk '{print $1}')
     case "${entry_type}" in
