@@ -83,7 +83,7 @@ mush_registry_index_parse() {
         local package_url=$(echo "${line}" | awk '{print $3}')
         local package_path=$(echo "${line}" | awk '{print $4}')
         local package_version=$(echo "${line}" | awk '{print $5}')
-        echo "${package_name} ${package_url} ${package_path} ${package_version}" >> "${MUSH_REGISTRY_INDEX}"
+        echo "${package_name} ${package_url} ${package_path} ${package_version} # Description" >> "${MUSH_REGISTRY_INDEX}"
         ;;
       *)
         console_error "not supported entry type at '${packages_file}'"
