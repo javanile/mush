@@ -37,6 +37,7 @@ parser_definition() {
   cmd   new      -- "Create a new Mush package"
   cmd   run      -- "Run a binary or example of the local package"
   cmd   test     -- "Run the tests"
+  cmd   search   -- "Search registry for packages"
   cmd   publish  -- "Package and upload this package to the registry"
 }
 
@@ -109,6 +110,9 @@ main() {
         ;;
       read-manifest)
         run_read_manifest "$@"
+        ;;
+      search)
+        run_search "$@"
         ;;
       pkgid)
         run_pkgid "$@"

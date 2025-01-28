@@ -280,3 +280,6 @@ test-install-plugin:
 
 test-posix-exec-install-binaries:
 	@sh tests/posix/exec-install-binaries-test.sh
+
+test-search:
+	@sh tests/bare/commands/search/search-test.sh

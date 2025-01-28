@@ -12,5 +12,6 @@ public run
 public pkgid
 public publish
 public read_manifest
+public search
 public test
 public uninstall

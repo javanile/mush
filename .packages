@@ -12,23 +12,25 @@
 ##    - Each `index` entry expands the overall package registry by including the packages listed in the specified URL.
 ##    - Example: index https://github.com/francescobianco/mush-packages
 ##
-## package <name> <url> [subdirectory]
+## package <name> <url> [subdirectory] # {description}
 ##    - This key defines a package and its source location.
 ##    - <name> specifies the package name.
 ##    - <url> specifies the repository where the package is hosted.
 ##    - [subdirectory] (optional) specifies the directory within the repository where the package files are located.
-##    - Example: package mush https://github.com/javanile/mush.git
-##               package console https://github.com/javanile/mush.git packages/console
+##    - Example: package mush https://github.com/javanile/mush.git # {Mush package}
+##               package console https://github.com/javanile/mush.git packages/console #
 ##
 
 index https://github.com/francescobianco/mush-packages
 
-package mush https://github.com/javanile/mush.git
-package console https://github.com/javanile/mush.git packages/console
-package getoptions https://github.com/javanile/mush.git packages/getoptions
-package code_dumper https://github.com/javanile/mush.git packages/code_dumper
-package error_trace https://github.com/javanile/mush.git packages/error_trace
-package build_logger https://github.com/javanile/mush.git packages/build_logger
-package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit
+## core packages
+package mush https://github.com/javanile/mush.git											 #
+package console https://github.com/javanile/mush.git packages/console						 #
+package getoptions https://github.com/javanile/mush.git packages/getoptions					 #
+package code_dumper https://github.com/javanile/mush.git packages/code_dumper				 #
+package error_trace https://github.com/javanile/mush.git packages/error_trace				 #
+package build_logger https://github.com/javanile/mush.git packages/build_logger				 #
+package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit  #
 
-package linkedin.sh https://github.com/francescobianco/linkedin.sh.git
+## miscellaneous packages
+package linkedin.sh https://github.com/francescobianco/linkedin.sh.git						 #
