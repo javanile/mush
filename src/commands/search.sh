@@ -25,5 +25,7 @@ run_search() {
 
   echo "Query: ${query}"
 
-  cat "${MUSH_REGISTRY_INDEX}" | grep -i "${query}"
+  awk '{name=$1; desc=""; if (index($0, "#")) desc=substr($0, index($0, "#")); print name, desc}' \
+    "${MUSH_REGISTRY_INDEX}" \
+    | grep --color=auto -i "${query}"
 }

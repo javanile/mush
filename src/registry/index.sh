@@ -4,7 +4,7 @@ mush_registry_index_update()
   MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
   MUSH_REGISTRY_URL=https://github.com/javanile/mush
   MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
-  MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
@@ -52,6 +52,8 @@ mush_registry_index_parse() {
   local packages_local_file
   local packages_index
 
+  local package_description
+
   packages_file=$1
   packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
   packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
@@ -83,7 +85,8 @@ mush_registry_index_parse() {
         local package_url=$(echo "${line}" | awk '{print $3}')
         local package_path=$(echo "${line}" | awk '{print $4}')
         local package_version=$(echo "${line}" | awk '{print $5}')
-        echo "${package_name} ${package_url} ${package_path} ${package_version} # Description" >> "${MUSH_REGISTRY_INDEX}"
+        package_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 ;; *) echo "(no description)" ;; esac)
+        echo "${package_name} ${package_url} ${package_path} ${package_version} # ${package_description}" >> "${MUSH_REGISTRY_INDEX}"
         ;;
       *)
         console_error "not supported entry type at '${packages_file}'"

@@ -7,4 +7,4 @@ sh -x target/debug/mush.sh build
 
 ## Build Basic App
 rm -fr "$HOME/.mush/registry/"
-sh target/debug/mush -vvv search http
+sh target/debug/mush -vvv search amazing
