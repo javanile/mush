@@ -24,7 +24,7 @@
 index https://github.com/francescobianco/mush-packages
 
 package mush https://github.com/javanile/mush.git
-package console https://github.com/javanile/mush.git packages/console
+package console https://github.com/javanile/mush.git packages/console # Console prints amazing output in Rush-style!
 package getoptions https://github.com/javanile/mush.git packages/getoptions
 package code_dumper https://github.com/javanile/mush.git packages/code_dumper
 package error_trace https://github.com/javanile/mush.git packages/error_trace
