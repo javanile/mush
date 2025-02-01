@@ -10,6 +10,7 @@ module errors
 module package_managers
 module registry
 module tasks
+module env
 
 VERSION="Mush 0.2.0 (2025-01-05 develop)"
 

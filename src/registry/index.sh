@@ -14,11 +14,11 @@ mush_registry_index_update()
 
   local update_strategy="${1:-lazy}"
 
-  echo "Updating strategy: $update_strategy"
+  [ "$VERBOSE" -gt "0" ] && console_debug "Indexing" "updating strategy: $update_strategy"
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
-      echo "Entry cache: ${line}"
+      [ "$VERBOSE" -gt "2" ] && echo "Entry cache: ${line}"
       [ -z "${line}" ] && continue
       [ "$(echo "$line" | cut -c1)" = "#" ] && continue
       packages_file_url="$(echo "${line}" | awk '{print $1}')"
@@ -42,8 +42,8 @@ mush_registry_index_update()
     local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
     echo "${packages_file_url} ${packages_hash}" > "${MUSH_REGISTRY_CACHE}"
     mush_registry_index_parse "${packages_file_url}"
-  else
-    echo "Lazy update_strategy"
+  elif [ "${VERBOSE}" -gt "0" ]; then
+    console_debug "Updating" "index through cache"
   fi
 }
 

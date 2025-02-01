@@ -20,6 +20,8 @@ run_install() {
 
   local package_path
 
+  mush_env
+
   if [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
 
