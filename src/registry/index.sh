@@ -14,7 +14,7 @@ mush_registry_index_update()
 
   local update_strategy="${1:-lazy}"
 
-  [ "$VERBOSE" -gt "0" ] && console_debug "Indexing" "updating strategy: $update_strategy"
+  [ "$VERBOSE" -gt "0" ] && console_status "Indexing" "updating strategy: $update_strategy"
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
