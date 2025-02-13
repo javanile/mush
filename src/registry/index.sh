@@ -23,9 +23,11 @@ mush_registry_index_update()
       [ "$(echo "$line" | cut -c1)" = "#" ] && continue
       packages_file_url="$(echo "${line}" | awk '{print $1}')"
       packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
-      packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
-      if [ "${packages_cache_hash}" != "${packages_hash}" ]; then
-         rm -fr "${MUSH_HOME}/registry/index" && true
+      packages_hash="$(curl -I -s -L -H "Pragma: no-cache" -H "Cache-Control: no-cache" "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+      if [ "${packages_cache_hash}" = "${packages_hash}" ]; then
+        [ "$VERBOSE" -gt "3" ] && echo "Entry cache: ${line} [unchanged]"
+      else
+        rm -fr "${MUSH_HOME}/registry/index" && true
       fi
     done < "${MUSH_REGISTRY_CACHE}"
   fi
@@ -51,8 +53,16 @@ mush_registry_index_parse() {
   local packages_file
   local packages_local_file
   local packages_index
-
-  local package_description
+  local entry
+  local entry_type
+  local entry_description
+  local package_name
+  local package_url
+  local package_path
+  local package_version
+  local packages_file_url
+  local packages_hash
+  local packages_index
 
   packages_file=$1
   packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
@@ -71,22 +81,24 @@ mush_registry_index_parse() {
     [ -z "${line}" ] && continue
     [ "$(echo "$line" | cut -c1)" = "#" ] && continue
 
-    local entry_type=$(echo "${line}" | awk '{print $1}')
+    entry=$(echo "${line}" | cut -d'#' -f1)
+    entry_type=$(echo "${line}" | awk '{print $1}')
+    entry_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 ;; *) echo "(no description)" ;; esac)
+
     case "${entry_type}" in
       "index")
-        local entry_url=$(echo "${line}" | awk '{print $2}')
-        local packages_file_url="${entry_url}/raw/main/.packages"
-        local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+        entry_url=$(echo "${entry}" | awk '{print $2}')
+        packages_file_url="${entry_url}/raw/main/.packages"
+        packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
         mush_registry_index_parse "${packages_file_url}"
         echo "${packages_file_url} ${packages_hash}" >> "${MUSH_REGISTRY_CACHE}"
         ;;
       "package")
-        local package_name=$(echo "${line}" | awk '{print $2}')
-        local package_url=$(echo "${line}" | awk '{print $3}')
-        local package_path=$(echo "${line}" | awk '{print $4}')
-        local package_version=$(echo "${line}" | awk '{print $5}')
-        package_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 ;; *) echo "(no description)" ;; esac)
-        echo "${package_name} ${package_url} ${package_path} ${package_version} # ${package_description}" >> "${MUSH_REGISTRY_INDEX}"
+        package_name=$(echo "${entry}" | awk '{print $2}')
+        package_url=$(echo "${entry}" | awk '{print $3}')
+        package_path=$(echo "${entry}" | awk '{print $4}')
+        package_version=$(echo "${entry}" | awk '{print $5}')
+        echo "${package_name} ${package_url} ${package_path} ${package_version} # ${entry_description}" >> "${MUSH_REGISTRY_INDEX}"
         ;;
       *)
         console_error "not supported entry type at '${packages_file}'"

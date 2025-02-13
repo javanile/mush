@@ -72,9 +72,15 @@ exec_install() {
 }
 
 exec_install_from_index() {
+  local package_entry
   local package_name
+  local package_url
   local package_version_constraint
   local dependency_type
+  local package_path
+  local package_version
+  local package_version_selected
+  local package_src
 
   package_name=$1
   package_version_constraint=$2
@@ -88,13 +94,14 @@ exec_install_from_index() {
   fi
 
   ## TODO: Implement version constraint
-  local package_version_selected=1
-  local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
+  package_version_selected=1
+  package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
-  local package_name=$(echo "${package_search}" | awk '{print $1}')
-  local package_url=$(echo "${package_search}" | awk '{print $2}')
-  local package_path=$(echo "${package_search}" | awk '{print $3}')
-  local package_version=$(echo "${package_search}" | awk '{print $4}')
+  package_entry=$(echo "${package_search}" | cut -d'#' -f1)
+  package_name=$(echo "${package_entry}" | awk '{print $1}')
+  package_url=$(echo "${package_entry}" | awk '{print $2}')
+  package_path=$(echo "${package_entry}" | awk '{print $3}')
+  package_version=$(echo "${package_entry}" | awk '{print $4}')
 
   if [ -d "${package_src}" ]; then
     rm -fr "${package_src}"
