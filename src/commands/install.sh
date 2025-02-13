@@ -24,7 +24,9 @@ run_install() {
 
   mush_env
 
-  if [ -n "$PACKAGE_PATH" ]; then
+  if [ -n "${LIST}" ]; then
+    tree -d -L 2 $MUSH_HOME/registry/src
+  elif [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
 
     [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
