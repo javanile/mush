@@ -75,18 +75,19 @@ exec_install_from_index() {
   local package_entry
   local package_name
   local package_url
-  local package_version_constraint
+  #local package_version_constraint
   local dependency_type
   local package_path
   local package_version
-  local package_version_selected
+  #local package_version_selected
   local package_src
+  local package_search
 
   package_name=$1
-  package_version_constraint=$2
+  #package_version_constraint=$2
   dependency_type=$3
 
-  local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+  package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
   if [ -z "${package_search}" ]; then
     console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '*'"
@@ -94,7 +95,7 @@ exec_install_from_index() {
   fi
 
   ## TODO: Implement version constraint
-  package_version_selected=1
+  #package_version_selected=1
   package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
   package_entry=$(echo "${package_search}" | cut -d'#' -f1)
