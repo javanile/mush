@@ -10,6 +10,8 @@ parser_definition_install() {
 
   param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+  flag   LIST           -l --list                         -- "List all installed packages and their versions"
+
   disp   :usage         -h --help                         -- "Print help information"
 }
 
