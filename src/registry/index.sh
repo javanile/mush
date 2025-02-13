@@ -43,7 +43,7 @@ mush_registry_index_update()
     echo "${packages_file_url} ${packages_hash}" > "${MUSH_REGISTRY_CACHE}"
     mush_registry_index_parse "${packages_file_url}"
   elif [ "${VERBOSE}" -gt "0" ]; then
-    console_debug "Updating" "index through cache"
+    console_status "Updating" "index through cache"
   fi
 }
 
