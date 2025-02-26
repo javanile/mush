@@ -1,0 +1,10 @@
+[package]
+name = "sed_utils"
+version = "0.1.0"
+description = "Collection of sed utility functions for text processing"
+license = "MIT"
+edition = "2022"
+
+# See more keys and their definitions at https://mush.javanile.org/manifest.html
+
+[dependencies]
