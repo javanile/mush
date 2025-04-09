@@ -1,40 +1,75 @@
-##
-## Packages file
-## =============
-##
-## This file lists all the nodes and packages that contribute to building the package registry index.
-##
-## Key Definitions:
-## ----------------
-##
-## index <url>
-##    - This key points to another .packages file hosted in a different repository.
-##    - Each `index` entry expands the overall package registry by including the packages listed in the specified URL.
-##    - Example: index https://github.com/francescobianco/mush-packages
-##
-## package <name> <url> [subdirectory]
-##    - This key defines a package and its source location.
-##    - <name> specifies the package name.
-##    - <url> specifies the repository where the package is hosted.
-##    - [subdirectory] (optional) specifies the directory within the repository where the package files are located.
-##    - Example: package mush https://github.com/javanile/mush.git
-##               package console https://github.com/javanile/mush.git packages/console
-##
+################################################################################
+#                                                                              #
+#                     ███╗   ███╗██╗   ██╗███████╗██╗  ██╗                    #
+#                     ████╗ ████║██║   ██║██╔════╝██║  ██║                    #
+#                     ██╔████╔██║██║   ██║███████╗███████║                    #
+#                     ██║╚██╔╝██║██║   ██║╚════██║██╔══██║                    #
+#                     ██║ ╚═╝ ██║╚██████╔╝███████║██║  ██║                    #
+#                     ╚═╝     ╚═╝ ╚═════╝ ╚══════╝╚═╝  ╚═╝                    #
+#                                                                              #
+################################################################################
+#
+# SUPPORT THE MISSION:
+#
+# This project aims to make the DevOps and cloud world less complex and less
+# dependent on closed technologies. Our mission is to ensure that DevOps
+# becomes an activity focused on system access, leveraging base APIs at 100%
+# efficiency rather than relying on costly and unnecessary proprietary wrappers.
+#
+# Join us in building a more open and accessible DevOps ecosystem!
+#
+################################################################################
+#
+# Description:
+#   This file defines the package registry index and lists all nodes and 
+#   packages that contribute to building it.
+#
+# Format:
+#   index <url>         - References another .packages file in a remote repository
+#   package <name> <url> [subdirectory] - Defines a package and its source location
+#
+# Maintainer: N/A
+# Version: 1.0
+# Last Updated: 2025-04-09
+#
+################################################################################
 
-## Affiliate Indexes
+#------------------------------------------------------------------------------
+# AFFILIATE INDEXES
+#------------------------------------------------------------------------------
+
 index https://github.com/francescobianco/mush-packages
 
-## Core Packages
-package mush https://github.com/javanile/mush.git
-package console https://github.com/javanile/mush.git packages/console # Console prints amazing output in Rush-style!
-package getoptions https://github.com/javanile/mush.git packages/getoptions
-package code_dumper https://github.com/javanile/mush.git packages/code_dumper
-package error_trace https://github.com/javanile/mush.git packages/error_trace
-package build_logger https://github.com/javanile/mush.git packages/build_logger
-package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit
+#------------------------------------------------------------------------------
+# CORE PACKAGES
+#------------------------------------------------------------------------------
 
-## Misc Packages
+# Main package
+package mush https://github.com/javanile/mush.git
+
+# Core components
+package console https://github.com/javanile/mush.git packages/console           # Rush-style console output
+package getoptions https://github.com/javanile/mush.git packages/getoptions      # Option parsing support
+package code_dumper https://github.com/javanile/mush.git packages/code_dumper    # Code inspection utilities
+package error_trace https://github.com/javanile/mush.git packages/error_trace    # Error handling framework
+package build_logger https://github.com/javanile/mush.git packages/build_logger  # Build process logging
+package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit # Testing framework
+
+#------------------------------------------------------------------------------
+# MISCELLANEOUS PACKAGES
+#------------------------------------------------------------------------------
+
 package linkedin.sh https://github.com/francescobianco/linkedin.sh.git
 
-## Hackathon
+#------------------------------------------------------------------------------
+# HACKATHON PACKAGES
+#------------------------------------------------------------------------------
+
 package matrix-theme https://github.com/francescobianco/matrix-theme.git
+
+#------------------------------------------------------------------------------
+# EXPERIMENTAL/DEVELOPMENT PACKAGES
+#------------------------------------------------------------------------------
+
+# Add experimental packages below
+# package example-pkg https://github.com/example/example-pkg.git
