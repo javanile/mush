@@ -41,6 +41,7 @@
 #------------------------------------------------------------------------------
 
 index https://github.com/francescobianco/mush-packages
+index https://github.com/francescobianco/mush-plugins
 
 #------------------------------------------------------------------------------
 # CORE PACKAGES
