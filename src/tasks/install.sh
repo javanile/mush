@@ -107,19 +107,18 @@ exec_install_from_index() {
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
 
-  if [ -d "${package_src}" ]; then
-    rm -fr "${package_src}"
-  fi
-
-  [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
-
-  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
-
   if [ ! -d "${package_src}" ]; then
-    console_error "Cannot install ${package_name}"
-  fi
 
-  rm -fr "${package_src}/.git" "${package_src}/.github" || true
+    [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
+
+    git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
+
+    if [ ! -d "${package_src}" ]; then
+      console_error "Cannot install ${package_name}"
+    fi
+
+    rm -fr "${package_src}/.git" "${package_src}/.github" || true
+  fi
 
   local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
 
