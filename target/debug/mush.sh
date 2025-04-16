@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 set -e
 
-## BP002: Package and debug variables 
+# @build_section: BS002 - Package and debug variables 
 MUSH_PACKAGE_NAME="mush"
 MUSH_TARGET_FILE="target/debug/mush"
 MUSH_TARGET_PATH="target/debug"
 MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
 MUSH_DEBUG_PATH="$(realpath "$(dirname "$0")/../..")"
 
-## BP003: Embedding debug api
+# @build_section: BS003 - Embedding debug api
 debug() {
   local api
   api=$1
@@ -111,7 +111,7 @@ debug() {
   esac
 }
 
-## BP001: Appending entrypoint to debug build
+# @build_section: BS001 - Appending entrypoint to debug build
 debug init
 debug file "${MUSH_DEBUG_PATH}/src/main.sh"
 main "$@"

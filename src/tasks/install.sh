@@ -96,13 +96,16 @@ exec_install_from_index() {
 
   ## TODO: Implement version constraint
   #package_version_selected=1
-  package_src="${MUSH_REGISTRY_SRC}/${package_name}"
 
   package_entry=$(echo "${package_search}" | cut -d'#' -f1)
   package_name=$(echo "${package_entry}" | awk '{print $1}')
   package_url=$(echo "${package_entry}" | awk '{print $2}')
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
+
+  package_version=main
+
+  package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
 
   if [ -d "${package_src}" ]; then
     rm -fr "${package_src}"
@@ -111,7 +114,7 @@ exec_install_from_index() {
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
 
-  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
 }

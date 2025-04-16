@@ -283,3 +283,6 @@ test-posix-exec-install-binaries:
 
 test-search:
 	@sh tests/bare/commands/search/search-test.sh
+
+test-install-list:
+	@sh tests/bare/commands/install/install-list-test.sh
