@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-16 develop)
-# @build_date: 2025-04-16T19:28:45Z
+# @build_date: 2025-04-16T20:09:32Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -972,7 +972,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:25Z
+## @build_date: 2025-04-16T20:09:06Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2398,7 +2398,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:34Z
+## @build_date: 2025-04-16T20:09:20Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2457,7 +2457,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:45Z
+## @build_date: 2025-04-16T20:09:32Z
 set -e
 use() { return 0; }
 extern() { return 0; }

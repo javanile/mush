@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-16 develop)
-# @build_date: 2025-04-16T19:28:45Z
+# @build_date: 2025-04-16T20:09:32Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -972,7 +972,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:25Z
+## @build_date: 2025-04-16T20:09:06Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1683,8 +1683,7 @@ exec_install_from_index() {
   git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
   if [ ! -d "${package_src}" ]; then
-    console_error "failed to retrieve '${package_name}' from '${package_url}'"
-    exit 101
+    console_error "Cannot install ${package_name}"
   fi
 
   rm -fr "${package_src}/.git" "${package_src}/.github" || true
@@ -2399,7 +2398,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:34Z
+## @build_date: 2025-04-16T20:09:20Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2458,7 +2457,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T19:28:45Z
+## @build_date: 2025-04-16T20:09:32Z
 set -e
 use() { return 0; }
 extern() { return 0; }
