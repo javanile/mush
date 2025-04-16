@@ -12,7 +12,7 @@ module registry
 module tasks
 module env
 
-VERSION="Mush 0.2.0 (2025-02-01 develop)"
+VERSION="Mush 0.2.0 (2025-04-16 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
