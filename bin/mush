@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-02-01 develop)
-# @build_date: 2025-04-16T18:36:35Z
+# @build_with: Mush 0.2.0 (2025-04-16 develop)
+# @build_date: 2025-04-16T18:53:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -26,7 +26,7 @@ module registry
 module tasks
 module env
 
-VERSION="Mush 0.2.0 (2025-02-01 develop)"
+VERSION="Mush 0.2.0 (2025-04-16 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -366,11 +366,16 @@ run_build() {
 
   exec_feature_hook "build"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
+
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy build..."
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
   exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
@@ -967,7 +972,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T18:36:11Z
+## @build_date: 2025-04-16T18:53:16Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2386,7 +2391,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T18:36:19Z
+## @build_date: 2025-04-16T18:53:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2445,7 +2450,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T18:36:35Z
+## @build_date: 2025-04-16T18:53:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }

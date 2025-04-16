@@ -30,9 +30,13 @@ install:
 sudo-install:
 	@sudo install -m 0755 target/releasemush /usr/local/bin/
 
-mush-install:
+auto-install:
 	@bash ./bin/mush build --release
 	@bash ./bin/mush install --path .
+
+mush-install:
+	@mush build -vvvv --release
+	@install -m 0755 target/release/mush $(HOME)/.mush/bin/
 
 publish:
 	@git add .

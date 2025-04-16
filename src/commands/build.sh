@@ -23,11 +23,16 @@ run_build() {
 
   exec_feature_hook "build"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
+
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy build..."
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
   exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
