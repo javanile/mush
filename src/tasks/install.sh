@@ -114,7 +114,8 @@ exec_install_from_index() {
     git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
     if [ ! -d "${package_src}" ]; then
-      console_error "Cannot install ${package_name}"
+      console_error "failed to retrieve '${package_name} ${package_version}` from '${package_url}'"
+      exit 101
     fi
 
     rm -fr "${package_src}/.git" "${package_src}/.github" || true
