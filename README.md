@@ -20,6 +20,19 @@ Stay tuned!
 
 ---
 
+<div align="center">
+
+
+<a href="https://www.javanile.org/hackathon/">
+<img src="https://raw.githubusercontent.com/javanile/hackathon/refs/heads/main/assets/images/devops-hackathon-banner.svg" />
+</a>
+
+
+</div>
+
+---
+
+
 # 🍄 Mush
 
 [![autobuild](https://github.com/javanile/mush/actions/workflows/autobuild.yml/badge.svg)](https://github.com/javanile/mush/actions/workflows/autobuild.yml)
