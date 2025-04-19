@@ -33,13 +33,17 @@ run_install() {
 
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_PATH=target/release
-      exec_legacy_fetch "${MUSH_TARGET_PATH}"
-      exec_legacy_build "${MUSH_TARGET_PATH}"
-      exec_dependencies "${MUSH_TARGET_PATH}"
-      exec_build_release "$@"
-      exec_install_binaries
-      exec_install
+      if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+        echo "Install plugin: $MUSH_PACKAGE_NAME"
+      else
+        MUSH_TARGET_PATH=target/release
+        exec_legacy_fetch "${MUSH_TARGET_PATH}"
+        exec_legacy_build "${MUSH_TARGET_PATH}"
+        exec_dependencies "${MUSH_TARGET_PATH}"
+        exec_build_release "$@"
+        exec_install_binaries
+        exec_install
+      fi
     else
       console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
     fi

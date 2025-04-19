@@ -14,6 +14,9 @@ compile_file() {
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
+  # Analyze file for syntax errors
+  bash -n "${src_file}"
+
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"

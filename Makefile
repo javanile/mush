@@ -27,6 +27,9 @@ shellcheck:
 install:
 	@install -m 0755 target/release/mush $(HOME)/.mush/bin/
 
+bin-install:
+	@install -m 0755 bin/mush $(HOME)/.mush/bin/
+
 sudo-install:
 	@sudo install -m 0755 target/releasemush /usr/local/bin/
 

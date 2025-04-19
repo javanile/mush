@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-16 develop)
-# @build_date: 2025-04-16T20:32:49Z
+# @build_date: 2025-04-19T08:05:38Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -530,13 +530,17 @@ run_install() {
 
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_PATH=target/release
-      exec_legacy_fetch "${MUSH_TARGET_PATH}"
-      exec_legacy_build "${MUSH_TARGET_PATH}"
-      exec_dependencies "${MUSH_TARGET_PATH}"
-      exec_build_release "$@"
-      exec_install_binaries
-      exec_install
+      if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+        echo "Install plugin: $MUSH_PACKAGE_NAME"
+      else
+        MUSH_TARGET_PATH=target/release
+        exec_legacy_fetch "${MUSH_TARGET_PATH}"
+        exec_legacy_build "${MUSH_TARGET_PATH}"
+        exec_dependencies "${MUSH_TARGET_PATH}"
+        exec_build_release "$@"
+        exec_install_binaries
+        exec_install
+      fi
     else
       console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
     fi
@@ -972,7 +976,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T20:32:42Z
+## @build_date: 2025-04-19T08:05:33Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1681,7 +1685,8 @@ exec_install_from_index() {
     git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
     if [ ! -d "${package_src}" ]; then
-      console_error "Cannot install ${package_name}"
+      console_error "failed to retrieve '${package_name} ${package_version}' from '${package_url}'"
+      exit 101
     fi
 
     rm -fr "${package_src}/.git" "${package_src}/.github" || true
@@ -2008,6 +2013,9 @@ compile_file() {
   build_mode=${4:-debug}
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
+
+  # Analyze file for syntax errors
+  bash -n "${src_file}"
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
@@ -2397,7 +2405,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T20:32:46Z
+## @build_date: 2025-04-19T08:05:35Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2456,7 +2464,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-16T20:32:49Z
+## @build_date: 2025-04-19T08:05:38Z
 set -e
 use() { return 0; }
 extern() { return 0; }
