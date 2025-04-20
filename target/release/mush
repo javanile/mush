@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-04-16 develop)
-# @build_date: 2025-04-19T08:05:38Z
+# @build_with: Mush 0.2.0 (2025-04-20 develop)
+# @build_date: 2025-04-20T10:15:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -26,7 +26,7 @@ module registry
 module tasks
 module env
 
-VERSION="Mush 0.2.0 (2025-04-16 develop)"
+VERSION="Mush 0.2.0 (2025-04-20 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -54,6 +54,8 @@ parser_definition() {
   cmd   test     -- "Run the tests"
   cmd   search   -- "Search registry for packages"
   cmd   publish  -- "Package and upload this package to the registry"
+  cmd   info     hidden:true -- "Show information of a package in the registry"
+  cmd   index    hidden:true -- "Display index of to the registry"
 }
 
 args_error() {
@@ -131,6 +133,12 @@ main() {
         ;;
       pkgid)
         run_pkgid "$@"
+        ;;
+      index)
+        run_index "$@"
+        ;;
+      info)
+        run_info "$@"
         ;;
       --) # no subcommand, arguments only
     esac
@@ -338,6 +346,8 @@ public read_manifest
 public search
 public test
 public uninstall
+public info
+public index
 
 test0 () {
   echo "TEST"
@@ -923,6 +933,52 @@ run_uninstall() {
   cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
 }
 
+parser_definition_info() {
+	setup REST help:usage abbr:true -- "Display metadata for a package at the current registry" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} info [OPTIONS] [package]" ''
+
+	msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp  :usage         -h --help                         -- "Print help information"
+}
+
+run_info() {
+  eval "$(getoptions parser_definition_info parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  mush_registry_index_update
+
+
+
+  echo "Package: ${MUSH_PACKAGE_NAME}"
+  echo "Version: ${MUSH_PACKAGE_VERSION}"
+  echo "Type:    ${MUSH_PACKAGE_TYPE}"
+}
+
+parser_definition_index() {
+	setup REST help:usage abbr:true -- "Show or manage the index status of current registry" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} index [OPTIONS]" ''
+
+	msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp  :usage         -h --help                         -- "Print help information"
+}
+
+run_index() {
+  eval "$(getoptions parser_definition_index parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  mush_registry_index_update
+
+  cat "$MUSH_REGISTRY_INDEX"
+}
+
 extern package code_dumper
 
 mush_errors_explain() {
@@ -976,7 +1032,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-19T08:05:33Z
+## @build_date: 2025-04-20T10:15:06Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2405,7 +2461,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-19T08:05:35Z
+## @build_date: 2025-04-20T10:15:08Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2464,7 +2520,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-19T08:05:38Z
+## @build_date: 2025-04-20T10:15:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }

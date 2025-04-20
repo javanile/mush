@@ -15,3 +15,5 @@ public read_manifest
 public search
 public test
 public uninstall
+public info
+public index

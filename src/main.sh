@@ -12,7 +12,7 @@ module registry
 module tasks
 module env
 
-VERSION="Mush 0.2.0 (2025-04-16 develop)"
+VERSION="Mush 0.2.0 (2025-04-20 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -27,19 +27,22 @@ parser_definition() {
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
 
-  msg            -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build    -- "Compile the current package"
-  cmd   check    -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch    -- "Fetch dependencies of a package from the network"
-  cmd   init     -- "Create a new package in an existing directory"
-  cmd   install  -- "Build and install a Mush binary"
-  cmd   legacy   -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   metadata -- "Print package metadata"
-  cmd   new      -- "Create a new Mush package"
-  cmd   run      -- "Run a binary or example of the local package"
-  cmd   test     -- "Run the tests"
-  cmd   search   -- "Search registry for packages"
-  cmd   publish  -- "Package and upload this package to the registry"
+  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build   -- "Compile the current package"
+  cmd   check   -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch   -- "Fetch dependencies of a package from the network"
+  cmd   init    -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new     -- "Create a new Mush package"
+  cmd   run     -- "Run a binary or example of the local package"
+  cmd   test    -- "Run the tests"
+  cmd   search  -- "Search registry for packages"
+  cmd   publish -- "Package and upload this package to the registry"
+
+  cmd   metadata hidden:true -- "Print package metadata"
+  cmd   info     hidden:true -- "Show information of a package in the registry"
+  cmd   index    hidden:true -- "Display index of to the registry"
 }
 
 args_error() {
@@ -117,6 +120,12 @@ main() {
         ;;
       pkgid)
         run_pkgid "$@"
+        ;;
+      index)
+        run_index "$@"
+        ;;
+      info)
+        run_info "$@"
         ;;
       --) # no subcommand, arguments only
     esac
