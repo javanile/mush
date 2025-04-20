@@ -18,8 +18,41 @@ run_info() {
   mush_registry_index_update
 
 
+  local package_name
+  local package_entry
 
-  echo "Package: ${MUSH_PACKAGE_NAME}"
-  echo "Version: ${MUSH_PACKAGE_VERSION}"
-  echo "Type:    ${MUSH_PACKAGE_TYPE}"
+  package_name="$1"
+
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    case "$line" in \#*) continue ;; esac
+
+    case "$line" in
+      "$package_name "*)
+        package_entry="${line%%#*}"
+        break
+        ;;
+    esac
+  done < "$MUSH_REGISTRY_INDEX"
+
+  if [ -n "$package_entry" ]; then
+    # shellcheck disable=SC2086
+    set -- $package_entry
+    package_name=$1
+    package_url=$2
+    package_path=$3
+
+    echo "Name: $package_name"
+    echo "Url:  $package_url"
+    echo "Path: $package_path"
+    echo ""
+    echo "Versions:"
+
+    mush_registry_package_versions "$package_url" | sed 's/^/  - /'
+
+    #echo "Entry: $package_entry"
+  else
+    console_error "could not find '$package_name' in registry '${MUSH_REGISTRY_URL}'" >&2
+    exit 101
+  fi
 }

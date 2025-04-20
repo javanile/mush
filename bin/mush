@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-20T10:15:09Z
+# @build_date: 2025-04-20T10:59:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -41,19 +41,20 @@ parser_definition() {
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
 
-  msg            -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build    -- "Compile the current package"
-  cmd   check    -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch    -- "Fetch dependencies of a package from the network"
-  cmd   init     -- "Create a new package in an existing directory"
-  cmd   install  -- "Build and install a Mush binary"
-  cmd   legacy   -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   metadata -- "Print package metadata"
-  cmd   new      -- "Create a new Mush package"
-  cmd   run      -- "Run a binary or example of the local package"
-  cmd   test     -- "Run the tests"
-  cmd   search   -- "Search registry for packages"
-  cmd   publish  -- "Package and upload this package to the registry"
+  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build   -- "Compile the current package"
+  cmd   check   -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch   -- "Fetch dependencies of a package from the network"
+  cmd   init    -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new     -- "Create a new Mush package"
+  cmd   run     -- "Run a binary or example of the local package"
+  cmd   test    -- "Run the tests"
+  cmd   search  -- "Search registry for packages"
+  cmd   publish -- "Package and upload this package to the registry"
+
+  cmd   metadata hidden:true -- "Print package metadata"
   cmd   info     hidden:true -- "Show information of a package in the registry"
   cmd   index    hidden:true -- "Display index of to the registry"
 }
@@ -952,10 +953,43 @@ run_info() {
   mush_registry_index_update
 
 
+  local package_name
+  local package_entry
 
-  echo "Package: ${MUSH_PACKAGE_NAME}"
-  echo "Version: ${MUSH_PACKAGE_VERSION}"
-  echo "Type:    ${MUSH_PACKAGE_TYPE}"
+  package_name="$1"
+
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    case "$line" in \#*) continue ;; esac
+
+    case "$line" in
+      "$package_name "*)
+        package_entry="${line%%#*}"
+        break
+        ;;
+    esac
+  done < "$MUSH_REGISTRY_INDEX"
+
+  if [ -n "$package_entry" ]; then
+    # shellcheck disable=SC2086
+    set -- $package_entry
+    package_name=$1
+    package_url=$2
+    package_path=$3
+
+    echo "Name: $package_name"
+    echo "Url:  $package_url"
+    echo "Path: $package_path"
+    echo ""
+    echo "Versions:"
+
+    mush_registry_package_versions "$package_url" | sed 's/^/  - /'
+
+    #echo "Entry: $package_entry"
+  else
+    console_error "could not find '$package_name' in registry '${MUSH_REGISTRY_URL}'" >&2
+    exit 101
+  fi
 }
 
 parser_definition_index() {
@@ -1032,7 +1066,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:15:06Z
+## @build_date: 2025-04-20T10:59:52Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1322,6 +1356,15 @@ mush_registry_index_parse() {
   done < "${packages_local_file}"
 }
 
+mush_registry_package_versions() {
+  local package_url
+
+  package_url=$1
+
+  git ls-remote --heads "$package_url"  | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
+
+  git ls-remote --tags "$package_url"  | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+}
 public build_debug
 public build_release
 public build_test
@@ -2461,7 +2504,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:15:08Z
+## @build_date: 2025-04-20T10:59:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2520,7 +2563,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:15:09Z
+## @build_date: 2025-04-20T10:59:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }

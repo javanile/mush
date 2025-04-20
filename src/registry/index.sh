@@ -106,3 +106,13 @@ mush_registry_index_parse() {
     esac
   done < "${packages_local_file}"
 }
+
+mush_registry_package_versions() {
+  local package_url
+
+  package_url=$1
+
+  git ls-remote --heads "$package_url"  | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
+
+  git ls-remote --tags "$package_url"  | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+}
