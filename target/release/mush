@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-21T17:07:01Z
+# @build_date: 2025-04-21T17:19:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -513,12 +513,13 @@ parser_definition_install() {
   msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET           -q --quiet                        -- "Do not print mush log messages"
 
-  param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-  flag   LIST           -l --list                         -- "List all installed packages and their versions"
+  param  PACKAGE_VERSION    --version                      -- "Specify a version to install"
+  param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
+  param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
+  flag   LIST            -l --list                         -- "List all installed packages and their versions"
 
   disp   :usage         -h --help                         -- "Print help information"
 }
@@ -564,7 +565,7 @@ run_install() {
       fi
     else
       mush_registry_index_update
-      exec_install_from_index "$1"
+      exec_install_from_index "$1" "${PACKAGE_VERSION}"
     fi
   fi
 }
@@ -1066,7 +1067,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:06:56Z
+## @build_date: 2025-04-21T17:19:21Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2510,7 +2511,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:06:59Z
+## @build_date: 2025-04-21T17:19:24Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2569,7 +2570,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:07:01Z
+## @build_date: 2025-04-21T17:19:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }

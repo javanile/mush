@@ -5,12 +5,13 @@ parser_definition_install() {
   msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET           -q --quiet                        -- "Do not print mush log messages"
 
-  param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
-  flag   LIST           -l --list                         -- "List all installed packages and their versions"
+  param  PACKAGE_VERSION    --version                      -- "Specify a version to install"
+  param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
+  param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
+  flag   LIST            -l --list                         -- "List all installed packages and their versions"
 
   disp   :usage         -h --help                         -- "Print help information"
 }
@@ -56,7 +57,7 @@ run_install() {
       fi
     else
       mush_registry_index_update
-      exec_install_from_index "$1"
+      exec_install_from_index "$1" "${PACKAGE_VERSION}"
     fi
   fi
 }
