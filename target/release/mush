@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-21T18:03:19Z
+# @build_date: 2025-04-21T18:09:02Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1075,7 +1075,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:03:14Z
+## @build_date: 2025-04-21T18:08:57Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1799,7 +1799,7 @@ exec_install_from_index() {
     git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
     if [ ! -d "${package_src}" ]; then
-      console_error "failed to retrieve '${package_name} ${package_version}' from '${package_url}'"
+      console_error "failed to retrieve '${package_name}' at version '${package_version}' from '${package_url}'"
       exit 101
     fi
 
@@ -2537,7 +2537,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:03:17Z
+## @build_date: 2025-04-21T18:09:00Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2596,7 +2596,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:03:19Z
+## @build_date: 2025-04-21T18:09:02Z
 set -e
 use() { return 0; }
 extern() { return 0; }
