@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-20T10:59:53Z
+# @build_date: 2025-04-21T15:43:36Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1066,7 +1066,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:59:52Z
+## @build_date: 2025-04-21T15:43:19Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1361,9 +1361,10 @@ mush_registry_package_versions() {
 
   package_url=$1
 
-  git ls-remote --heads "$package_url"  | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
+  git ls-remote --heads "$package_url" | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
 
-  git ls-remote --tags "$package_url"  | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+  # git ls-remote --tags "$package_url" | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+  git ls-remote --tags "$package_url" | sed -n 's|.*refs/tags/\(v\?\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\)\)$|\1|p'
 }
 public build_debug
 public build_release
@@ -2504,7 +2505,7 @@ mush_env() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:59:53Z
+## @build_date: 2025-04-21T15:43:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2563,7 +2564,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-20T10:59:53Z
+## @build_date: 2025-04-21T15:43:36Z
 set -e
 use() { return 0; }
 extern() { return 0; }

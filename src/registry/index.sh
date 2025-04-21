@@ -112,7 +112,8 @@ mush_registry_package_versions() {
 
   package_url=$1
 
-  git ls-remote --heads "$package_url"  | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
+  git ls-remote --heads "$package_url" | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
 
-  git ls-remote --tags "$package_url"  | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+  # git ls-remote --tags "$package_url" | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+  git ls-remote --tags "$package_url" | sed -n 's|.*refs/tags/\(v\?\([0-9]\{1,\}\.[0-9]\{1,\}\.[0-9]\{1,\}\)\)$|\1|p'
 }
