@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2024-03-21)
-# @build_date: 2024-06-27T14:40:16Z
+# @build_with: Mush 0.2.0 (2025-04-20 develop)
+# @build_date: 2025-04-21T18:02:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -24,8 +24,10 @@ module errors
 module package_managers
 module registry
 module tasks
+module env
+module polyfill
 
-VERSION="Mush 0.2.0 (2024-03-21)"
+VERSION="Mush 0.2.0 (2025-04-20 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -40,18 +42,22 @@ parser_definition() {
   flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage  -h --help                         -- "Print help information"
 
-  msg            -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build    -- "Compile the current package"
-  cmd   check    -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch    -- "Fetch dependencies of a package from the network"
-  cmd   init     -- "Create a new package in an existing directory"
-  cmd   install  -- "Build and install a Mush binary"
-  cmd   legacy   -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   metadata -- "Print package metadata"
-  cmd   new      -- "Create a new Mush package"
-  cmd   run      -- "Run a binary or example of the local package"
-  cmd   test     -- "Run the tests"
-  cmd   publish  -- "Package and upload this package to the registry"
+  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build   -- "Compile the current package"
+  cmd   check   -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch   -- "Fetch dependencies of a package from the network"
+  cmd   init    -- "Create a new package in an existing directory"
+  cmd   install -- "Build and install a Mush binary"
+  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new     -- "Create a new Mush package"
+  cmd   run     -- "Run a binary or example of the local package"
+  cmd   test    -- "Run the tests"
+  cmd   search  -- "Search registry for packages"
+  cmd   publish -- "Package and upload this package to the registry"
+
+  cmd   metadata hidden:true -- "Print package metadata"
+  cmd   info     hidden:true -- "Show information of a package in the registry"
+  cmd   index    hidden:true -- "Display index of to the registry"
 }
 
 args_error() {
@@ -124,8 +130,17 @@ main() {
       read-manifest)
         run_read_manifest "$@"
         ;;
+      search)
+        run_search "$@"
+        ;;
       pkgid)
         run_pkgid "$@"
+        ;;
+      index)
+        run_index "$@"
+        ;;
+      info)
+        run_info "$@"
         ;;
       --) # no subcommand, arguments only
     esac
@@ -161,8 +176,8 @@ debug() {
         if [ "$1" = "package" ]; then
           local package_name=$MUSH_PACKAGE_NAME
           local extern_package_name=$2
-          local extern_package_path="${MUSH_TARGET_PATH}/packages/${extern_package_name}"
-          local extern_package_lib_file="${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
+          local extern_package_path="${MUSH_DEBUG_PATH}/${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+          local extern_package_lib_file="${MUSH_DEBUG_PATH}/${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
           if [ -d "${extern_package_path}" ]; then
             debug file "${extern_package_lib_file}"
             debug init
@@ -190,7 +205,7 @@ debug() {
           echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
           exit 101
         fi
-        source "${legacy_file_path}"
+        . "${legacy_file_path}"
       }
       module() {
         local module_name=$1
@@ -201,10 +216,10 @@ debug() {
         local debug_file=$MUSH_DEBUG_FILE
         local package_name=$MUSH_PACKAGE_NAME
         if [ -f "${module_file_path}" ]; then
-          source "${module_file_path}"
+          . "${module_file_path}"
         elif [ -f "${module_dir_file_path}" ]; then
           MUSH_RUNTIME_MODULE=$1
-          source "${module_dir_file_path}"
+          . "${module_dir_file_path}"
         else
           console_error_code E0583 "file not found for module '${module_name}'"
           [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
@@ -226,9 +241,9 @@ debug() {
         local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
         local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
         if [ -f "${module_file_path}" ]; then
-          source "${module_file_path}"
+          . "${module_file_path}"
         elif [ -f "${module_dir_file_path}" ]; then
-          source "${module_dir_file_path}"
+          . "${module_dir_file_path}"
         else
           echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
           exit 101
@@ -246,7 +261,7 @@ debug() {
     file)
       local previous_debug_file=$MUSH_DEBUG_FILE
       MUSH_DEBUG_FILE=$2
-      source "$2"
+      . "$2"
       MUSH_DEBUG_FILE=$previous_debug_file
       ;;
     *)
@@ -330,8 +345,11 @@ public run
 public pkgid
 public publish
 public read_manifest
+public search
 public test
 public uninstall
+public info
+public index
 
 test0 () {
   echo "TEST"
@@ -360,11 +378,16 @@ run_build() {
 
   exec_feature_hook "build"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
+
+  [ "$VERBOSE" -gt "3" ] && echo "Legacy build..."
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
   exec_dependencies "${MUSH_TARGET_PATH}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
@@ -491,11 +514,14 @@ parser_definition_install() {
   msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
-  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
-  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET           -q --quiet                        -- "Do not print mush log messages"
 
-  param  PACKAGE_PATH      --path                         -- "Filesystem path to local package to install"
-  param  BUILD_TARGET   -t --target                       -- "Build for the specific target"
+  param  PACKAGE_VERSION    --version                      -- "Specify a version to install"
+  param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
+  param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
+  flag   LIST            -l --list                         -- "List all installed packages and their versions"
+
   disp   :usage         -h --help                         -- "Print help information"
 }
 
@@ -506,20 +532,28 @@ run_install() {
 
   local package_path
 
-  if [ -n "$PACKAGE_PATH" ]; then
+  mush_env
+
+  if [ -n "${LIST}" ]; then
+    tree -d -L 3 $MUSH_HOME/registry/src | sed '$d'
+  elif [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
 
     [ "${VERBOSE}" -gt 5 ] && console_info "Installing" "path='$PACKAGE_PATH' realpath='$package_path'"
 
     if [ -f "${package_path}/Manifest.toml" ]; then
       exec_manifest_lookup "${package_path}"
-      MUSH_TARGET_PATH=target/release
-      exec_legacy_fetch "${MUSH_TARGET_PATH}"
-      exec_legacy_build "${MUSH_TARGET_PATH}"
-      exec_dependencies "${MUSH_TARGET_PATH}"
-      exec_build_release "$@"
-      exec_install_binaries
-      exec_install
+      if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+        echo "Install plugin: $MUSH_PACKAGE_NAME"
+      else
+        MUSH_TARGET_PATH=target/release
+        exec_legacy_fetch "${MUSH_TARGET_PATH}"
+        exec_legacy_build "${MUSH_TARGET_PATH}"
+        exec_dependencies "${MUSH_TARGET_PATH}"
+        exec_build_release "$@"
+        exec_install_binaries
+        exec_install
+      fi
     else
       console_error "'${package_path}' does not contain a Manifest.toml file. --path must point to a directory containing a Manifest.toml file."
     fi
@@ -532,7 +566,7 @@ run_install() {
       fi
     else
       mush_registry_index_update
-      exec_install_from_index "$1"
+      exec_install_from_index "$1" "${PACKAGE_VERSION}"
     fi
   fi
 }
@@ -605,11 +639,18 @@ run_metadata() {
   parse "$@"
   eval "set -- $REST"
 
+  mush_env
+
   exec_manifest_lookup "${PWD}"
 
   echo "Package: ${MUSH_PACKAGE_NAME}"
   echo "Version: ${MUSH_PACKAGE_VERSION}"
   echo "Type:    ${MUSH_PACKAGE_TYPE}"
+
+  echo ""
+
+  echo "Features:"
+  echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 }
 
 parser_definition_new() {
@@ -801,6 +842,36 @@ run_read_manifest() {
   exec_manifest_lookup
 }
 
+parser_definition_search() {
+  setup   REST help:usage abbr:true -- "Search registry for package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} search [OPTIONS] [query]..." ''
+
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_search() {
+  eval "$(getoptions parser_definition_install parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  mush_registry_index_update
+
+  local query
+
+  query="$1"
+
+  echo "Query: ${query}"
+
+  awk '{name=$1; desc=""; if (index($0, "#")) desc=substr($0, index($0, "#")); print name, desc}' \
+    "${MUSH_REGISTRY_INDEX}" \
+    | grep --color=auto -i "${query}"
+}
+
 parser_definition_test() {
 	setup   REST help:usage abbr:true -- "Execute all unit and integration tests and build examples of a local package" ''
 
@@ -872,6 +943,85 @@ run_uninstall() {
   cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
 }
 
+parser_definition_info() {
+	setup REST help:usage abbr:true -- "Display metadata for a package at the current registry" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} info [OPTIONS] [package]" ''
+
+	msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp  :usage         -h --help                         -- "Print help information"
+}
+
+run_info() {
+  eval "$(getoptions parser_definition_info parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  mush_registry_index_update
+
+
+  local package_name
+  local package_entry
+
+  package_name="$1"
+
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    case "$line" in \#*) continue ;; esac
+
+    case "$line" in
+      "$package_name "*)
+        package_entry="${line%%#*}"
+        break
+        ;;
+    esac
+  done < "$MUSH_REGISTRY_INDEX"
+
+  if [ -n "$package_entry" ]; then
+    # shellcheck disable=SC2086
+    set -- $package_entry
+    package_name=$1
+    package_url=$2
+    package_path=$3
+
+    echo "Name: $package_name"
+    echo "Url:  $package_url"
+    echo "Path: $package_path"
+    echo ""
+    echo "Versions:"
+
+    mush_registry_package_versions "$package_url" | sed 's/^/ - /'
+
+    #echo "Entry: $package_entry"
+  else
+    console_error "could not find '$package_name' in registry '${MUSH_REGISTRY_URL}'" >&2
+    exit 101
+  fi
+}
+
+parser_definition_index() {
+	setup REST help:usage abbr:true -- "Show or manage the index status of current registry" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} index [OPTIONS]" ''
+
+	msg   -- 'OPTIONS:'
+  flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET          -q --quiet                        -- "Do not print mush log messages"
+	disp  :usage         -h --help                         -- "Print help information"
+}
+
+run_index() {
+  eval "$(getoptions parser_definition_index parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  mush_registry_index_update
+
+  cat "$MUSH_REGISTRY_INDEX"
+}
+
 extern package code_dumper
 
 mush_errors_explain() {
@@ -925,7 +1075,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T14:40:12Z
+## @build_date: 2025-04-21T18:02:04Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1112,10 +1262,33 @@ mush_registry_index_update()
   MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
   MUSH_REGISTRY_URL=https://github.com/javanile/mush
   MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
-  MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
+  MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
 
+  local packages_file_url
+  local packages_cache_hash
+  local packages_hash
+
   local update_strategy="${1:-lazy}"
+
+  [ "$VERBOSE" -gt "0" ] && console_status "Indexing" "updating strategy: $update_strategy"
+
+  if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
+    while read -r line; do
+      [ "$VERBOSE" -gt "2" ] && echo "Entry cache: ${line}"
+      [ -z "${line}" ] && continue
+      [ "$(echo "$line" | cut -c1)" = "#" ] && continue
+      packages_file_url="$(echo "${line}" | awk '{print $1}')"
+      packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
+      packages_hash="$(curl -I -s -L -H "Pragma: no-cache" -H "Cache-Control: no-cache" "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+      if [ "${packages_cache_hash}" = "${packages_hash}" ]; then
+        [ "$VERBOSE" -gt "3" ] && echo "Entry cache: ${line} [unchanged]"
+      else
+        rm -fr "${MUSH_HOME}/registry/index" && true
+      fi
+    done < "${MUSH_REGISTRY_CACHE}"
+  fi
 
   if [ "${update_strategy}" = "full" ]; then
     rm -fr "${MUSH_HOME}/registry/index" && true
@@ -1125,13 +1298,28 @@ mush_registry_index_update()
     console_status "Updating" "mush packages index"
     mkdir -p "${MUSH_HOME}/registry/index"
     > "${MUSH_REGISTRY_INDEX}"
-    mush_registry_index_parse "${MUSH_REGISTRY_URL}/raw/main/.packages"
+    local packages_file_url="${MUSH_REGISTRY_URL}/raw/main/.packages"
+    local packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+    echo "${packages_file_url} ${packages_hash}" > "${MUSH_REGISTRY_CACHE}"
+    mush_registry_index_parse "${packages_file_url}"
+  elif [ "${VERBOSE}" -gt "0" ]; then
+    console_status "Updating" "index through cache"
   fi
 }
 
 mush_registry_index_parse() {
   local packages_file
   local packages_local_file
+  local packages_index
+  local entry
+  local entry_type
+  local entry_description
+  local package_name
+  local package_url
+  local package_path
+  local package_version
+  local packages_file_url
+  local packages_hash
   local packages_index
 
   packages_file=$1
@@ -1149,20 +1337,26 @@ mush_registry_index_parse() {
   while read -r line; do
     #echo "Entry: ${line}"
     [ -z "${line}" ] && continue
-    [ "${line:0:1}" = "#" ] && continue
+    [ "$(echo "$line" | cut -c1)" = "#" ] && continue
 
-    local entry_type=$(echo "${line}" | awk '{print $1}')
+    entry=$(echo "${line}" | cut -d'#' -f1)
+    entry_type=$(echo "${line}" | awk '{print $1}')
+    entry_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 ;; *) echo "(no description)" ;; esac)
+
     case "${entry_type}" in
       "index")
-        local entry_url=$(echo "${line}" | awk '{print $2}')
-        mush_registry_index_parse "${entry_url}/raw/main/.packages"
+        entry_url=$(echo "${entry}" | awk '{print $2}')
+        packages_file_url="${entry_url}/raw/main/.packages"
+        packages_hash="$(curl -I -s -L "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
+        mush_registry_index_parse "${packages_file_url}"
+        echo "${packages_file_url} ${packages_hash}" >> "${MUSH_REGISTRY_CACHE}"
         ;;
       "package")
-        local package_name=$(echo "${line}" | awk '{print $2}')
-        local package_url=$(echo "${line}" | awk '{print $3}')
-        local package_path=$(echo "${line}" | awk '{print $4}')
-        local package_version=$(echo "${line}" | awk '{print $5}')
-        echo "${package_name} ${package_url} ${package_path} ${package_version}" >> "${MUSH_REGISTRY_INDEX}"
+        package_name=$(echo "${entry}" | awk '{print $2}')
+        package_url=$(echo "${entry}" | awk '{print $3}')
+        package_path=$(echo "${entry}" | awk '{print $4}')
+        package_version=$(echo "${entry}" | awk '{print $5}')
+        echo "${package_name} ${package_url} ${package_path} ${package_version} # ${entry_description}" >> "${MUSH_REGISTRY_INDEX}"
         ;;
       *)
         console_error "not supported entry type at '${packages_file}'"
@@ -1171,6 +1365,21 @@ mush_registry_index_parse() {
   done < "${packages_local_file}"
 }
 
+mush_registry_package_versions() {
+  local package_url
+
+  package_url=$1
+
+  git ls-remote --heads "$package_url" | sed 's?.*refs/heads/??' | grep -E '^[a-z]+$'
+
+  # git ls-remote --tags "$package_url" | sed -n 's|.*refs/tags/\(v\?\([0-9]\+\.[0-9]\+\.[0-9]\+\)\)$|\1|p'
+  git ls-remote --tags "$package_url"  | \
+                                        grep -o 'refs/tags/v\?[0-9]*\.[0-9]*\.[0-9]*$' | \
+                                        sed 's|refs/tags/||' | \
+                                        sort -V -r
+
+
+  }
 public build_debug
 public build_release
 public build_test
@@ -1186,9 +1395,13 @@ public plugin
 public dependencies
 
 exec_build_debug() {
-  local src_file=$1
-  local bin_file=$2
-  local lib_file=$3
+  local src_file
+  local bin_file
+  local lib_file
+
+  src_file=$1
+  bin_file=$2
+  lib_file=$3
 
   mkdir -p "$(dirname "${bin_file}")"
 
@@ -1210,26 +1423,26 @@ exec_build_debug() {
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
   MUSH_DEBUG_PATH="${PWD}"
 
-  echo "## BP002: Package and debug variables " >> "${build_file}"
+  echo "# @build_section: BS002 - Package and debug variables " >> "${build_file}"
   echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
   echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
   echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
   echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\"\${MUSH_DEBUG_TARGET_FILE::-\${#MUSH_TARGET_FILE}-1}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
   exec_feature_hook "build_debug_head_section" "${build_file}"
 
-  echo "## BP003: Embedding debug api" >> "${build_file}"
+  echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
   echo "" >> "${build_file}"
 
   if [ -n "${lib_file}" ]; then
-    echo "## BP015: Appending library" >> "${build_file}"
+    echo "# @build_section: BS015 - Appending library" >> "${build_file}"
     echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
   fi
 
-  echo "## BP001: Appending entrypoint to debug build" >> "${build_file}"
+  echo "# @build_section: BS001 - Appending entrypoint to debug build" >> "${build_file}"
   echo "debug init" >> "${build_file}"
   echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -1473,6 +1686,34 @@ exec_init() {
 
 exec_install_binaries() {
   echo "${MUSH_BINARIES}"
+
+  local binaries
+  local bin_name
+  local bin_path
+  local tmp_ifs
+
+  binaries="${MUSH_BINARIES}"
+
+  for bin in $binaries; do
+    bin_name=""
+    bin_path=""
+
+    tmp_ifs=$IFS
+    IFS=','
+    for field in ${bin}; do
+      case "$field" in
+        name=*)
+          bin_name="${field#name=}"
+          ;;
+        path=*)
+          bin_path="${field#path=}"
+          ;;
+      esac
+    done
+    IFS=$tmp_ifs
+
+    echo "name: $bin_name, path: $bin_path"
+  done
 }
 
 
@@ -1516,15 +1757,22 @@ exec_install() {
 }
 
 exec_install_from_index() {
+  local package_entry
   local package_name
-  local package_version_constraint
+  local package_url
+  #local package_version_constraint
   local dependency_type
+  local package_path
+  local package_version
+  #local package_version_selected
+  local package_src
+  local package_search
 
   package_name=$1
-  package_version_constraint=$2
+  #package_version_constraint=$2
   dependency_type=$3
 
-  local package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+  package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
   if [ -z "${package_search}" ]; then
     console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '*'"
@@ -1532,22 +1780,33 @@ exec_install_from_index() {
   fi
 
   ## TODO: Implement version constraint
-  local package_version_selected=1
-  local package_src="${MUSH_REGISTRY_SRC}/${package_name}"
+  #package_version_selected=1
 
-  local package_name=$(echo "${package_search}" | awk '{print $1}')
-  local package_url=$(echo "${package_search}" | awk '{print $2}')
-  local package_path=$(echo "${package_search}" | awk '{print $3}')
-  local package_version=$(echo "${package_search}" | awk '{print $4}')
+  package_entry=$(echo "${package_search}" | cut -d'#' -f1)
+  package_name=$(echo "${package_entry}" | awk '{print $1}')
+  package_url=$(echo "${package_entry}" | awk '{print $2}')
+  package_path=$(echo "${package_entry}" | awk '{print $3}')
+  package_version=$(echo "${package_entry}" | awk '{print $4}')
 
-  if [ -d "${package_src}" ]; then
-    rm -fr "${package_src}"
+  package_version=main
+
+  package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
+
+  if [ ! -d "${package_src}" ]; then
+
+    [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
+
+    git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
+
+    if [ ! -d "${package_src}" ]; then
+      console_error "failed to retrieve '${package_name} ${package_version}' from '${package_url}'"
+      exit 101
+    fi
+
+    rm -fr "${package_src}/.git" "${package_src}/.github" || true
   fi
 
-  git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1
-  rm -fr "${package_src}/.git" "${package_src}/.github" || true
-
-  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_path}"
+  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
 }
@@ -1743,20 +2002,28 @@ exec_manifest_lookup() {
   fi
 
   MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
+
+  MUSH_FEATURES=$(printf "%s\n" "$MUSH_FEATURES" | \
+      sed '/^$/d' | \
+      tac | \
+      sort -t= -k1,1 -u | \
+      tac
+  )
 }
 
 manifest_parse() {
   local manifest_file=$1
 
     #echo "S:"
-    newline=$'\n'
+    newline='
+'
     section=MUSH_USTABLE
-    while IFS= read -r line || [[ -n "${line}" ]]; do
+    while IFS= read -r line || [ -n "${line}" ]; do
       line="${line#"${line%%[![:space:]]*}"}"
       line="${line%"${line##*[![:space:]]}"}"
       line_number=$((line_number + 1))
-      [[ -z "${line}" ]] && continue
-      [[ "${line::1}" == "#" ]] && continue
+      [ -z "${line}" ] && continue
+      [ "$(printf '%s' "$line" | cut -c1)" = "#" ] && continue
       case $line in
         "[package]")
           section=MUSH_PACKAGE
@@ -1786,7 +2053,7 @@ manifest_parse() {
           section=MUSH_DEV_LEGACY_BUILD
           ;;
         "[features]")
-          section=MUSH_FEATURE
+          section=MUSH_FEATURES
           ;;
         "[[bin]]")
           section=MUSH_BINARIES
@@ -1829,7 +2096,7 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
-            MUSH_FEATURE)
+            MUSH_FEATURES)
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
@@ -1853,6 +2120,8 @@ manifest_parse() {
     #echo "E."
 }
 
+
+
 compile_file() {
   local src_file
   local build_file
@@ -1865,6 +2134,9 @@ compile_file() {
   build_mode=${4:-debug}
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
+
+  # Analyze file for syntax errors
+  bash -n "${src_file}"
 
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
@@ -2165,6 +2437,8 @@ exec_dependencies() {
 process_dependencies() {
   local dependencies_type
   local dependencies_list
+  local package_name
+  local package_signature
 
   dependencies_type=$1
   if [ "${dependencies_type}" = "prod" ]; then
@@ -2176,8 +2450,8 @@ process_dependencies() {
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
 
-    local package_name=${dependency%=*}
-    local package_signature=${dependency#*=}
+    package_name="${dependency%=*}"
+    package_signature="${dependency#*=}"
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}"
@@ -2245,10 +2519,25 @@ process_dependencies_build() {
     fi
   done
 }
+
+mush_env() {
+  local newline
+
+  newline='
+'
+
+  MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
+
+  MUSH_FEATURES="${MUSH_FEATURES}init=true${newline}"
+  MUSH_FEATURES="${MUSH_FEATURES}build=true${newline}"
+  MUSH_FEATURES="${MUSH_FEATURES}build_release=true${newline}"
+}
+
+tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T14:40:14Z
+## @build_date: 2025-04-21T18:02:07Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2307,7 +2596,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2024-06-27T14:40:16Z
+## @build_date: 2025-04-21T18:02:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }

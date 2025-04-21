@@ -48,7 +48,7 @@ run_info() {
     echo ""
     echo "Versions:"
 
-    mush_registry_package_versions "$package_url" | sed 's/^/  - /'
+    mush_registry_package_versions "$package_url" | sed 's/^/ - /'
 
     #echo "Entry: $package_entry"
   else

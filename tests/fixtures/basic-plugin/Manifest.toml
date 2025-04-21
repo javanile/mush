@@ -15,3 +15,6 @@ path = "src/other_command/main.rs"
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [dev-dependencies]
+
+[features]
+build = false

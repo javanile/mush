@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-21T17:19:26Z
+# @build_date: 2025-04-21T18:03:19Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -25,6 +25,7 @@ module package_managers
 module registry
 module tasks
 module env
+module polyfill
 
 VERSION="Mush 0.2.0 (2025-04-20 develop)"
 
@@ -638,11 +639,18 @@ run_metadata() {
   parse "$@"
   eval "set -- $REST"
 
+  mush_env
+
   exec_manifest_lookup "${PWD}"
 
   echo "Package: ${MUSH_PACKAGE_NAME}"
   echo "Version: ${MUSH_PACKAGE_VERSION}"
   echo "Type:    ${MUSH_PACKAGE_TYPE}"
+
+  echo ""
+
+  echo "Features:"
+  echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 }
 
 parser_definition_new() {
@@ -984,7 +992,7 @@ run_info() {
     echo ""
     echo "Versions:"
 
-    mush_registry_package_versions "$package_url" | sed 's/^/  - /'
+    mush_registry_package_versions "$package_url" | sed 's/^/ - /'
 
     #echo "Entry: $package_entry"
   else
@@ -1067,7 +1075,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:19:21Z
+## @build_date: 2025-04-21T18:03:14Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1994,6 +2002,13 @@ exec_manifest_lookup() {
   fi
 
   MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
+
+  MUSH_FEATURES=$(printf "%s\n" "$MUSH_FEATURES" | \
+      sed '/^$/d' | \
+      tac | \
+      sort -t= -k1,1 -u | \
+      tac
+  )
 }
 
 manifest_parse() {
@@ -2038,7 +2053,7 @@ manifest_parse() {
           section=MUSH_DEV_LEGACY_BUILD
           ;;
         "[features]")
-          section=MUSH_FEATURE
+          section=MUSH_FEATURES
           ;;
         "[[bin]]")
           section=MUSH_BINARIES
@@ -2081,7 +2096,7 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
-            MUSH_FEATURE)
+            MUSH_FEATURES)
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
@@ -2506,12 +2521,23 @@ process_dependencies_build() {
 }
 
 mush_env() {
+  local newline
+
+  newline='
+'
+
   MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
+
+  MUSH_FEATURES="${MUSH_FEATURES}init=true${newline}"
+  MUSH_FEATURES="${MUSH_FEATURES}build=true${newline}"
+  MUSH_FEATURES="${MUSH_FEATURES}build_release=true${newline}"
 }
+
+tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:19:24Z
+## @build_date: 2025-04-21T18:03:17Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2570,7 +2596,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T17:19:26Z
+## @build_date: 2025-04-21T18:03:19Z
 set -e
 use() { return 0; }
 extern() { return 0; }

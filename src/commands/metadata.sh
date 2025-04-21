@@ -15,9 +15,16 @@ run_metadata() {
   parse "$@"
   eval "set -- $REST"
 
+  mush_env
+
   exec_manifest_lookup "${PWD}"
 
   echo "Package: ${MUSH_PACKAGE_NAME}"
   echo "Version: ${MUSH_PACKAGE_VERSION}"
   echo "Type:    ${MUSH_PACKAGE_TYPE}"
+
+  echo ""
+
+  echo "Features:"
+  echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 }

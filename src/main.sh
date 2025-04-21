@@ -11,6 +11,7 @@ module package_managers
 module registry
 module tasks
 module env
+module polyfill
 
 VERSION="Mush 0.2.0 (2025-04-20 develop)"
 

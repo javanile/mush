@@ -24,6 +24,13 @@ exec_manifest_lookup() {
   fi
 
   MUSH_PACKAGE_TYPE="${MUSH_PACKAGE_TYPE:-lib}"
+
+  MUSH_FEATURES=$(printf "%s\n" "$MUSH_FEATURES" | \
+      sed '/^$/d' | \
+      tac | \
+      sort -t= -k1,1 -u | \
+      tac
+  )
 }
 
 manifest_parse() {
@@ -68,7 +75,7 @@ manifest_parse() {
           section=MUSH_DEV_LEGACY_BUILD
           ;;
         "[features]")
-          section=MUSH_FEATURE
+          section=MUSH_FEATURES
           ;;
         "[[bin]]")
           section=MUSH_BINARIES
@@ -111,7 +118,7 @@ manifest_parse() {
               script=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_DEV_DEPS_BUILD="${MUSH_DEV_DEPS_BUILD}${package}=${script}${newline}"
               ;;
-            MUSH_FEATURE)
+            MUSH_FEATURES)
               feature=$(echo "$line" | cut -d'=' -f1 | xargs | tr '-' '_')
               value=$(echo "$line" | cut -d'=' -f2 | xargs)
               MUSH_FEATURES="${MUSH_FEATURES}${feature}=${value}${newline}"
