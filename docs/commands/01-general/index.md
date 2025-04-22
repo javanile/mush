@@ -1,5 +1,5 @@
 ---
-layout: default
+layout: redirect
 title: General 
 permalink: /commands/general/
 parent: CLI Commands
