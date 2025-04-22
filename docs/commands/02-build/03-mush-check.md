@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush check
-permalink: /commands/check/
+permalink: /commands/mush-check/
 parent: Build
 nav_order: 03
 ---

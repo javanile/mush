@@ -1,7 +1,7 @@
 ---
 layout: default
 title: mush run
-permalink: /commands/run/
+permalink: /commands/mush-run/
 parent: Build
 nav_order: 04
 ---

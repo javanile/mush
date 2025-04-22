@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Package Commands
+title: Package
 permalink: /commands/package/
 parent: CLI Commands
 nav_order: 04

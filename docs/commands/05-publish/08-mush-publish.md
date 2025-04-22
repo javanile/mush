@@ -1,8 +1,8 @@
 ---
 layout: default
 title: mush publish
-permalink: /commands/publish/
-parent: Publish Commands
+permalink: /commands/mush-publish/
+parent: Publish
 nav_order: 08
 ---
 

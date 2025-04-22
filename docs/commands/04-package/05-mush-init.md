@@ -1,8 +1,8 @@
 ---
 layout: default
 title: mush init
-permalink: /commands/init/
-parent: Package Commands
+permalink: /commands/mush-init/
+parent: Package
 nav_order: 05
 ---
 

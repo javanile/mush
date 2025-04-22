@@ -1,8 +1,8 @@
 ---
 layout: default
 title: mush legacy
-permalink: /commands/legacy/
-parent: Manifest Commands
+permalink: /commands/mush-legacy/
+parent: Manifest
 nav_order: 09
 ---
 

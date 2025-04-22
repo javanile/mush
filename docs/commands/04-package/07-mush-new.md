@@ -1,8 +1,8 @@
 ---
 layout: default
 title: mush new
-permalink: /commands/new/
-parent: Package Commands
+permalink: /commands/mush-new/
+parent: Package
 nav_order: 07
 ---
 

@@ -1,8 +1,8 @@
 ---
 layout: default
 title: mush install
-permalink: /commands/install/
-parent: Package Commands
+permalink: /commands/mush-install/
+parent: Package
 nav_order: 06
 ---
 
