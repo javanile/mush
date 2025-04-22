@@ -2,7 +2,7 @@
 layout: default
 title: mush
 permalink: /commands/mush/
-parent: General Commands
+parent: General
 nav_order: 01
 ---
 
@@ -257,3 +257,4 @@ See <https://github.com/javanile/mush/issues> for issues.
 ## SEE ALSO
 
 [The Manifest File](/manifest/), [Environment Variables](/environment-variables/)
+````

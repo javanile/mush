@@ -2,7 +2,7 @@
 layout: default
 title: mush build
 permalink: /commands/mush-build/
-parent: Build Commands
+parent: Build
 nav_order: 02
 ---
 

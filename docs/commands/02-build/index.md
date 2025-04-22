@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Build Commands 
+title: Build 
 permalink: /commands/build/
 parent: CLI Commands
 nav_order: 02

@@ -2,7 +2,7 @@
 layout: default
 title: mush check
 permalink: /commands/check/
-parent: Build Commands
+parent: Build
 nav_order: 03
 ---
 
