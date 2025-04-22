@@ -2,7 +2,7 @@
 layout: default
 title: mush publish
 permalink: /commands/publish/
-parent: CLI Commands
+parent: Publish Commands
 nav_order: 08
 ---
 

@@ -2,7 +2,7 @@
 layout: default
 title: mush run
 permalink: /commands/run/
-parent: CLI Commands
+parent: Build Commands
 nav_order: 04
 ---
 

@@ -2,7 +2,7 @@
 layout: default
 title: mush legacy
 permalink: /commands/legacy/
-parent: CLI Commands
+parent: Manifest Commands
 nav_order: 09
 ---
 

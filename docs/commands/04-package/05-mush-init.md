@@ -1,63 +1,68 @@
 ---
 layout: default
-title: mush new
-permalink: /commands/new/
-parent: CLI Commands
-nav_order: 07
+title: mush init
+permalink: /commands/init/
+parent: Package Commands
+nav_order: 05
 ---
 
-# mush new(1)
+# mush init(1)
 
 ## NAME
 
-mush new --- Create a new Mush package
+mush init --- Create a new Cargo package in an existing directory
 
 ## SYNOPSIS
 
-`mush new` [_options_] _path_
+`mush init` [_options_] [_path_]
 
 ## DESCRIPTION
 
-This command will create a new Cargo package in the given directory. This
-includes a simple template with a `Cargo.toml` manifest, sample source file,
-and a VCS ignore file. If the directory is not already in a VCS repository,
-then a new repository is created (see `--vcs` below).
+This command will create a new Mush manifest in the current directory. Give a
+path as an argument to create in the given directory.
 
-See [mush init(1)](mush-init.md) for a similar command which will create a new manifest
-in an existing directory.
+If there are typically-named Rust source files already in the directory, those
+will be used. If not, then a sample `src/main.sh` file will be created, or
+`src/lib.sh` if `--lib` is passed.
+
+If the directory is not already in a VCS repository, then a new repository
+is created (see `--vcs` below).
+
+See [mush new(1)](mush-new.md) for a similar command which will create a new package in
+a new directory.
 
 ## OPTIONS
 
-### New Options
+### Init Options
 
 <dl>
 
-<dt class="option-term" id="option-cargo-new---bin"><a class="option-anchor" href="#option-cargo-new---bin"></a><code>--bin</code></dt>
+<dt class="option-term" id="option-cargo-init---bin"><a class="option-anchor" href="#option-cargo-init---bin"></a><code>--bin</code></dt>
 <dd class="option-desc">Create a package with a binary target (<code>src/main.rs</code>).
 This is the default behavior.</dd>
 
 
-<dt class="option-term" id="option-cargo-new---lib"><a class="option-anchor" href="#option-cargo-new---lib"></a><code>--lib</code></dt>
+<dt class="option-term" id="option-cargo-init---lib"><a class="option-anchor" href="#option-cargo-init---lib"></a><code>--lib</code></dt>
 <dd class="option-desc">Create a package with a library target (<code>src/lib.rs</code>).</dd>
 
 
-<dt class="option-term" id="option-cargo-new---edition"><a class="option-anchor" href="#option-cargo-new---edition"></a><code>--edition</code> <em>edition</em></dt>
+<dt class="option-term" id="option-cargo-init---edition"><a class="option-anchor" href="#option-cargo-init---edition"></a><code>--edition</code> <em>edition</em></dt>
 <dd class="option-desc">Specify the Rust edition to use. Default is 2021.
 Possible values: 2015, 2018, 2021</dd>
 
 
-<dt class="option-term" id="option-cargo-new---name"><a class="option-anchor" href="#option-cargo-new---name"></a><code>--name</code> <em>name</em></dt>
+<dt class="option-term" id="option-cargo-init---name"><a class="option-anchor" href="#option-cargo-init---name"></a><code>--name</code> <em>name</em></dt>
 <dd class="option-desc">Set the package name. Defaults to the directory name.</dd>
 
 
-<dt class="option-term" id="option-cargo-new---vcs"><a class="option-anchor" href="#option-cargo-new---vcs"></a><code>--vcs</code> <em>vcs</em></dt>
+<dt class="option-term" id="option-cargo-init---vcs"><a class="option-anchor" href="#option-cargo-init---vcs"></a><code>--vcs</code> <em>vcs</em></dt>
 <dd class="option-desc">Initialize a new VCS repository for the given version control system (git,
 hg, pijul, or fossil) or do not initialize any version control at all
 (none). If not specified, defaults to <code>git</code> or the configuration value
 <code>cargo-new.vcs</code>, or <code>none</code> if already inside a VCS repository.</dd>
 
 
-<dt class="option-term" id="option-cargo-new---registry"><a class="option-anchor" href="#option-cargo-new---registry"></a><code>--registry</code> <em>registry</em></dt>
+<dt class="option-term" id="option-cargo-init---registry"><a class="option-anchor" href="#option-cargo-init---registry"></a><code>--registry</code> <em>registry</em></dt>
 <dd class="option-desc">This sets the <code>publish</code> field in <code>Cargo.toml</code> to the given registry name
 which will restrict publishing only to that registry.</p>
 <p>Registry names are defined in <a href="../reference/config.html">Cargo config files</a>.
@@ -73,22 +78,22 @@ be restricted.</dd>
 ### Display Options
 
 <dl>
-<dt class="option-term" id="option-cargo-new--v"><a class="option-anchor" href="#option-cargo-new--v"></a><code>-v</code></dt>
-<dt class="option-term" id="option-cargo-new---verbose"><a class="option-anchor" href="#option-cargo-new---verbose"></a><code>--verbose</code></dt>
+<dt class="option-term" id="option-cargo-init--v"><a class="option-anchor" href="#option-cargo-init--v"></a><code>-v</code></dt>
+<dt class="option-term" id="option-cargo-init---verbose"><a class="option-anchor" href="#option-cargo-init---verbose"></a><code>--verbose</code></dt>
 <dd class="option-desc">Use verbose output. May be specified twice for “very verbose” output which
 includes extra output such as dependency warnings and build script output.
 May also be specified with the <code>term.verbose</code>
 <a href="../reference/config.html">config value</a>.</dd>
 
 
-<dt class="option-term" id="option-cargo-new--q"><a class="option-anchor" href="#option-cargo-new--q"></a><code>-q</code></dt>
-<dt class="option-term" id="option-cargo-new---quiet"><a class="option-anchor" href="#option-cargo-new---quiet"></a><code>--quiet</code></dt>
+<dt class="option-term" id="option-cargo-init--q"><a class="option-anchor" href="#option-cargo-init--q"></a><code>-q</code></dt>
+<dt class="option-term" id="option-cargo-init---quiet"><a class="option-anchor" href="#option-cargo-init---quiet"></a><code>--quiet</code></dt>
 <dd class="option-desc">Do not print cargo log messages.
 May also be specified with the <code>term.quiet</code>
 <a href="../reference/config.html">config value</a>.</dd>
 
 
-<dt class="option-term" id="option-cargo-new---color"><a class="option-anchor" href="#option-cargo-new---color"></a><code>--color</code> <em>when</em></dt>
+<dt class="option-term" id="option-cargo-init---color"><a class="option-anchor" href="#option-cargo-init---color"></a><code>--color</code> <em>when</em></dt>
 <dd class="option-desc">Control when colored output is used. Valid values:</p>
 <ul>
 <li><code>auto</code> (default): Automatically detect if color support is available on the
@@ -106,7 +111,7 @@ terminal.</li>
 
 <dl>
 
-<dt class="option-term" id="option-cargo-new-+toolchain"><a class="option-anchor" href="#option-cargo-new-+toolchain"></a><code>+</code><em>toolchain</em></dt>
+<dt class="option-term" id="option-cargo-init-+toolchain"><a class="option-anchor" href="#option-cargo-init-+toolchain"></a><code>+</code><em>toolchain</em></dt>
 <dd class="option-desc">If Cargo has been installed with rustup, and the first argument to <code>cargo</code>
 begins with <code>+</code>, it will be interpreted as a rustup toolchain name (such
 as <code>+stable</code> or <code>+nightly</code>).
@@ -114,13 +119,13 @@ See the <a href="https://rust-lang.github.io/rustup/overrides.html">rustup docum
 for more information about how toolchain overrides work.</dd>
 
 
-<dt class="option-term" id="option-cargo-new---config"><a class="option-anchor" href="#option-cargo-new---config"></a><code>--config</code> <em>KEY=VALUE</em> or <em>PATH</em></dt>
+<dt class="option-term" id="option-cargo-init---config"><a class="option-anchor" href="#option-cargo-init---config"></a><code>--config</code> <em>KEY=VALUE</em> or <em>PATH</em></dt>
 <dd class="option-desc">Overrides a Cargo configuration value. The argument should be in TOML syntax of <code>KEY=VALUE</code>,
 or provided as a path to an extra configuration file. This flag may be specified multiple times.
 See the <a href="../reference/config.html#command-line-overrides">command-line overrides section</a> for more information.</dd>
 
 
-<dt class="option-term" id="option-cargo-new--C"><a class="option-anchor" href="#option-cargo-new--C"></a><code>-C</code> <em>PATH</em></dt>
+<dt class="option-term" id="option-cargo-init--C"><a class="option-anchor" href="#option-cargo-init--C"></a><code>-C</code> <em>PATH</em></dt>
 <dd class="option-desc">Changes the current working directory before executing any specified operations. This affects
 things like where cargo looks by default for the project manifest (<code>Cargo.toml</code>), as well as
 the directories searched for discovering <code>.cargo/config.toml</code>, for example. This option must
@@ -131,12 +136,12 @@ requires the <code>-Z unstable-options</code> flag to enable (see
 <a href="https://github.com/rust-lang/cargo/issues/10098">#10098</a>).</dd>
 
 
-<dt class="option-term" id="option-cargo-new--h"><a class="option-anchor" href="#option-cargo-new--h"></a><code>-h</code></dt>
-<dt class="option-term" id="option-cargo-new---help"><a class="option-anchor" href="#option-cargo-new---help"></a><code>--help</code></dt>
+<dt class="option-term" id="option-cargo-init--h"><a class="option-anchor" href="#option-cargo-init--h"></a><code>-h</code></dt>
+<dt class="option-term" id="option-cargo-init---help"><a class="option-anchor" href="#option-cargo-init---help"></a><code>--help</code></dt>
 <dd class="option-desc">Prints help information.</dd>
 
 
-<dt class="option-term" id="option-cargo-new--Z"><a class="option-anchor" href="#option-cargo-new--Z"></a><code>-Z</code> <em>flag</em></dt>
+<dt class="option-term" id="option-cargo-init--Z"><a class="option-anchor" href="#option-cargo-init--Z"></a><code>-Z</code> <em>flag</em></dt>
 <dd class="option-desc">Unstable (nightly-only) flags to Cargo. Run <code>cargo -Z help</code> for details.</dd>
 
 
@@ -145,7 +150,7 @@ requires the <code>-Z unstable-options</code> flag to enable (see
 
 ## ENVIRONMENT
 
-See [the reference](../reference/environment-variables.html) for
+See [the reference](../environment-variables.md) for
 details on environment variables that Cargo reads.
 
 
@@ -157,9 +162,12 @@ details on environment variables that Cargo reads.
 
 ## EXAMPLES
 
-1. Create a binary Cargo package in the given directory:
+1. Create a binary Mush package in the current directory:
 
-       cargo new foo
+```shell
+mush init
+```
 
 ## SEE ALSO
-[cargo(1)](cargo.html), [cargo-init(1)](cargo-init.html)
+
+[cargo(1)](mush), [cargo-new(1)](mush-new)

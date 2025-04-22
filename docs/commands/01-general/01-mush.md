@@ -2,7 +2,7 @@
 layout: default
 title: mush
 permalink: /commands/mush/
-parent: CLI Commands
+parent: General Commands
 nav_order: 01
 ---
 

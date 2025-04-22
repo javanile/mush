@@ -2,7 +2,7 @@
 layout: default
 title: mush install
 permalink: /commands/install/
-parent: CLI Commands
+parent: Package Commands
 nav_order: 06
 ---
 
