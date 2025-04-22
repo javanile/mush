@@ -15,7 +15,7 @@ aux_links:
 
 footer_content: >
   © 2024 Francesco Bianco. All rights reserved.
-  <script>document.querySelector('div.site-header a').innerHTML = '🍄 Mush<sup>ALPHA</sup>';</script>  
+  <script>document.querySelector('div.site-header a').innerHTML = '🍄 Mush<sup>BETA</sup>';</script>  
   <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
 
 markdown: kramdown
