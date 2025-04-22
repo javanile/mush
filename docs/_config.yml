@@ -10,6 +10,8 @@ aux_links:
     - "https://github.com/javanile/mush"
   "<img src='/assets/img/discord.svg'/>":
     - "https://discord.gg/SVx7JHjAcY"
+  "<img src='/assets/img/whatsapp.svg'/>":
+    - "https://chat.whatsapp.com/Lt7wfx0wU8yKb8d9SFINUE"
 
 footer_content: >
   © 2024 Francesco Bianco. All rights reserved.

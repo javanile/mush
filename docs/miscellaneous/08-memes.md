@@ -10,6 +10,10 @@ parent: Miscellaneous
 
 This is the page where we remind you that keeping things simple means writing less code, but also using fewer tools than necessary.
 
+## One More Thing
+
+![One More Thing](/assets/img/memes/meme-03.jpg)
+
 ## Huge Amount of Mud
 
 ![Huge Amount of Mud](/assets/img/memes/meme-02.jpg)

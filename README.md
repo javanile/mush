@@ -1,6 +1,6 @@
 <div align="center">
 
-# 🎉 **Exciting News** 🎉<br>**Release 0.3.0 on March 14, 2025!** 
+# 🎉 **Exciting News** 🎉<br>**Release 0.3.0 on March 14, 2026!** 
 
 </div>
 
@@ -19,6 +19,19 @@ Thank you for your ongoing support and for being a part of our community. We loo
 Stay tuned!
 
 ---
+
+<div align="center">
+
+
+<a href="https://www.javanile.org/hackathon/">
+<img src="https://raw.githubusercontent.com/javanile/hackathon/refs/heads/main/assets/images/devops-hackathon-banner.svg" />
+</a>
+
+
+</div>
+
+---
+
 
 # 🍄 Mush
 

@@ -11,7 +11,7 @@ compliance: 1
 
 The installation of the stable version of Mush follows a standard approach, which is straightforward and ideal for most users. Installing the stable release ensures a reliable and tested version suitable for general use. Here’s the standard method:
 
-#### Installing the stable version
+## Installing the stable version
 
 The easiest way to get Mush is to install the current stable release from GitHub using `curl`. This method will also create a directory at `$HOME/.mush/bin`, where you can host the scripts you’ll install subsequently.
 

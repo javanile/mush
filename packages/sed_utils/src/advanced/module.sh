@@ -1,0 +1,3 @@
+public insert_before
+public insert_after
+public delete_lines
