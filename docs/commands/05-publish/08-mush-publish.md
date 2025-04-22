@@ -8,6 +8,8 @@ nav_order: 08
 
 # cargo-publish
 
+
+
 ## NAME
 
 mush publish --- Upload a package to the registry
