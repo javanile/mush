@@ -59,6 +59,12 @@ package build_logger https://github.com/javanile/mush.git packages/build_logger 
 package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit # Testing framework
 
 #------------------------------------------------------------------------------
+# PACKAGE MANAGERS
+#------------------------------------------------------------------------------
+
+package tpkg https://github.com/francescobianco/tpkg.git
+
+#------------------------------------------------------------------------------
 # MISCELLANEOUS PACKAGES
 #------------------------------------------------------------------------------
 
