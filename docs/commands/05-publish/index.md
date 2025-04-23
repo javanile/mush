@@ -1,9 +1,10 @@
 ---
-layout: default
+layout: redirect
 title: Publish
-permalink: /commands/publish/
+permalink: /commands/mush-publish/
 parent: CLI Commands
 nav_order: 05
+redirect_to: /commands/mush-build/
 ---
 
 

@@ -1,11 +1,12 @@
 ---
-layout: default
+layout: redirect
 title: CLI Commands
 permalink: /commands/
 nav_order: 2
 has_children: true
 has_toc: false
 compliance: 1
+redirect_to: /commands/mush/
 ---
 
 # Commands
