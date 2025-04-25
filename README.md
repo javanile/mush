@@ -115,6 +115,18 @@ To interact with us, you can find us in the following ways:
 - [Mush on Discord](https://discord.com/invite/SVx7JHjAcY): Join the `#mush` channel on the Javanile Discord community 
 - [StackOverflow Tag](https://stackoverflow.com/questions/tagged/bash+unit-testing): See existing Q&A for `BASH` and `Unit Testing`. We look at them often
 
+## Acknowledgements
+
+I would like to express my sincere gratitude to those who have contributed to maintaining the idea that Bash and all shell languages are proper programming languages, deserving to be treated with the appropriate tools.
+
+Special thanks to:
+
+**Joseph Werle** ([@jwerle](https://github.com/jwerle)) and **Ben Peachey** ([@Potherca](https://github.com/Potherca)) for their outstanding work in maintaining BPKG and for their contribution in supporting the Bash ecosystem, demonstrating that shell languages deserve the same dignity as other programming languages.
+
+A special acknowledgement goes to **Koichi Nakashima** ([@ko1nksm](https://github.com/ko1nksm)), not only for his pioneering work on ShellSpec, but also for his determination and willingness to keep the world of shell languages at the cutting edge. His vision has shown that these languages are full of possibilities and without effective limitations.
+
+Thanks to their commitment, the shell languages community continues to thrive and evolve, providing developers with powerful and elegant tools to solve complex problems.
+
 ## License
 
 Mush is open-sourced software licensed under the [MIT license](LICENSE.md).
