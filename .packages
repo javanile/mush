@@ -65,7 +65,7 @@ package test_with_bashunit https://github.com/javanile/mush.git packages/test_wi
 package tpkg https://github.com/francescobianco/tpkg.git
 
 #------------------------------------------------------------------------------
-# DEVELOPMENT PACKAGES
+# DEVELOPMENT TOOLS
 #------------------------------------------------------------------------------
 
 package make.sh https://github.com/francescobianco/make.sh.git
