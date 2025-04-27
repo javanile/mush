@@ -73,6 +73,9 @@ process_dependency() {
     mush)
       mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
+    bpkg)
+      bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
+      ;;
     *)
       console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
       exit 101

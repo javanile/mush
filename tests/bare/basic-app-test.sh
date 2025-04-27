@@ -4,10 +4,14 @@ set -e
 echo "Prepare system for testing..."
 echo "------------------------------------------------------------------------------"
 
-mush build -v --target releasesudo make install
+mush build -v --release
+make install
 
+echo ""
 echo "Start testing basic-app..."
 echo "------------------------------------------------------------------------------"
 
-mush build
-
+cd tests/fixtures/basic-app
+rm -fr bin target
+mush build -vvvvvv
+#mush build -vvvvvv --release

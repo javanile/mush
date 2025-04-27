@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-21T18:09:02Z
+# @build_date: 2025-04-27T14:58:52Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1075,7 +1075,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:08:57Z
+## @build_date: 2025-04-27T14:58:50Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1121,6 +1121,47 @@ public bpkg
 public git
 public mush
 public pip
+
+bpkg_dependency() {
+  local pwd
+  local package_name
+  local package_full_name
+  local package_version_constraint
+  local dependency_type
+  local package_cache_file
+  local package_cache_hash
+
+  pwd=$PWD
+  package_name=$1
+  package_full_name=$2
+  package_version_constraint=$3
+  dependency_type=$4
+
+  package_cache_file="./deps/.mush_cache/${package_name}"
+  package_cache_hash="${package_full_name}"
+
+  [ "${VERBOSE}" -gt 4 ] && echo "Processing 'bpkg' dependency '$package_name', '$package_full_name', 'source=bpkg'"
+
+  if [ -f "$package_cache_file" ] && [ "$(cat "$package_cache_file")" = "$package_cache_hash" ]; then
+    echo "Package already exists, skipping..."
+  else
+    if [ -z "$(command -v bpkg || true)" ]; then
+      console_error "failed to run 'bpkg' to fetch dependency '$package_full_name' from remote registry\n\nYou can install it by running:\n  curl -Lo- https://raw.githubusercontent.com/bpkg/bpkg/master/setup.sh | bash"
+      exit 101
+    fi
+
+    bpkg install "${package_full_name}"
+
+    mkdir -p bin || true
+
+    [ -d "./deps/bin" ] && cp -r ./deps/bin/* ./bin/
+
+    if [ -d "./deps" ]; then
+      mkdir -p "./deps/.mush_cache" || true
+      echo "$package_cache_hash" > "$package_cache_file"
+    fi
+  fi
+}
 
 git_dependency() {
   local pwd=$PWD
@@ -2488,6 +2529,9 @@ process_dependency() {
     mush)
       mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
+    bpkg)
+      bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
+      ;;
     *)
       console_error "Unsupported package manager '${package_source}' for '$1' on Manifest.toml"
       exit 101
@@ -2537,7 +2581,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:09:00Z
+## @build_date: 2025-04-27T14:58:51Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2596,7 +2640,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-21T18:09:02Z
+## @build_date: 2025-04-27T14:58:52Z
 set -e
 use() { return 0; }
 extern() { return 0; }

@@ -6,7 +6,8 @@ edition = "2022"
 # See more keys and their definitions at https://mush.javanile.org/manifest.html
 
 [dev-dependencies]
-error_trace = "*"
+#error_trace = "*"
+json = "bpkg json.sh"
 
-[features]
-error_dumper = "true"
+#[features]
+#error_dumper = "true"
