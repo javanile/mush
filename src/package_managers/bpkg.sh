@@ -29,9 +29,8 @@ bpkg_dependency() {
 
     bpkg install "${package_full_name}"
 
-    mkdir -p bin || true
-
-    [ -d "./deps/bin" ] && cp -r ./deps/bin/* ./bin/
+    #mkdir -p bin || true
+    #[ -d "./deps/bin" ] && cp -r ./deps/bin/* ./bin/
 
     if [ -d "./deps" ]; then
       mkdir -p "./deps/.mush_cache" || true
