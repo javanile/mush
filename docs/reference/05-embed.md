@@ -9,10 +9,10 @@ compliance: 1
 
 # The 'embed' keyword
 
-The `embed` keyword includes external files or resources into the Mush codebase.
+The `embed` keyword includes module source as part of final build.
 
 Example:
 
 ```mush
-embed "resource.js"
+embed my_module_to_embed
 ```
