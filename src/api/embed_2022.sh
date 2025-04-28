@@ -21,7 +21,7 @@ mush_api_2022_embed() {
   echo "  else"
 
   echo "    case \"\$1\" in"
-  grep -n '^inject [a-z][a-z]* [a-z][a-z_\.]*$' "${module_file}" | while read -r line; do
+  grep -n '^inject [a-z][a-z]* [a-zA-Z0-9][a-zA-Z0-9_\.]*$' "${module_file}" | while read -r line; do
     inject_type=$(echo "${line#*inject}" | awk '{print $1}')
     inject_name=$(echo "${line#*inject}" | awk '{print $2}')
     echo "      ${inject_name})"

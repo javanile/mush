@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-28T10:36:57Z
+## @build_date: 2025-04-28T11:09:11Z
 set -e
 use() { return 0; }
 extern() { return 0; }

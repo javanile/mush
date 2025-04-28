@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-28T10:36:59Z
+# @build_date: 2025-04-28T11:09:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -176,7 +176,7 @@ mush_api_2022_embed() {
   echo "  else"
 
   echo "    case \"\$1\" in"
-  grep -n '^inject [a-z][a-z]* [a-z][a-z_\.]*$' "${module_file}" | while read -r line; do
+  grep -n '^inject [a-z][a-z]* [a-zA-Z0-9][a-zA-Z0-9_\.]*$' "${module_file}" | while read -r line; do
     inject_type=$(echo "${line#*inject}" | awk '{print $1}')
     inject_name=$(echo "${line#*inject}" | awk '{print $2}')
     echo "      ${inject_name})"
@@ -1167,7 +1167,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-28T10:36:57Z
+## @build_date: 2025-04-28T11:09:11Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2670,7 +2670,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-28T10:36:58Z
+## @build_date: 2025-04-28T11:09:12Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2730,7 +2730,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-28T10:36:59Z
+## @build_date: 2025-04-28T11:09:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
