@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-27T14:58:52Z
+# @build_date: 2025-04-28T10:36:59Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -11,6 +11,7 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
 
 extern package console
@@ -147,25 +148,70 @@ main() {
   fi
 }
 
-public embed
-
 embed debug_2022
 embed release_2022
 embed test_2022
 
-embed_file() {
-  local module_name=$1
-  local module_file=$2
+public embed_2022
+
+mush_api_2022_embed() {
+  local module_name
+  local module_file
+  local inject_type
+  local inject_name
+  local inject_file
+  local inject_data
+
+  module_name=$1
+  module_file=$2
 
   echo "${module_name}() {"
-  echo "  cat <<'EOF'"
+
+  echo "  if [ -z \"\$1\" ]; then"
+  echo "    cat <<'EMBED'"
   #cat "$module_file" | tr -s '\n'
   sed '/^[[:space:]]*$/d' "${module_file}"
-  echo "EOF"
+  echo "EMBED"
+
+  echo "  else"
+
+  echo "    case \"\$1\" in"
+  grep -n '^inject [a-z][a-z]* [a-z][a-z_\.]*$' "${module_file}" | while read -r line; do
+    inject_type=$(echo "${line#*inject}" | awk '{print $1}')
+    inject_name=$(echo "${line#*inject}" | awk '{print $2}')
+    echo "      ${inject_name})"
+    case "${inject_type}" in
+      file)
+        inject_file="$(dirname "${module_file}")/${inject_name}"
+        echo "        cat <<'EMBED'"
+        cat "$inject_file"
+        echo ""
+        echo "EMBED"
+        ;;
+      env)
+        eval inject_data="\$$inject_name"
+        echo "        echo \"$inject_data\""
+        ;;
+      *)
+        echo "ERROR: Unknown inject type '${inject_type}' in line '${line}'"
+        exit 101
+        ;;
+    esac
+    echo "        ;;"
+  done
+  echo "      *)"
+  echo "        echo \"${inject_type}: ${inject_name}\""
+  echo "        ;;"
+  echo "    esac"
+
+  echo "  fi"
+
+
   echo "}"
 }
 debug_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 debug() {
   local api
   api=$1
@@ -255,7 +301,10 @@ debug() {
       embed() {
         local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
         local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
-        eval "$(embed_file "$1" "${module_file_path}")"
+        eval "$(mush_api_2022_embed "$1" "${module_file_path}")"
+      }
+      inject() {
+        return 0
       }
       ;;
     file)
@@ -267,21 +316,38 @@ debug() {
     *)
   esac
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 release_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-EOF
+inject() { return 0; }
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 test_2022() {
-  cat <<'EOF'
-mush_api_test_2022 () {
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
+mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
   declare -F | awk '{print $3}' | grep "test_$1" | while read -r unit_test; do
@@ -291,10 +357,18 @@ mush_api_test_2022 () {
     eval "$unit_test"
   done
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 
 public profile
+public script
 
 mush_build_print() {
     case "$1" in
@@ -326,6 +400,21 @@ mush_build_profile_init() {
   MUSH_PROFILE="${profile}"
   MUSH_TARGET_DIR="${target_dir}"
   MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
+}
+
+mush_build_script_run() {
+  local pwd
+
+  pwd=$1
+  build_script="${pwd}/build.sh"
+
+  if [ -f "${build_script}" ]; then
+    [ "$VERBOSE" -gt "3" ] && echo "Running build script"
+    # shellcheck disable=SC1090
+    source "${build_script}"
+  else
+    [ "$VERBOSE" -gt "3" ] && echo "No build script found"
+  fi
 }
 
 mush_space_iterable() {
@@ -380,6 +469,9 @@ run_build() {
 
   [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
+
+  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  mush_build_script_run "${PWD}"
 
   [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
@@ -1075,7 +1167,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-27T14:58:50Z
+## @build_date: 2025-04-28T10:36:57Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1083,6 +1175,7 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
 code_dumper() {
   local file
@@ -1152,9 +1245,8 @@ bpkg_dependency() {
 
     bpkg install "${package_full_name}"
 
-    mkdir -p bin || true
-
-    [ -d "./deps/bin" ] && cp -r ./deps/bin/* ./bin/
+    #mkdir -p bin || true
+    #[ -d "./deps/bin" ] && cp -r ./deps/bin/* ./bin/
 
     if [ -d "./deps" ]; then
       mkdir -p "./deps/.mush_cache" || true
@@ -2072,14 +2164,11 @@ manifest_parse() {
         "[dependencies]")
           section=MUSH_DEPS
           ;;
-        "[dependencies-build]")
-          section=MUSH_DEPS_BUILD
-          ;;
         "[dev-dependencies]")
           section=MUSH_DEV_DEPS
           ;;
-        "[dev-dependencies-build]")
-          section=MUSH_DEV_DEPS_BUILD
+        "[build-dependencies]")
+          section=MUSH_BUILD_DEPS
           ;;
         "[legacy-fetch]")
           section=MUSH_LEGACY_FETCH
@@ -2327,7 +2416,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
-        embed_file "$module_name" "$module_file" >> $build_file
+        mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
@@ -2581,7 +2670,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-27T14:58:51Z
+## @build_date: 2025-04-28T10:36:58Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2589,6 +2678,7 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
 # FATAL
 # ERROR
@@ -2640,7 +2730,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-27T14:58:52Z
+## @build_date: 2025-04-28T10:36:59Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2648,6 +2738,7 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
 legacy getoptions
 # [getoptions] License: Creative Commons Zero v1.0 Universal

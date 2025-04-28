@@ -26,6 +26,9 @@ run_build() {
   [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
 
+  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  mush_build_script_run "${PWD}"
+
   [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
 

@@ -165,7 +165,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
-        embed_file "$module_name" "$module_file" >> "${build_file}"
+        mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"

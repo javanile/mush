@@ -1,5 +1,5 @@
 
-mush_api_test_2022 () {
+mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
   declare -F | awk '{print $3}' | grep "test_$1" | while read -r unit_test; do

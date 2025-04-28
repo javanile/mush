@@ -1,5 +1,6 @@
 
 public profile
+public script
 
 mush_build_print() {
     case "$1" in

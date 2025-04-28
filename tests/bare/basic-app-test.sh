@@ -13,5 +13,6 @@ echo "--------------------------------------------------------------------------
 
 cd tests/fixtures/basic-app
 rm -fr bin target
-mush build -vvvvvv
-#mush build -vvvvvv --release
+#mush build -vvvvvv
+mush build -vvvvvv --release
+./bin/basic-app

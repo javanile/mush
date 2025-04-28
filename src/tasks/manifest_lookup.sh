@@ -53,14 +53,11 @@ manifest_parse() {
         "[dependencies]")
           section=MUSH_DEPS
           ;;
-        "[dependencies-build]")
-          section=MUSH_DEPS_BUILD
-          ;;
         "[dev-dependencies]")
           section=MUSH_DEV_DEPS
           ;;
-        "[dev-dependencies-build]")
-          section=MUSH_DEV_DEPS_BUILD
+        "[build-dependencies]")
+          section=MUSH_BUILD_DEPS
           ;;
         "[legacy-fetch]")
           section=MUSH_LEGACY_FETCH

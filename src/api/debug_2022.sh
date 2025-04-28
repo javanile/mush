@@ -96,7 +96,10 @@ debug() {
         local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
         local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
 
-        eval "$(embed_file "$1" "${module_file_path}")"
+        eval "$(mush_api_2022_embed "$1" "${module_file_path}")"
+      }
+      inject() {
+        return 0
       }
       ;;
     file)
