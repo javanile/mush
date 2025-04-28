@@ -14,5 +14,9 @@ The `inject` keyword includes external files or resources into the Mush codebase
 Example:
 
 ```mush
-embed "resource.js"
+inject file resource.js
+```
+
+```mush
+inject env BUILD_VERSION
 ```
