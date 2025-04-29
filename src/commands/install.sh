@@ -21,12 +21,20 @@ run_install() {
   parse "$@"
   eval "set -- $REST"
 
+  local temp_pwd
   local package_path
 
   mush_env
 
   if [ -n "${LIST}" ]; then
-    tree -d -L 3 $MUSH_HOME/registry/src | sed '$d'
+    if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
+      temp_pwd=$PWD
+      cd "$MUSH_HOME/registry/src" || exit 1
+      find . -maxdepth 3 -type d | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
+      cd "$temp_pwd" || exit 1
+    else
+      tree -d -L 3 "$MUSH_HOME/registry/src" | sed '$d'
+    fi
   elif [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
 
