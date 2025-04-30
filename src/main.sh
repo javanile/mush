@@ -13,7 +13,7 @@ module tasks
 module env
 module polyfill
 
-VERSION="Mush 0.2.0 (2025-04-20 develop)"
+VERSION="Mush 0.2.0 (2025-04-30 develop)"
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -21,12 +21,12 @@ parser_definition() {
   msg   -- 'USAGE:' "  ${2##*/} [OPTIONS] [SUBCOMMAND]" ''
 
   msg   -- 'OPTIONS:'
-  disp  VERSION -V --version                      -- "Print version info and exit"
-  param PRINT      --print                        -- "Builder information to print on stdout"
-  param EXPLAIN    --explain                      -- "Provide a detailed explanation of an error message"
-  flag  VERBOSE -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
-  flag  QUIET   -q --quiet                        -- "Do not print cargo log messages"
-  disp  :usage  -h --help                         -- "Print help information"
+  disp  VERSION     -V --version                      -- "Print version info and exit"
+  param PRINT          --print                        -- "Builder information to print on stdout"
+  param EXPLAIN        --explain                      -- "Provide a detailed explanation of an error message"
+  flag  VERBOSE     -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag  QUIET       -q --quiet                        -- "Do not print cargo log messages"
+  disp  :usage      -h --help                         -- "Print help information"
 
   msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
   cmd   build   -- "Compile the current package"
@@ -63,6 +63,10 @@ args_error() {
 main() {
   if [ $# -eq 0 ]; then
     eval "set -- --help"
+  fi
+
+  if [ -n "${MUSH_DEBUG_TRACE}" ]; then
+    set -x
   fi
 
   eval "$(getoptions parser_definition parse "$0") exit 1"
