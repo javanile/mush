@@ -1,0 +1,2 @@
+
+inject file VERSION

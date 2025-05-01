@@ -13,7 +13,7 @@ module tasks
 module env
 module polyfill
 
-VERSION="Mush 0.2.0 (2025-04-30 develop)"
+embed global
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -68,6 +68,8 @@ main() {
   if [ -n "${MUSH_DEBUG_TRACE}" ]; then
     set -x
   fi
+
+  VERSION=$(global VERSION)
 
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"

@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-04-30 develop)
-# @build_date: 2025-04-30T16:04:43Z
+# @build_with: Mush 0.2.0 (2025-05-01 develop)
+# @build_date: 2025-05-01T21:30:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -28,7 +28,7 @@ module tasks
 module env
 module polyfill
 
-VERSION="Mush 0.2.0 (2025-04-30 develop)"
+embed global
 
 parser_definition() {
   setup REST error:args_error help:usage abbr:true -- "Shell's build system" ''
@@ -83,6 +83,8 @@ main() {
   if [ -n "${MUSH_DEBUG_TRACE}" ]; then
     set -x
   fi
+
+  VERSION=$(global VERSION)
 
   eval "$(getoptions parser_definition parse "$0") exit 1"
   parse "$@"
@@ -1177,7 +1179,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-30T16:04:41Z
+## @build_date: 2025-05-01T21:30:51Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2680,7 +2682,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-30T16:04:42Z
+## @build_date: 2025-05-01T21:30:54Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2740,7 +2742,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-04-30T16:04:43Z
+## @build_date: 2025-05-01T21:30:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3034,6 +3036,25 @@ getoptions_help() {
 	"$@"
 	echo "GETOPTIONSHERE"
 	echo "}"
+}
+global() {
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
+inject file VERSION
+EMBED
+  else
+    case "$1" in
+      VERSION)
+        cat <<'EMBED'
+Mush v0.2.0 (2025-05-01 develop)
+
+EMBED
+        ;;
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 ## BP005: Execute the entrypoint
 main "$@"
