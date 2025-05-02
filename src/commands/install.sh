@@ -12,8 +12,9 @@ parser_definition_install() {
   param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
   flag   LIST            -l --list                         -- "List all installed packages and their versions"
+  flag   FORCE           -f --force                        -- "Force overwriting existing crates or binaries"
 
-  disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage          -h --help                         -- "Print help information"
 }
 
 run_install() {
@@ -23,6 +24,7 @@ run_install() {
 
   local temp_pwd
   local package_path
+  local index_update
 
   mush_env
 
@@ -64,7 +66,8 @@ run_install() {
         console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source."
       fi
     else
-      mush_registry_index_update
+      [ -n "${FORCE}" ] && index_update=full
+      mush_registry_index_update "${index_update}"
       exec_install_from_index "$1" "${PACKAGE_VERSION}"
     fi
   fi

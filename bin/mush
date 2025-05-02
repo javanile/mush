@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-05-01 develop)
-# @build_date: 2025-05-01T21:30:56Z
+# @build_with: Mush v0.2.0 (2025-05-01 develop)
+# @build_date: 2025-05-02T18:43:52Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -617,8 +617,9 @@ parser_definition_install() {
   param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
   flag   LIST            -l --list                         -- "List all installed packages and their versions"
+  flag   FORCE           -f --force                        -- "Force overwriting existing crates or binaries"
 
-  disp   :usage         -h --help                         -- "Print help information"
+  disp   :usage          -h --help                         -- "Print help information"
 }
 
 run_install() {
@@ -628,6 +629,7 @@ run_install() {
 
   local temp_pwd
   local package_path
+  local index_update
 
   mush_env
 
@@ -669,7 +671,8 @@ run_install() {
         console_error "'${PWD}' is not a package root; specify a package to install, or use --path or --git to specify an alternate source."
       fi
     else
-      mush_registry_index_update
+      [ -n "${FORCE}" ] && index_update=full
+      mush_registry_index_update "${index_update}"
       exec_install_from_index "$1" "${PACKAGE_VERSION}"
     fi
   fi
@@ -1179,7 +1182,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-01T21:30:51Z
+## @build_date: 2025-05-02T18:43:48Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2682,7 +2685,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-01T21:30:54Z
+## @build_date: 2025-05-02T18:43:50Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2742,7 +2745,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-01T21:30:56Z
+## @build_date: 2025-05-02T18:43:52Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3046,7 +3049,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-01 develop)
+Mush v0.2.0 (2025-05-02 develop)
 
 EMBED
         ;;
