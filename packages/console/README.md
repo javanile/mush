@@ -1,6 +1,6 @@
 # 🍄️ Console
 
-Console is a simple Mush module that print amazing output in Rush-style!
+Console is a simple Mush module that print amazing output in Rust-style!
 
 ## Installation
 
