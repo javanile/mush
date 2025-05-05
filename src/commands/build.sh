@@ -46,6 +46,7 @@ run_build() {
 
   local src_file=src/main.sh
   local bin_file=${MUSH_TARGET_PATH}/${package_name}
+  local out_file=${MUSH_TARGET_PATH}/lib.sh
   local lib_file=src/lib.sh
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
@@ -58,7 +59,7 @@ run_build() {
     else
       if [ -f "${lib_file}" ]; then
         [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
-        exec_build_lib_debug "${lib_file}"
+        exec_build_lib_debug "${lib_file}" "${out_file}"
       else
         local lib_file=
       fi

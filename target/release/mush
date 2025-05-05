@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-05 develop)
-# @build_date: 2025-05-05T20:09:34Z
+# @build_date: 2025-05-05T20:26:16Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -494,6 +494,7 @@ run_build() {
 
   local src_file=src/main.sh
   local bin_file=${MUSH_TARGET_PATH}/${package_name}
+  local out_file=${MUSH_TARGET_PATH}/lib.sh
   local lib_file=src/lib.sh
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
@@ -506,7 +507,7 @@ run_build() {
     else
       if [ -f "${lib_file}" ]; then
         [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
-        exec_build_lib_debug "${lib_file}"
+        exec_build_lib_debug "${lib_file}" "${out_file}"
       else
         local lib_file=
       fi
@@ -1185,7 +1186,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:09:30Z
+## @build_date: 2025-05-05T20:26:11Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1606,10 +1607,24 @@ exec_build_bin_debug() {
 
 exec_build_lib_debug() {
   local lib_file
+  local out_file
+  local build_file
+  local final_file
 
   lib_file="$1"
+  out_file="$2"
 
   compile_file "${lib_file}"
+
+  mkdir -p "$(dirname "${out_file}")"
+
+  build_file="${out_file}.tmp"
+  final_file="${out_file}"
+
+  echo "debug init" >> "${build_file}"
+  echo "debug file \"\${lib_file}\"" >> "${build_file}"
+
+  mv "${build_file}" "${final_file}"
 }
 
 exec_build_release() {
@@ -2706,7 +2721,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:09:32Z
+## @build_date: 2025-05-05T20:26:14Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2766,7 +2781,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:09:34Z
+## @build_date: 2025-05-05T20:26:16Z
 set -e
 use() { return 0; }
 extern() { return 0; }

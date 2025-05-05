@@ -58,8 +58,22 @@ exec_build_bin_debug() {
 
 exec_build_lib_debug() {
   local lib_file
+  local out_file
+  local build_file
+  local final_file
 
   lib_file="$1"
+  out_file="$2"
 
   compile_file "${lib_file}"
+
+  mkdir -p "$(dirname "${out_file}")"
+
+  build_file="${out_file}.tmp"
+  final_file="${out_file}"
+
+  echo "debug init" >> "${build_file}"
+  echo "debug file \"\${lib_file}\"" >> "${build_file}"
+
+  mv "${build_file}" "${final_file}"
 }
