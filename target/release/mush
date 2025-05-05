@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-01 develop)
-# @build_date: 2025-05-02T18:43:52Z
+# @build_with: Mush v0.2.0 (2025-05-05 develop)
+# @build_date: 2025-05-05T20:09:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -457,6 +457,7 @@ parser_definition_build() {
 
   flag  QUIET          -q --quiet       -- "Do not print mush log messages"
   flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
+  flag  NO_CACHE          --no-cache    -- "Disables the registry cache when build the package"
 
   param BUILD_TARGET   -t --target      -- "Build for the specific target"
   disp  :usage         -h --help        -- "Print help information"
@@ -484,7 +485,8 @@ run_build() {
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
   [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
-  exec_dependencies "${MUSH_TARGET_PATH}"
+  update_strategy=lazy
+  exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
@@ -503,12 +505,13 @@ run_build() {
       exec_build_release "${MUSH_TARGET_PATH}"
     else
       if [ -f "${lib_file}" ]; then
-        compile_file "${lib_file}"
+        [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
+        exec_build_lib_debug "${lib_file}"
       else
         local lib_file=
       fi
       if [ -f "${src_file}" ]; then
-        exec_build_debug "src/main.sh" "${bin_file}" "${lib_file}"
+        exec_build_bin_debug "src/main.sh" "${bin_file}" "${lib_file}"
       fi
     fi
   fi
@@ -863,7 +866,7 @@ run_run() {
     local lib_file=
   fi
 
-  exec_build_debug "${src_file}" "${bin_file}" "${lib_file}"
+  exec_build_bin_debug "${src_file}" "${bin_file}" "${lib_file}"
 
   compile_file "${src_file}"
 
@@ -1182,7 +1185,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-02T18:43:48Z
+## @build_date: 2025-05-05T20:09:30Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1288,13 +1291,15 @@ mush_dependency() {
   local package_full_name
   local package_version_constraint
   local dependency_type
+  local update_strategy
 
   package_name=$1
   package_full_name=$2
   package_version_constraint=$3
   dependency_type=$4
+  update_strategy=${5:-lazy}
 
-  mush_registry_index_update
+  mush_registry_index_update "${update_strategy}"
 
   [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
 
@@ -1542,7 +1547,7 @@ public publish
 public plugin
 public dependencies
 
-exec_build_debug() {
+exec_build_bin_debug() {
   local src_file
   local bin_file
   local lib_file
@@ -1597,6 +1602,14 @@ exec_build_debug() {
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+}
+
+exec_build_lib_debug() {
+  local lib_file
+
+  lib_file="$1"
+
+  compile_file "${lib_file}"
 }
 
 exec_build_release() {
@@ -2560,6 +2573,7 @@ exec_plugin_list() {
 }
 
 exec_dependencies() {
+  local update_strategy
   ## TODO: Expected output
   #  Downloaded syn v2.0.37
   #  Downloaded 1 crate (243.2 KB) in 0.46s
@@ -2572,11 +2586,13 @@ exec_dependencies() {
   #   Compiling rust-lib v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-lib)
   #    Finished dev [unoptimized + debuginfo] target(s) in 4.65s
 
-  process_dependencies dev
-  process_dependencies_build dev
+  update_strategy="${1:-lazy}"
 
-  process_dependencies prod
-  process_dependencies_build prod
+  process_dependencies "dev" "${update_strategy}"
+  process_dependencies_build "dev"
+
+  process_dependencies "prod" "${update_strategy}"
+  process_dependencies_build "prod"
 }
 
 process_dependencies() {
@@ -2584,6 +2600,7 @@ process_dependencies() {
   local dependencies_list
   local package_name
   local package_signature
+  local update_strategy
 
   dependencies_type=$1
   if [ "${dependencies_type}" = "prod" ]; then
@@ -2592,6 +2609,8 @@ process_dependencies() {
     dependencies_list="${MUSH_DEV_DEPS}"
   fi
 
+  update_strategy="${2:-lazy}"
+
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
 
@@ -2599,7 +2618,7 @@ process_dependencies() {
     package_signature="${dependency#*=}"
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dependency "${dependencies_type}" "${package_name}" "${package_signature}"
+      process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
   done
 }
@@ -2624,6 +2643,8 @@ process_dependency() {
     package_version_constraint=$(echo "$3" | awk '{print $3}')
   fi
 
+  update_strategy=${1:-lazy}
+
   [ "${VERBOSE}" -gt 4 ] && echo "Processing '$1' dependency '$2', '$3', 'source=${package_source}'"
 
   case "${package_source}" in
@@ -2631,7 +2652,7 @@ process_dependency() {
       git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     mush)
-      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
       ;;
     bpkg)
       bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
@@ -2685,7 +2706,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-02T18:43:50Z
+## @build_date: 2025-05-05T20:09:32Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2745,7 +2766,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-02T18:43:52Z
+## @build_date: 2025-05-05T20:09:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3049,7 +3070,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-02 develop)
+Mush v0.2.0 (2025-05-05 develop)
 
 EMBED
         ;;

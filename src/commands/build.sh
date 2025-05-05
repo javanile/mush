@@ -57,12 +57,13 @@ run_build() {
       exec_build_release "${MUSH_TARGET_PATH}"
     else
       if [ -f "${lib_file}" ]; then
-        compile_file "${lib_file}"
+        [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
+        exec_build_lib_debug "${lib_file}"
       else
         local lib_file=
       fi
       if [ -f "${src_file}" ]; then
-        exec_build_debug "src/main.sh" "${bin_file}" "${lib_file}"
+        exec_build_bin_debug "src/main.sh" "${bin_file}" "${lib_file}"
       fi
     fi
   fi

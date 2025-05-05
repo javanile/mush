@@ -70,7 +70,7 @@ run_run() {
     local lib_file=
   fi
 
-  exec_build_debug "${src_file}" "${bin_file}" "${lib_file}"
+  exec_build_bin_debug "${src_file}" "${bin_file}" "${lib_file}"
 
   compile_file "${src_file}"
 

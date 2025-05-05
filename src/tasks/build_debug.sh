@@ -1,5 +1,5 @@
 
-exec_build_debug() {
+exec_build_bin_debug() {
   local src_file
   local bin_file
   local lib_file
@@ -54,4 +54,12 @@ exec_build_debug() {
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
+}
+
+exec_build_lib_debug() {
+  local lib_file
+
+  lib_file="$1"
+
+  compile_file "${lib_file}"
 }
