@@ -9,6 +9,7 @@ parser_definition_build() {
 
   flag  QUIET          -q --quiet       -- "Do not print mush log messages"
   flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
+  flag  NO_CACHE          --no-cache    -- "Disables the registry cache when build the package"
 
   param BUILD_TARGET   -t --target      -- "Build for the specific target"
   disp  :usage         -h --help        -- "Print help information"
@@ -36,7 +37,8 @@ run_build() {
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
   [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
-  exec_dependencies "${MUSH_TARGET_PATH}"
+  update_strategy=lazy
+  exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"

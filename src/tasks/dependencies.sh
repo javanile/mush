@@ -1,5 +1,6 @@
 
 exec_dependencies() {
+  local update_strategy
   ## TODO: Expected output
   #  Downloaded syn v2.0.37
   #  Downloaded 1 crate (243.2 KB) in 0.46s
@@ -12,11 +13,13 @@ exec_dependencies() {
   #   Compiling rust-lib v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-lib)
   #    Finished dev [unoptimized + debuginfo] target(s) in 4.65s
 
-  process_dependencies dev
-  process_dependencies_build dev
+  update_strategy="${1:-lazy}"
 
-  process_dependencies prod
-  process_dependencies_build prod
+  process_dependencies "dev" "${update_strategy}"
+  process_dependencies_build "dev"
+
+  process_dependencies "prod" "${update_strategy}"
+  process_dependencies_build "prod"
 }
 
 process_dependencies() {
@@ -24,6 +27,7 @@ process_dependencies() {
   local dependencies_list
   local package_name
   local package_signature
+  local update_strategy
 
   dependencies_type=$1
   if [ "${dependencies_type}" = "prod" ]; then
@@ -32,6 +36,8 @@ process_dependencies() {
     dependencies_list="${MUSH_DEV_DEPS}"
   fi
 
+  update_strategy="${2:-lazy}"
+
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
     [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
 
@@ -39,7 +45,7 @@ process_dependencies() {
     package_signature="${dependency#*=}"
 
     if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
-      process_dependency "${dependencies_type}" "${package_name}" "${package_signature}"
+      process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
   done
 }
@@ -64,6 +70,8 @@ process_dependency() {
     package_version_constraint=$(echo "$3" | awk '{print $3}')
   fi
 
+  update_strategy=${1:-lazy}
+
   [ "${VERBOSE}" -gt 4 ] && echo "Processing '$1' dependency '$2', '$3', 'source=${package_source}'"
 
   case "${package_source}" in
@@ -71,7 +79,7 @@ process_dependency() {
       git_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
     mush)
-      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
+      mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
       ;;
     bpkg)
       bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
