@@ -88,3 +88,4 @@ package matrix-theme https://github.com/francescobianco/matrix-theme.git
 
 # Add experimental packages below
 # package example-pkg https://github.com/example/example-pkg.git
+package error https://github.com/francescobianco/error.git # Prints error messages to stderr, optionally exiting with a status code
