@@ -42,6 +42,7 @@
 
 index https://github.com/francescobianco/mush-packages
 index https://github.com/francescobianco/mush-plugins
+index https://github.com/francescobianco/sev-utils
 
 #------------------------------------------------------------------------------
 # CORE PACKAGES
