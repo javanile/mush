@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-14 develop)
-# @build_date: 2025-05-14T18:04:56Z
+# @build_date: 2025-05-14T18:11:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -757,6 +757,8 @@ parser_definition_metadata() {
 }
 
 run_metadata() {
+  local plugins
+
   eval "$(getoptions parser_definition_metadata parse "$0")"
   parse "$@"
   eval "set -- $REST"
@@ -770,14 +772,16 @@ run_metadata() {
   echo "Type:    ${MUSH_PACKAGE_TYPE}"
 
   echo ""
-
   echo "Features:"
   echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 
-  echo ""
-  echo "Plugins:"
-  exec_plugin_list
-  #echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+  plugins=$(exec_plugin_list)
+
+  if [ -n "${plugins}" ]; then
+    echo ""
+    echo "Plugins:"
+    echo "${plugins}" | sed 's/^/ - /'
+  fi
 }
 
 parser_definition_new() {
@@ -1202,7 +1206,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T18:04:50Z
+## @build_date: 2025-05-14T18:11:20Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2629,8 +2633,8 @@ exec_plugin_list() {
   plugins_dir="${MUSH_HOME}/plugins"
   if [ -d "$plugins_dir" ]; then
     find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
-      echo "Found plugin: ${plugin_file}" >&2
-      echo "${plugin_file}"
+      plugin_name="$(basename "$(dirname "${plugin_file}")")"
+      echo "${plugin_name}=${plugin_file}"
     done
   fi
 
@@ -2639,7 +2643,7 @@ exec_plugin_list() {
   if [ -d "$plugins_dir" ]; then
     find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
       echo "Found plugin: ${plugin_file}" >&2
-      plugin_name=$(basename "$(dirname "$file")")
+      plugin_name="$(basename "$(dirname "${plugin_file}")")"
       echo "${plugin_name}=${plugin_file}"
     done
   fi
@@ -2782,7 +2786,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T18:04:53Z
+## @build_date: 2025-05-14T18:11:22Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2842,7 +2846,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T18:04:56Z
+## @build_date: 2025-05-14T18:11:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }

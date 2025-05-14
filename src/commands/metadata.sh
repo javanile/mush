@@ -11,6 +11,8 @@ parser_definition_metadata() {
 }
 
 run_metadata() {
+  local plugins
+
   eval "$(getoptions parser_definition_metadata parse "$0")"
   parse "$@"
   eval "set -- $REST"
@@ -24,12 +26,14 @@ run_metadata() {
   echo "Type:    ${MUSH_PACKAGE_TYPE}"
 
   echo ""
-
   echo "Features:"
   echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 
-  echo ""
-  echo "Plugins:"
-  exec_plugin_list
-  #echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+  plugins=$(exec_plugin_list)
+
+  if [ -n "${plugins}" ]; then
+    echo ""
+    echo "Plugins:"
+    echo "${plugins}" | sed 's/^/ - /'
+  fi
 }
