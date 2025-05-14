@@ -81,6 +81,9 @@ process_dependency() {
     mush)
       mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
       ;;
+    path)
+      mush_path_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
+      ;;
     bpkg)
       bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;

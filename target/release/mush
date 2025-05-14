@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-14 develop)
-# @build_date: 2025-05-14T15:59:34Z
+# @build_date: 2025-05-14T16:03:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1187,7 +1187,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T15:59:28Z
+## @build_date: 2025-05-14T16:03:50Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1274,6 +1274,7 @@ public bpkg
 public git
 public mush
 public pip
+public path
 
 bpkg_dependency() {
   local pwd
@@ -1346,6 +1347,24 @@ mush_dependency() {
   [ "${VERBOSE}" -gt 4 ] && echo "Processing dependency '$1', '$2', 'source=${package_source}'"
 
   exec_install_from_index "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
+}
+
+mush_path_dependency() {
+  local pwd
+  local package_name
+  local package_full_name
+  local package_version_constraint
+  local dependency_type
+  local package_cache_file
+  local package_cache_hash
+
+  pwd=$PWD
+  package_name=$1
+  package_full_name=$2
+  package_version_constraint=$3
+  dependency_type=$4
+
+  echo "Path: $package_name"
 }
 
 public github
@@ -2671,6 +2690,9 @@ process_dependency() {
     mush)
       mush_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
       ;;
+    path)
+      mush_path_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}" "${update_strategy}"
+      ;;
     bpkg)
       bpkg_dependency "${package_name}" "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
       ;;
@@ -2723,7 +2745,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T15:59:31Z
+## @build_date: 2025-05-14T16:03:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2783,7 +2805,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T15:59:33Z
+## @build_date: 2025-05-14T16:03:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }

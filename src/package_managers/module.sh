@@ -5,3 +5,4 @@ public bpkg
 public git
 public mush
 public pip
+public path
