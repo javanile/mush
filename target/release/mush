@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-14 develop)
-# @build_date: 2025-05-14T16:07:46Z
+# @build_date: 2025-05-14T17:47:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -622,6 +622,7 @@ parser_definition_install() {
   param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
   flag   LIST            -l --list                         -- "List all installed packages and their versions"
+  flag   SHOW_PLUGINS       --show-plugins                 -- "List all installed plugins"
   flag   FORCE           -f --force                        -- "Force overwriting existing crates or binaries"
 
   disp   :usage          -h --help                         -- "Print help information"
@@ -646,6 +647,15 @@ run_install() {
       cd "$temp_pwd" || exit 1
     else
       tree -d -L 3 "$MUSH_HOME/registry/src" | sed '$d'
+    fi
+  elif [ -n "${SHOW_PLUGINS}" ]; then
+    if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
+      temp_pwd=$PWD
+      cd "$MUSH_HOME/plugins" || exit 1
+      find . -maxdepth 2 -type d | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
+      cd "$temp_pwd" || exit 1
+    else
+      tree -d -L 2 "$MUSH_HOME/plugins" | sed '$d'
     fi
   elif [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")
@@ -1187,7 +1197,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:07:40Z
+## @build_date: 2025-05-14T17:47:03Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1962,6 +1972,7 @@ exec_install_from_index() {
   #local package_version_selected
   local package_src
   local package_search
+  local package_type
 
   package_name=$1
   #package_version_constraint=$2
@@ -2004,6 +2015,16 @@ exec_install_from_index() {
   local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
+
+  package_type=$(cat "${package_nested_src}/Manifest.toml" | grep '^type =' | cut -d'"' -f2)
+
+  echo "package_type=${package_type}"
+
+  if [ "${package_type}" = "plugin" ]; then
+    mkdir -p "${MUSH_HOME}/plugins/${package_name}"
+    cp "${package_nested_src}/src/lib.sh" "${MUSH_HOME}/plugins/${package_name}/plugin.sh"
+    cp "${package_nested_src}/src/Manifest.toml" "${MUSH_HOME}/plugins/${package_name}/Manifest.toml"
+  fi
 }
 
 exec_install_from_src() {
@@ -2745,7 +2766,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:07:43Z
+## @build_date: 2025-05-14T17:47:06Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2805,7 +2826,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:07:46Z
+## @build_date: 2025-05-14T17:47:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }

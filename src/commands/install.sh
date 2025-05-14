@@ -12,6 +12,7 @@ parser_definition_install() {
   param  PACKAGE_PATH       --path                         -- "Filesystem path to local package to install"
   param  BUILD_TARGET    -t --target                       -- "Build for the specific target"
   flag   LIST            -l --list                         -- "List all installed packages and their versions"
+  flag   SHOW_PLUGINS       --show-plugins                 -- "List all installed plugins"
   flag   FORCE           -f --force                        -- "Force overwriting existing crates or binaries"
 
   disp   :usage          -h --help                         -- "Print help information"
@@ -36,6 +37,15 @@ run_install() {
       cd "$temp_pwd" || exit 1
     else
       tree -d -L 3 "$MUSH_HOME/registry/src" | sed '$d'
+    fi
+  elif [ -n "${SHOW_PLUGINS}" ]; then
+    if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
+      temp_pwd=$PWD
+      cd "$MUSH_HOME/plugins" || exit 1
+      find . -maxdepth 2 -type d | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
+      cd "$temp_pwd" || exit 1
+    else
+      tree -d -L 2 "$MUSH_HOME/plugins" | sed '$d'
     fi
   elif [ -n "$PACKAGE_PATH" ]; then
     package_path=$(realpath "$PACKAGE_PATH")

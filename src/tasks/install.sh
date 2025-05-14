@@ -82,6 +82,7 @@ exec_install_from_index() {
   #local package_version_selected
   local package_src
   local package_search
+  local package_type
 
   package_name=$1
   #package_version_constraint=$2
@@ -124,6 +125,16 @@ exec_install_from_index() {
   local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
+
+  package_type=$(cat "${package_nested_src}/Manifest.toml" | grep '^type =' | cut -d'"' -f2)
+
+  echo "package_type=${package_type}"
+
+  if [ "${package_type}" = "plugin" ]; then
+    mkdir -p "${MUSH_HOME}/plugins/${package_name}"
+    cp "${package_nested_src}/src/lib.sh" "${MUSH_HOME}/plugins/${package_name}/plugin.sh"
+    cp "${package_nested_src}/src/Manifest.toml" "${MUSH_HOME}/plugins/${package_name}/Manifest.toml"
+  fi
 }
 
 exec_install_from_src() {
