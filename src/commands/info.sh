@@ -1,8 +1,8 @@
 
 parser_definition_info() {
-	setup REST help:usage abbr:true -- "Display metadata for a package at the current registry" ''
+	setup REST help:usage abbr:true -- "Display information about a package in the registry" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} info [OPTIONS] [package]" ''
+  msg   -- 'USAGE:' "  ${2##*/} info [OPTIONS] [PACKAGE]" ''
 
 	msg   -- 'OPTIONS:'
   flag  VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
@@ -11,17 +11,21 @@ parser_definition_info() {
 }
 
 run_info() {
+  local package_name
+  local package_entry
+
   eval "$(getoptions parser_definition_info parse "$0")"
   parse "$@"
   eval "set -- $REST"
 
-  mush_registry_index_update
-
-
-  local package_name
-  local package_entry
-
   package_name="$1"
+
+  if [ -z "${package_name}" ]; then
+    console_error "the following required arguments were not provided: PACKAGE"
+    exit 1
+  fi
+
+  mush_registry_index_update
 
   while IFS= read -r line; do
     [ -z "$line" ] && continue
