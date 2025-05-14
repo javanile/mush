@@ -17,6 +17,8 @@ compile_file() {
   # Analyze file for syntax errors
   bash -n "${src_file}"
 
+  mush_feature_hook compile_file "${src_file}"
+
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"

@@ -1,5 +1,5 @@
 
-exec_feature_hook() {
+mush_feature_hook() {
   local feature
   local feature_hook
   local feature_name

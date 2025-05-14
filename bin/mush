@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-05 develop)
-# @build_date: 2025-05-05T20:26:16Z
+# @build_with: Mush v0.2.0 (2025-05-14 develop)
+# @build_date: 2025-05-14T15:59:34Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -22,6 +22,7 @@ module build
 module collections
 module commands
 module errors
+module features
 module package_managers
 module registry
 module tasks
@@ -470,7 +471,7 @@ run_build() {
 
   exec_manifest_lookup "${PWD}"
 
-  exec_feature_hook "build"
+  mush_feature_hook "build"
 
   [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
@@ -1186,7 +1187,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:26:11Z
+## @build_date: 2025-05-14T15:59:28Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1225,6 +1226,46 @@ code_dumper() {
     echo -e "\e[0m${padding} \e[0m\e[0m\e[1m\e[38;5;12m= \e[0m\e[1;39mhelp:\e[0m ${help}\e[0m"
   fi
   echo ""
+}
+
+mush_feature_hook() {
+  local feature
+  local feature_hook
+  local feature_name
+  local feature_value
+  local feature_function
+  local plugin
+  local plugin_name
+  local plugins
+
+  feature_hook=$1
+
+  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
+
+  echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
+    feature_name=${feature%=*}
+    feature_value=${feature#*=}
+
+    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
+
+    if [ -n "${plugins}" ]; then
+      echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
+        local plugin_name=$(basename "${plugin}" .sh)
+        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
+
+        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
+
+        if [ -n "$feature_value" ]; then
+          source "${plugin}"
+          if [ "$(type -t "$feature_function" && true)" = "function" ]; then
+            $feature_function "${feature_value}" "${@:2}"
+          fi
+        fi
+      done
+    fi
+  done
+
+  #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
 
 public apt
@@ -1537,7 +1578,6 @@ mush_registry_package_versions() {
 public build_debug
 public build_release
 public build_test
-public feature
 public init
 public install
 public legacy_fetch
@@ -1585,7 +1625,7 @@ exec_build_bin_debug() {
   echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
-  exec_feature_hook "build_debug_head_section" "${build_file}"
+  mush_feature_hook "build_debug_head_section" "${build_file}"
 
   echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"
@@ -1791,46 +1831,6 @@ exec_build_test() {
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
-}
-
-exec_feature_hook() {
-  local feature
-  local feature_hook
-  local feature_name
-  local feature_value
-  local feature_function
-  local plugin
-  local plugin_name
-  local plugins
-
-  feature_hook=$1
-
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
-
-  echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
-    feature_name=${feature%=*}
-    feature_value=${feature#*=}
-
-    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
-
-    if [ -n "${plugins}" ]; then
-      echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
-        local plugin_name=$(basename "${plugin}" .sh)
-        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
-
-        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
-
-        if [ -n "$feature_value" ]; then
-          source "${plugin}"
-          if [ "$(type -t "$feature_function" && true)" = "function" ]; then
-            $feature_function "${feature_value}" "${@:2}"
-          fi
-        fi
-      done
-    fi
-  done
-
-  #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
 
 exec_init() {
@@ -2311,6 +2311,8 @@ compile_file() {
   # Analyze file for syntax errors
   bash -n "${src_file}"
 
+  mush_feature_hook compile_file "${src_file}"
+
   if [ -n "${build_file}" ]; then
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
@@ -2721,7 +2723,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:26:14Z
+## @build_date: 2025-05-14T15:59:31Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2781,7 +2783,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-05T20:26:16Z
+## @build_date: 2025-05-14T15:59:33Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3085,7 +3087,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-05 develop)
+Mush v0.2.0 (2025-05-14 develop)
 
 EMBED
         ;;

@@ -7,6 +7,7 @@ module build
 module collections
 module commands
 module errors
+module features
 module package_managers
 module registry
 module tasks

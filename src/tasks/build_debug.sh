@@ -36,7 +36,7 @@ exec_build_bin_debug() {
   echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
   echo "" >> "${build_file}"
 
-  exec_feature_hook "build_debug_head_section" "${build_file}"
+  mush_feature_hook "build_debug_head_section" "${build_file}"
 
   echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
   debug_2022 >> "${build_file}"

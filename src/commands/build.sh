@@ -22,7 +22,7 @@ run_build() {
 
   exec_manifest_lookup "${PWD}"
 
-  exec_feature_hook "build"
+  mush_feature_hook "build"
 
   [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
   mush_build_profile_init "${BUILD_RELEASE}"
