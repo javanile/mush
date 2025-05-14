@@ -8,8 +8,8 @@ exec_plugin_list() {
   plugins_dir="${MUSH_HOME}/plugins"
   if [ -d "$plugins_dir" ]; then
     find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
-      echo "Found plugin: ${plugin_file}" >&2
-      echo "${plugin_file}"
+      plugin_name=$(basename "$(dirname "$file")")
+      echo "${plugin_name}=${plugin_file}"
     done
   fi
 
