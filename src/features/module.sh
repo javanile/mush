@@ -11,7 +11,7 @@ mush_feature_hook() {
 
   feature_hook=$1
 
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
+  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@"
 
   echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
     feature_name=${feature%=*}

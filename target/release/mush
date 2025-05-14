@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-14 develop)
-# @build_date: 2025-05-14T16:03:56Z
+# @build_date: 2025-05-14T16:07:46Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1187,7 +1187,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:03:50Z
+## @build_date: 2025-05-14T16:07:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1240,7 +1240,7 @@ mush_feature_hook() {
 
   feature_hook=$1
 
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES}"
+  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@"
 
   echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
     feature_name=${feature%=*}
@@ -2745,7 +2745,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:03:53Z
+## @build_date: 2025-05-14T16:07:43Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2805,7 +2805,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T16:03:56Z
+## @build_date: 2025-05-14T16:07:46Z
 set -e
 use() { return 0; }
 extern() { return 0; }
