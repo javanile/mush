@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-14 develop)
-# @build_date: 2025-05-14T17:47:09Z
+# @build_date: 2025-05-14T18:04:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -773,6 +773,11 @@ run_metadata() {
 
   echo "Features:"
   echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+
+  echo ""
+  echo "Plugins:"
+  exec_plugin_list
+  #echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 }
 
 parser_definition_new() {
@@ -1197,7 +1202,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T17:47:03Z
+## @build_date: 2025-05-14T18:04:50Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2618,13 +2623,24 @@ exec_publish() {
 exec_plugin_list() {
   local plugins_dir
   local plugin_file
+  local plugin_name
 
-  plugins_dir="$1/plugins"
-
+  # Global installed plugin
+  plugins_dir="${MUSH_HOME}/plugins"
   if [ -d "$plugins_dir" ]; then
-    find "$plugins_dir" -type f -name "*.sh" | while IFS=$'\n' read -r plugin_file; do
-      echo "Loading plugin: ${plugin_file}" >&2
+    find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
+      echo "Found plugin: ${plugin_file}" >&2
       echo "${plugin_file}"
+    done
+  fi
+
+  # Project related plugin
+  plugins_dir="$1/plugins"
+  if [ -d "$plugins_dir" ]; then
+    find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
+      echo "Found plugin: ${plugin_file}" >&2
+      plugin_name=$(basename "$(dirname "$file")")
+      echo "${plugin_name}=${plugin_file}"
     done
   fi
 }
@@ -2766,7 +2782,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T17:47:06Z
+## @build_date: 2025-05-14T18:04:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2826,7 +2842,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-14T17:47:09Z
+## @build_date: 2025-05-14T18:04:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }

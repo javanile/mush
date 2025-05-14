@@ -2,13 +2,24 @@
 exec_plugin_list() {
   local plugins_dir
   local plugin_file
+  local plugin_name
 
-  plugins_dir="$1/plugins"
-
+  # Global installed plugin
+  plugins_dir="${MUSH_HOME}/plugins"
   if [ -d "$plugins_dir" ]; then
-    find "$plugins_dir" -type f -name "*.sh" | while IFS=$'\n' read -r plugin_file; do
-      echo "Loading plugin: ${plugin_file}" >&2
+    find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
+      echo "Found plugin: ${plugin_file}" >&2
       echo "${plugin_file}"
+    done
+  fi
+
+  # Project related plugin
+  plugins_dir="$1/plugins"
+  if [ -d "$plugins_dir" ]; then
+    find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
+      echo "Found plugin: ${plugin_file}" >&2
+      plugin_name=$(basename "$(dirname "$file")")
+      echo "${plugin_name}=${plugin_file}"
     done
   fi
 }

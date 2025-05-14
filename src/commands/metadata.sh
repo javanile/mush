@@ -27,4 +27,9 @@ run_metadata() {
 
   echo "Features:"
   echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+
+  echo ""
+  echo "Plugins:"
+  exec_plugin_list
+  #echo "${MUSH_FEATURES}" | sed 's/^/ - /'
 }
