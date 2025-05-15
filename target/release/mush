@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: inject file VERSION
-# @build_date: 2025-05-15T07:53:26Z
+# @build_with: Mush v0.2.0 (2025-05-15 develop)
+# @build_date: 2025-05-15T08:04:21Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1210,7 +1210,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T07:53:18Z
+## @build_date: 2025-05-15T08:04:17Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1259,6 +1259,7 @@ mush_feature_hook() {
   local feature_function
   local plugin
   local plugin_name
+  local plugin_file
   local plugins
 
   feature_hook=$1
@@ -1273,13 +1274,16 @@ mush_feature_hook() {
 
     if [ -n "${plugins}" ]; then
       echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
-        local plugin_name=$(basename "${plugin}" .sh)
-        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
+
+        plugin_name=${plugin%%=*}
+        plugin_file=${plugin#*=}
+
+        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}__"
 
         [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
 
         if [ -n "$feature_value" ]; then
-          source "${plugin}"
+          [ -f "${plugin_file}" ] && source "${plugin_file}"
           if [ "$(type -t "$feature_function" && true)" = "function" ]; then
             $feature_function "${feature_value}" "${@:2}"
           fi
@@ -2790,7 +2794,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T07:53:21Z
+## @build_date: 2025-05-15T08:04:19Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2850,7 +2854,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T07:53:26Z
+## @build_date: 2025-05-15T08:04:21Z
 set -e
 use() { return 0; }
 extern() { return 0; }

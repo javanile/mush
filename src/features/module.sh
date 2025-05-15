@@ -7,6 +7,7 @@ mush_feature_hook() {
   local feature_function
   local plugin
   local plugin_name
+  local plugin_file
   local plugins
 
   feature_hook=$1
@@ -21,13 +22,16 @@ mush_feature_hook() {
 
     if [ -n "${plugins}" ]; then
       echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
-        local plugin_name=$(basename "${plugin}" .sh)
-        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
+
+        plugin_name=${plugin%%=*}
+        plugin_file=${plugin#*=}
+
+        local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}__"
 
         [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
 
         if [ -n "$feature_value" ]; then
-          source "${plugin}"
+          [ -f "${plugin_file}" ] && source "${plugin_file}"
           if [ "$(type -t "$feature_function" && true)" = "function" ]; then
             $feature_function "${feature_value}" "${@:2}"
           fi
