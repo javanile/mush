@@ -27,13 +27,13 @@ run_metadata() {
 
   echo ""
   echo "Features:"
-  echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+  echo "${MUSH_FEATURES}" | sed 's/^/ - /' | sed 's/=/: /1'
 
   plugins=$(exec_plugin_list)
 
   if [ -n "${plugins}" ]; then
     echo ""
     echo "Plugins:"
-    echo "${plugins}" | sed 's/^/ - /'
+    echo "${plugins}" | sed 's/^/ - /' | sed 's/=/: /1'
   fi
 }

@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-15 develop)
-# @build_date: 2025-05-15T08:04:21Z
+# @build_date: 2025-05-15T08:24:18Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -773,14 +773,14 @@ run_metadata() {
 
   echo ""
   echo "Features:"
-  echo "${MUSH_FEATURES}" | sed 's/^/ - /'
+  echo "${MUSH_FEATURES}" | sed 's/^/ - /' | sed 's/=/: /1'
 
   plugins=$(exec_plugin_list)
 
   if [ -n "${plugins}" ]; then
     echo ""
     echo "Plugins:"
-    echo "${plugins}" | sed 's/^/ - /'
+    echo "${plugins}" | sed 's/^/ - /' | sed 's/=/: /1'
   fi
 }
 
@@ -1210,7 +1210,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:04:17Z
+## @build_date: 2025-05-15T08:24:14Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2794,7 +2794,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:04:19Z
+## @build_date: 2025-05-15T08:24:16Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2854,7 +2854,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:04:21Z
+## @build_date: 2025-05-15T08:24:18Z
 set -e
 use() { return 0; }
 extern() { return 0; }
