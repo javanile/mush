@@ -5,6 +5,7 @@ extern package getoptions
 module api
 module build
 module collections
+module color
 module commands
 module errors
 module features

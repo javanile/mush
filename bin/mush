@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-15 develop)
-# @build_date: 2025-05-15T08:24:18Z
+# @build_date: 2025-05-15T09:54:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -20,6 +20,7 @@ extern package getoptions
 module api
 module build
 module collections
+module color
 module commands
 module errors
 module features
@@ -424,6 +425,12 @@ mush_build_script_run() {
 
 mush_space_iterable() {
     echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
+}
+
+mush_color() {
+    if [ -n "${MUSH_TERM_COLOR}" ]; then
+        printf '%b' "$1"
+    fi
 }
 
 public add
@@ -1088,6 +1095,9 @@ parser_definition_info() {
 run_info() {
   local package_name
   local package_entry
+  local bold
+  local green
+  local reset
 
   eval "$(getoptions parser_definition_info parse "$0")"
   parse "$@"
@@ -1100,6 +1110,7 @@ run_info() {
     exit 1
   fi
 
+  mush_env
   mush_registry_index_update
 
   while IFS= read -r line; do
@@ -1108,7 +1119,9 @@ run_info() {
 
     case "$line" in
       "$package_name "*)
+        [ "${VERBOSE}" -gt 2 ] && echo "Found: $line"
         package_entry="${line%%#*}"
+        package_description="$(printf '%s\n' "${line}" | sed -n 's/^[^#]*# *\([^ ]\(.*\)\)/\1/p')"
         break
         ;;
     esac
@@ -1121,13 +1134,23 @@ run_info() {
     package_url=$2
     package_path=$3
 
-    echo "Name: $package_name"
-    echo "Url:  $package_url"
-    echo "Path: $package_path"
-    echo ""
-    echo "Versions:"
+    bold=$(mush_color '\033[1m')
+    green=$(mush_color '\033[32m')
+    cyan=$(mush_color '\033[36m')
+    yellow=$(mush_color '\033[33m')
+    reset=$(mush_color '\033[0m')
 
+    echo "${bold}Name:${reset} ${green}${package_name}${reset}"
+    [ -n "$package_description" ] && echo "${bold}Desc:${reset} ${cyan}${package_description}${reset}"
+    echo "${bold}Repo:${reset} ${cyan}${package_url}${reset}"
+    [ -n "$package_path" ] && echo "${bold}Path:${reset} ${cyan}${package_path}${reset}"
+
+    echo ""
+    echo "${bold}Versions:${reset}"
+
+    echo -n "${yellow}"
     mush_registry_package_versions "$package_url" | sed 's/^/ - /'
+    echo -n "${reset}"
 
     #echo "Entry: $package_entry"
   else
@@ -1210,7 +1233,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:24:14Z
+## @build_date: 2025-05-15T09:54:39Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2788,13 +2811,15 @@ mush_env() {
   MUSH_FEATURES="${MUSH_FEATURES}init=true${newline}"
   MUSH_FEATURES="${MUSH_FEATURES}build=true${newline}"
   MUSH_FEATURES="${MUSH_FEATURES}build_release=true${newline}"
+
+  MUSH_TERM_COLOR="yes"
 }
 
 tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:24:16Z
+## @build_date: 2025-05-15T09:54:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2854,7 +2879,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T08:24:18Z
+## @build_date: 2025-05-15T09:54:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }

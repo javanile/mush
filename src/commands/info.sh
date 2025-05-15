@@ -13,6 +13,9 @@ parser_definition_info() {
 run_info() {
   local package_name
   local package_entry
+  local bold
+  local green
+  local reset
 
   eval "$(getoptions parser_definition_info parse "$0")"
   parse "$@"
@@ -25,6 +28,7 @@ run_info() {
     exit 1
   fi
 
+  mush_env
   mush_registry_index_update
 
   while IFS= read -r line; do
@@ -33,7 +37,9 @@ run_info() {
 
     case "$line" in
       "$package_name "*)
+        [ "${VERBOSE}" -gt 2 ] && echo "Found: $line"
         package_entry="${line%%#*}"
+        package_description="$(printf '%s\n' "${line}" | sed -n 's/^[^#]*# *\([^ ]\(.*\)\)/\1/p')"
         break
         ;;
     esac
@@ -46,13 +52,23 @@ run_info() {
     package_url=$2
     package_path=$3
 
-    echo "Name: $package_name"
-    echo "Url:  $package_url"
-    echo "Path: $package_path"
-    echo ""
-    echo "Versions:"
+    bold=$(mush_color '\033[1m')
+    green=$(mush_color '\033[32m')
+    cyan=$(mush_color '\033[36m')
+    yellow=$(mush_color '\033[33m')
+    reset=$(mush_color '\033[0m')
 
+    echo "${bold}Name:${reset} ${green}${package_name}${reset}"
+    [ -n "$package_description" ] && echo "${bold}Desc:${reset} ${cyan}${package_description}${reset}"
+    echo "${bold}Repo:${reset} ${cyan}${package_url}${reset}"
+    [ -n "$package_path" ] && echo "${bold}Path:${reset} ${cyan}${package_path}${reset}"
+
+    echo ""
+    echo "${bold}Versions:${reset}"
+
+    echo -n "${yellow}"
     mush_registry_package_versions "$package_url" | sed 's/^/ - /'
+    echo -n "${reset}"
 
     #echo "Entry: $package_entry"
   else
