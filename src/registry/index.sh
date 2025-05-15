@@ -83,7 +83,7 @@ mush_registry_index_parse() {
 
     entry=$(echo "${line}" | cut -d'#' -f1)
     entry_type=$(echo "${line}" | awk '{print $1}')
-    entry_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 ;; *) echo "(no description)" ;; esac)
+    entry_description=$(case "$line" in *#*) echo "$line" | cut -d'#' -f2 | sed 's/^[[:space:]]*//; s/[[:space:]]*$//' ;; *) echo "(no description)" ;; esac)
 
     case "${entry_type}" in
       "index")
