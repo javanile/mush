@@ -133,7 +133,7 @@ exec_install_from_index() {
   if [ "${package_type}" = "plugin" ]; then
     mkdir -p "${MUSH_HOME}/plugins/${package_name}"
     cp "${package_nested_src}/src/lib.sh" "${MUSH_HOME}/plugins/${package_name}/plugin.sh"
-    cp "${package_nested_src}/src/Manifest.toml" "${MUSH_HOME}/plugins/${package_name}/Manifest.toml"
+    cp "${package_nested_src}/Manifest.toml" "${MUSH_HOME}/plugins/${package_name}/Manifest.toml"
   fi
 }
 
