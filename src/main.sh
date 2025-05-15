@@ -77,6 +77,7 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
+  [ "${VERBOSE}" -gt 1 ] && console_info "Version" "${VERSION}"
   [ "${VERBOSE}" -gt 2 ] && console_info "Verbosity" "level=${VERBOSE}"
   [ "${VERBOSE}" -gt 3 ] && console_info "Directory" "home=${MUSH_HOME} pwd=${PWD}"
 

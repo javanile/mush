@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-15 develop)
-# @build_date: 2025-05-15T17:29:14Z
+# @build_date: 2025-05-15T17:44:27Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -92,6 +92,7 @@ main() {
   parse "$@"
   eval "set -- $REST"
 
+  [ "${VERBOSE}" -gt 1 ] && console_info "Version" "${VERSION}"
   [ "${VERBOSE}" -gt 2 ] && console_info "Verbosity" "level=${VERBOSE}"
   [ "${VERBOSE}" -gt 3 ] && console_info "Directory" "home=${MUSH_HOME} pwd=${PWD}"
 
@@ -1246,7 +1247,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:29:12Z
+## @build_date: 2025-05-15T17:44:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2832,7 +2833,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:29:13Z
+## @build_date: 2025-05-15T17:44:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2892,7 +2893,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:29:14Z
+## @build_date: 2025-05-15T17:44:27Z
 set -e
 use() { return 0; }
 extern() { return 0; }
