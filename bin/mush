@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-17 develop)
-# @build_date: 2025-05-17T20:43:48Z
+# @build_with: inject file VERSION
+# @build_date: 2025-05-17T21:54:29Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1250,7 +1250,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T20:43:28Z
+## @build_date: 2025-05-17T21:54:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2112,8 +2112,6 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
-  exec_dependencies "${package_src}/target/release" lazy
-
   if [ -f "${package_src}/src/lib.sh" ]; then
     exec_install_lib_from_src "${package_src}"
   fi
@@ -2851,7 +2849,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T20:43:36Z
+## @build_date: 2025-05-17T21:54:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2911,7 +2909,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T20:43:48Z
+## @build_date: 2025-05-17T21:54:29Z
 set -e
 use() { return 0; }
 extern() { return 0; }
