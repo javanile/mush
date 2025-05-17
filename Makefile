@@ -98,11 +98,13 @@ ci-shellcheck:
 ## ===========
 
 dev-commit:
+	@git config credential.helper 'cache --timeout=7200'
 	@git add .
 	@git commit -am "Development Commit" || true
 	@git push
 
 dev-push:
+	@git config credential.helper 'cache --timeout=7200'
 	@git add .
 	@git commit -am "Small fix" || true
 	@git push
