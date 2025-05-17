@@ -125,5 +125,6 @@ case ${file_extension} in
     ;;
 
   md)
+    proselint "$file_to_check"
     ;;
 esac
