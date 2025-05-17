@@ -84,6 +84,9 @@ exec_install_from_index() {
   local package_search
   local package_type
 
+  local package_repo
+  local package_repo_id
+
   package_name=$1
   #package_version_constraint=$2
   dependency_type=$3
@@ -104,9 +107,12 @@ exec_install_from_index() {
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
 
+  package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
+
   package_version=main
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
+  package_repo="${MUSH_REGISTRY_REPO}/${package_repo_id}/${package_version}"
 
   if [ ! -d "${package_src}" ]; then
 

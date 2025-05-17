@@ -7,6 +7,7 @@ mush_registry_index_update()
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_REPO="${MUSH_HOME}/registry/repo"
 
   local packages_file_url
   local packages_cache_hash
