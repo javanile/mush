@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-17 develop)
-# @build_date: 2025-05-17T21:57:45Z
+# @build_with: Mush v0.2.0 (2025-05-18 develop)
+# @build_date: 2025-05-17T22:40:02Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1250,7 +1250,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T21:54:25Z
+## @build_date: 2025-05-17T22:39:59Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1864,8 +1864,8 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/releaselib.sh.tmp
-  local final_file=${package_src}/target/releaselib.sh
+  local build_file=${package_src}/target/release/lib.sh.tmp
+  local final_file=${package_src}/target/release/lib.sh
 
   mkdir -p "${package_src}/target/release"
 
@@ -2112,6 +2112,8 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
+  exec_build_from_src "${package_src}"
+
   if [ -f "${package_src}/src/lib.sh" ]; then
     exec_install_lib_from_src "${package_src}"
   fi
@@ -2164,7 +2166,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/releaselib.sh
+  local final_file=${package_src}/target/release/lib.sh
 
   local cp=cp
   local chmod=chmod
@@ -2849,7 +2851,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T21:54:26Z
+## @build_date: 2025-05-17T22:40:01Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2909,7 +2911,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T21:54:29Z
+## @build_date: 2025-05-17T22:40:02Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3213,7 +3215,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-17 develop)
+Mush v0.2.0 (2025-05-18 develop)
 
 EMBED
         ;;
