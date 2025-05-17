@@ -1,3 +1,4 @@
+# @score: 5
 
 exec_plugin_list() {
   local plugins_dir

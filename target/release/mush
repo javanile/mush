@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-15 develop)
-# @build_date: 2025-05-15T17:44:27Z
+# @build_with: Mush v0.2.0 (2025-05-17 develop)
+# @build_date: 2025-05-17T19:53:59Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -13,6 +13,7 @@ public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
 ## BP004: Compile the entrypoint
+# @score: 10
 
 extern package console
 extern package getoptions
@@ -1247,7 +1248,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:25Z
+## @build_date: 2025-05-17T19:53:53Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1670,6 +1671,7 @@ public compile
 public publish
 public plugin
 public dependencies
+# @score: 1
 
 exec_build_bin_debug() {
   local src_file
@@ -1700,29 +1702,37 @@ exec_build_bin_debug() {
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
   MUSH_DEBUG_PATH="${PWD}"
 
-  echo "# @build_section: BS002 - Package and debug variables " >> "${build_file}"
-  echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
-  echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
-  echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
-  echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
-  echo "" >> "${build_file}"
+  {
+    echo "# @build_section: BS002 - Package and debug variables"
+    echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\""
+    echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
+    echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
+    echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
+    echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    echo ""
+  } >> "${build_file}"
 
   mush_feature_hook "build_debug_head_section" "${build_file}"
 
-  echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
-  debug_2022 >> "${build_file}"
-  echo "" >> "${build_file}"
+  {
+    echo "# @build_section: BS003 - Embedding debug api"
+    debug_2022
+    echo ""
+  } >> "${build_file}"
 
   if [ -n "${lib_file}" ]; then
-    echo "# @build_section: BS015 - Appending library" >> "${build_file}"
-    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+    {
+      echo "# @build_section: BS015 - Appending library"
+      echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
+    } >> "${build_file}"
   fi
 
-  echo "# @build_section: BS001 - Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug init" >> "${build_file}"
-  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
-  echo "main \"\$@\"" >> "${build_file}"
+  {
+    echo "# @build_section: BS001 - Appending entrypoint to debug build"
+    echo "debug init"
+    echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\""
+    echo "main \"\$@\""
+  } >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
@@ -2222,10 +2232,15 @@ exec_legacy_fetch() {
     esac
   done
 }
+# @score: 5
 
 exec_legacy_build() {
-  local target_dir=$1
-  local legacy_dir="${target_dir}/legacy"
+  local target_dir
+  local legacy_dir
+  local temp_pwd
+
+  target_dir=$1
+  legacy_dir="${target_dir}/legacy"
 
   [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
 
@@ -2239,10 +2254,10 @@ exec_legacy_build() {
     if [ ! -f "${package_file}" ]; then
       console_status "Compiling" "$package_name => $package_script ($package_file)"
       mkdir -p "${legacy_dir}"
-      local pwd=$PWD
-      cd "$legacy_dir"
+      temp_pwd=$PWD
+      cd "$legacy_dir" || exit 101
       eval "PATH=${PATH}:${PWD} ${package_script}"
-      cd "$pwd"
+      cd "$temp_pwd" || exit 101
     fi
   done
 }
@@ -2668,6 +2683,7 @@ exec_publish() {
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
+# @score: 5
 
 exec_plugin_list() {
   local plugins_dir
@@ -2833,7 +2849,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:26Z
+## @build_date: 2025-05-17T19:53:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2893,7 +2909,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:27Z
+## @build_date: 2025-05-17T19:53:59Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3197,7 +3213,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-15 develop)
+Mush v0.2.0 (2025-05-17 develop)
 
 EMBED
         ;;
