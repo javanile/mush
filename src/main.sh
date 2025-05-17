@@ -1,3 +1,4 @@
+# @score: 10
 
 extern package console
 extern package getoptions
