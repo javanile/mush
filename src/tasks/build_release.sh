@@ -101,8 +101,8 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/releaselib.sh.tmp
-  local final_file=${package_src}/target/releaselib.sh
+  local build_file=${package_src}/target/release/lib.sh.tmp
+  local final_file=${package_src}/target/release/lib.sh
 
   mkdir -p "${package_src}/target/release"
 

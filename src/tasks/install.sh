@@ -208,7 +208,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/releaselib.sh
+  local final_file=${package_src}/target/release/lib.sh
 
   local cp=cp
   local chmod=chmod
