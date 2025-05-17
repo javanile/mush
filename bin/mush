@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-17 develop)
-# @build_date: 2025-05-17T19:53:59Z
+# @build_date: 2025-05-17T20:30:29Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -619,9 +619,9 @@ run_init() {
 }
 
 parser_definition_install() {
-  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+  setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
+  msg    -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
   flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
@@ -647,6 +647,8 @@ run_install() {
   local index_update
 
   mush_env
+
+  [ "${VERBOSE}" -gt 2 ] && console_info "Installing" "with args '$@'"
 
   if [ -n "${LIST}" ]; then
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
@@ -1248,7 +1250,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T19:53:53Z
+## @build_date: 2025-05-17T20:30:23Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2110,6 +2112,8 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
+  exec_dependencies "${package_src}/target/release" lazy
+
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -2849,7 +2853,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T19:53:56Z
+## @build_date: 2025-05-17T20:30:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2909,7 +2913,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-17T19:53:59Z
+## @build_date: 2025-05-17T20:30:29Z
 set -e
 use() { return 0; }
 extern() { return 0; }

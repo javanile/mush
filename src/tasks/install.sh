@@ -156,7 +156,7 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
-  exec_build_from_src "${package_src}"
+  exec_dependencies "${package_src}/target/release" lazy
 
   if [ -f "${package_src}/src/lib.sh" ]; then
     exec_install_lib_from_src "${package_src}"
