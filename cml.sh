@@ -35,6 +35,7 @@ file_missing_score=""
 oldest_mtime=9999999999
 min_score_file=""
 min_score=9999
+file_to_check=
 
 for f in "${files[@]}"; do
   score=$(get_score "$f")
@@ -109,7 +110,20 @@ echo
 
 # Suggerimento per azione
 if [[ -n $file_missing_score ]]; then
+  file_to_check=$file_missing_score
   echo "➡️  Next file to score (oldest without score): $file_missing_score"
 else
+  file_to_check=$min_score_file
   echo "⚠️  All files have scores. Lowest scored file: $min_score_file (score: $min_score)"
 fi
+
+file_extension="${file_to_check##*.}"
+
+case ${file_extension} in
+  sh)
+    shellcheck "$file_to_check"
+    ;;
+
+  md)
+    ;;
+esac
