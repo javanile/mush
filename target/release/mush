@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-01-27 develop)
-# @build_date: 2026-01-27T19:19:48Z
+# @build_date: 2026-01-27T19:23:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1265,7 +1265,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:19:45Z
+## @build_date: 2026-01-27T19:23:40Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2941,7 +2941,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:19:47Z
+## @build_date: 2026-01-27T19:23:41Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3001,7 +3001,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:19:48Z
+## @build_date: 2026-01-27T19:23:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
