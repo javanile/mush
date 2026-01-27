@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-05-18 develop)
-# @build_date: 2026-01-27T18:58:19Z
+# @build_with: Mush v0.2.0 (2026-01-27 develop)
+# @build_date: 2026-01-27T18:54:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -13,7 +13,6 @@ public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
 ## BP004: Compile the entrypoint
-# @score: 10
 
 extern package console
 extern package getoptions
@@ -619,9 +618,9 @@ run_init() {
 }
 
 parser_definition_install() {
-  setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
-  msg    -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
+  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
   flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
@@ -647,8 +646,6 @@ run_install() {
   local index_update
 
   mush_env
-
-  [ "${VERBOSE}" -gt 2 ] && console_info "Installing" "with args '$@'"
 
   if [ -n "${LIST}" ]; then
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
@@ -1250,7 +1247,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:58:17Z
+## @build_date: 2026-01-27T18:54:08Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1546,7 +1543,6 @@ mush_registry_index_update()
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
-  MUSH_REGISTRY_REPO="${MUSH_HOME}/registry/repo"
 
   local packages_file_url
   local packages_cache_hash
@@ -1674,7 +1670,6 @@ public compile
 public publish
 public plugin
 public dependencies
-# @score: 1
 
 exec_build_bin_debug() {
   local src_file
@@ -1707,37 +1702,29 @@ exec_build_bin_debug() {
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
   MUSH_DEBUG_PATH="${PWD}"
 
-  {
-    echo "# @build_section: BS002 - Package and debug variables"
-    echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\""
-    echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
-    echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
-    echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
-    echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
-    echo ""
-  } >> "${build_file}"
+  echo "# @build_section: BS002 - Package and debug variables " >> "${build_file}"
+  echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
+  echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
+  echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
+  echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
+  echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
+  echo "" >> "${build_file}"
 
   mush_feature_hook "build_debug_head_section" "${build_file}"
 
-  {
-    echo "# @build_section: BS003 - Embedding debug api"
-    debug_2022
-    echo ""
-  } >> "${build_file}"
+  echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
+  debug_2022 >> "${build_file}"
+  echo "" >> "${build_file}"
 
   if [ -n "${lib_file}" ]; then
-    {
-      echo "# @build_section: BS015 - Appending library"
-      echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
-    } >> "${build_file}"
+    echo "# @build_section: BS015 - Appending library" >> "${build_file}"
+    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
   fi
 
-  {
-    echo "# @build_section: BS001 - Appending entrypoint to debug build"
-    echo "debug init"
-    echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\""
-    echo "main \"\$@\""
-  } >> "${build_file}"
+  echo "# @build_section: BS001 - Appending entrypoint to debug build" >> "${build_file}"
+  echo "debug init" >> "${build_file}"
+  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
+  echo "main \"\$@\"" >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
@@ -1873,8 +1860,8 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/release/lib.sh.tmp
-  local final_file=${package_src}/target/release/lib.sh
+  local build_file=${package_src}/target/releaselib.sh.tmp
+  local final_file=${package_src}/target/releaselib.sh
 
   mkdir -p "${package_src}/target/release"
 
@@ -2053,9 +2040,6 @@ exec_install_from_index() {
   local package_search
   local package_type
 
-  local package_repo
-  local package_repo_id
-
   package_name=$1
   #package_version_constraint=$2
   dependency_type=$3
@@ -2076,12 +2060,9 @@ exec_install_from_index() {
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
 
-  package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
-
   package_version=main
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
-  package_repo="${MUSH_REGISTRY_REPO}/${package_repo_id}/${package_version}"
 
   if [ ! -d "${package_src}" ]; then
 
@@ -2185,7 +2166,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/release/lib.sh
+  local final_file=${package_src}/target/releaselib.sh
 
   local cp=cp
   local chmod=chmod
@@ -2253,15 +2234,10 @@ exec_legacy_fetch() {
     esac
   done
 }
-# @score: 5
 
 exec_legacy_build() {
-  local target_dir
-  local legacy_dir
-  local temp_pwd
-
-  target_dir=$1
-  legacy_dir="${target_dir}/legacy"
+  local target_dir=$1
+  local legacy_dir="${target_dir}/legacy"
 
   [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
 
@@ -2275,10 +2251,10 @@ exec_legacy_build() {
     if [ ! -f "${package_file}" ]; then
       console_status "Compiling" "$package_name => $package_script ($package_file)"
       mkdir -p "${legacy_dir}"
-      temp_pwd=$PWD
-      cd "$legacy_dir" || exit 101
+      local pwd=$PWD
+      cd "$legacy_dir"
       eval "PATH=${PATH}:${PWD} ${package_script}"
-      cd "$temp_pwd" || exit 101
+      cd "$pwd"
     fi
   done
 }
@@ -2714,7 +2690,6 @@ exec_publish() {
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
-# @score: 5
 
 exec_plugin_list() {
   local plugins_dir
@@ -2880,7 +2855,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:58:18Z
+## @build_date: 2026-01-27T18:54:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2940,7 +2915,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:58:19Z
+## @build_date: 2026-01-27T18:54:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3245,7 +3220,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-18 develop)
+Mush v0.2.0 (2026-01-27 develop)
 
 EMBED
         ;;

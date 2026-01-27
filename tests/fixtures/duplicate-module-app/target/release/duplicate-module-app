@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# @BP010: Release metadata
+# @package: duplicate-module-app
+# @build_type: bin
+# @build_with: Mush v0.2.0 (2026-01-27 develop)
+# @build_date: 2026-01-27T18:58:01Z
+set -e
+use() { return 0; }
+extern() { return 0; }
+legacy() { return 0; }
+module() { return 0; }
+public() { return 0; }
+embed() { return 0; }
+inject() { return 0; }
+## BP004: Compile the entrypoint
+
+module module_a
+module module_b
+
+main() {
+  module_a_hello
+  module_b_hello
+  shared_utils_print "from main"
+}
+
+module shared_utils
+
+module_a_hello() {
+  shared_utils_print "from module_a"
+}
+
+shared_utils_print() {
+  echo "shared_utils: $1"
+}
+
+module shared_utils
+
+module_b_hello() {
+  shared_utils_print "from module_b"
+}
+## BP005: Execute the entrypoint
+main "$@"
