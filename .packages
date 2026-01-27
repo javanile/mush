@@ -76,6 +76,7 @@ package make.sh https://github.com/francescobianco/make.sh.git
 #------------------------------------------------------------------------------
 
 package linkedin.sh https://github.com/francescobianco/linkedin.sh.git
+package linkedin.sh https://github.com/francescobianco/openapi-token-manager.git
 
 #------------------------------------------------------------------------------
 # HACKATHON PACKAGES
