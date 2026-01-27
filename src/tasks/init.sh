@@ -16,6 +16,8 @@ exec_init() {
   echo "" >> ${manifest_file}
   echo "[dependencies]" >> ${manifest_file}
 
+  global MUSH.md > MUSH.md
+
   if [ ! -f "${main_file}" ]; then
     echo "" > ${main_file}
     echo "main() {" >> ${main_file}

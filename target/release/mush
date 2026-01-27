@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2025-05-15 develop)
-# @build_date: 2025-05-15T17:44:27Z
+# @build_date: 2026-01-27T18:55:03Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1247,7 +1247,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:25Z
+## @build_date: 2026-01-27T18:55:01Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1689,7 +1689,9 @@ exec_build_bin_debug() {
   local build_file="${bin_file}.tmp"
   local final_file="${bin_file}"
 
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${src_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "#!/usr/bin/env bash" > "${build_file}"
   echo "set -e" >> "${build_file}"
@@ -1737,7 +1739,9 @@ exec_build_lib_debug() {
   lib_file="$1"
   out_file="$2"
 
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${lib_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   mkdir -p "$(dirname "${out_file}")"
 
@@ -1779,7 +1783,9 @@ exec_build_release() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "src/main.sh" "${build_file}" "" "release"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -1830,7 +1836,9 @@ exec_build_bin_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/main.sh" "${build_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -1867,7 +1875,9 @@ exec_build_lib_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -1932,6 +1942,8 @@ exec_init() {
   echo "# See more keys and their definitions at https://mush.javanile.org/manifest.html" >> ${manifest_file}
   echo "" >> ${manifest_file}
   echo "[dependencies]" >> ${manifest_file}
+
+  global MUSH.md > MUSH.md
 
   if [ ! -f "${main_file}" ]; then
     echo "" > ${main_file}
@@ -2402,6 +2414,16 @@ compile_file() {
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
+  # Deduplication: skip if already compiled
+  local real_path
+  real_path=$(realpath "${src_file}")
+  if [ -n "${MUSH_COMPILED_MODULES:-}" ]; then
+    if grep -qxF "${real_path}" "${MUSH_COMPILED_MODULES}"; then
+      return 0
+    fi
+    echo "${real_path}" >> "${MUSH_COMPILED_MODULES}"
+  fi
+
   # Analyze file for syntax errors
   bash -n "${src_file}"
 
@@ -2833,7 +2855,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:26Z
+## @build_date: 2026-01-27T18:55:02Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2893,7 +2915,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2025-05-15T17:44:27Z
+## @build_date: 2026-01-27T18:55:03Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3192,13 +3214,50 @@ global() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
 inject file VERSION
+inject file MUSH.md
 EMBED
   else
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2025-05-15 develop)
+Mush v0.2.0 (2026-01-27 develop)
 
+EMBED
+        ;;
+      MUSH.md)
+        cat <<'EMBED'
+# Mush - Shell Package Manager
+
+## Project Structure
+- `Manifest.toml` - package manifest (name, version, edition, dependencies)
+- `src/main.sh` - entry point with `main()` function
+- `src/<module>.sh` - single-file modules
+- `src/<module>/module.sh` - folder modules with submodules
+
+## Keywords
+- `module <name>` - load a module from src/
+- `public <name>` - expose a submodule outside its parent module
+- `extern package <name>` - declare external dependency
+- `embed <name>` - embed module source in the final binary
+- `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
+- `legacy` - backward compatibility with traditional shell scripting
+
+## Naming Convention
+Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
+- Variables: lowercase snake_case (e.g. `my_variable`)
+- Constants: UPPERCASE (e.g. `PI=3.14`)
+- Functions: snake_case (e.g. `my_function`)
+
+## Commands
+- `mush new <name>` - create new project
+- `mush init` - init project in existing directory
+- `mush build` - build debug binary to target/debug/
+- `mush build --release` - build release binary
+- `mush run` - build and run
+
+## Manifest.toml
+[package] section: name, version (semver), edition ("2022")
+[dependencies] section: `package_name = "version_constraint"`
 EMBED
         ;;
       *)

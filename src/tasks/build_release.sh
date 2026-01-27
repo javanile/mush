@@ -28,7 +28,9 @@ exec_build_release() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "src/main.sh" "${build_file}" "" "release"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -79,7 +81,9 @@ exec_build_bin_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/main.sh" "${build_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
@@ -116,7 +120,9 @@ exec_build_lib_from_src() {
   release_2022 >> $build_file
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

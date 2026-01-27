@@ -14,6 +14,16 @@ compile_file() {
 
   [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
 
+  # Deduplication: skip if already compiled
+  local real_path
+  real_path=$(realpath "${src_file}")
+  if [ -n "${MUSH_COMPILED_MODULES:-}" ]; then
+    if grep -qxF "${real_path}" "${MUSH_COMPILED_MODULES}"; then
+      return 0
+    fi
+    echo "${real_path}" >> "${MUSH_COMPILED_MODULES}"
+  fi
+
   # Analyze file for syntax errors
   bash -n "${src_file}"
 

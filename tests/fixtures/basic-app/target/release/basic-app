@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: basic-app
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-04-20 develop)
-# @build_date: 2025-04-30T15:50:31Z
+# @build_with: Mush v0.2.0 (2026-01-27 develop)
+# @build_date: 2026-01-27T18:55:04Z
 set -e
 use() { return 0; }
 extern() { return 0; }

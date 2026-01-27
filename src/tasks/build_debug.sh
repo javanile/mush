@@ -17,7 +17,9 @@ exec_build_bin_debug() {
   local build_file="${bin_file}.tmp"
   local final_file="${bin_file}"
 
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${src_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "#!/usr/bin/env bash" > "${build_file}"
   echo "set -e" >> "${build_file}"
@@ -65,7 +67,9 @@ exec_build_lib_debug() {
   lib_file="$1"
   out_file="$2"
 
+  export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${lib_file}"
+  rm -f "${MUSH_COMPILED_MODULES}"
 
   mkdir -p "$(dirname "${out_file}")"
 
