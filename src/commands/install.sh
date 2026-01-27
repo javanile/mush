@@ -1,8 +1,8 @@
 
 parser_definition_install() {
-  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+  setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
+  msg    -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
   flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
@@ -28,6 +28,8 @@ run_install() {
   local index_update
 
   mush_env
+
+  [ "${VERBOSE}" -gt 2 ] && console_info "Installing" "with args '$@'"
 
   if [ -n "${LIST}" ]; then
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
