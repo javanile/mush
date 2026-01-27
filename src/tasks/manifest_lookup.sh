@@ -18,7 +18,7 @@ exec_manifest_lookup() {
     exit 101
   fi
 
-  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ]; then
+  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
@@ -137,4 +137,54 @@ manifest_parse() {
       #echo "L: $line"
     done < "${manifest_file}"
     #echo "E."
+}
+
+manifest_get_binaries() {
+  if [ -n "${MUSH_BINARIES}" ]; then
+    echo "${MUSH_BINARIES}"
+  elif [ -f "src/main.sh" ]; then
+    echo "name=${MUSH_PACKAGE_NAME},path=src/main.sh,"
+  fi
+}
+
+manifest_parse_bin_entry() {
+  local entry=$1
+
+  BIN_NAME=""
+  BIN_PATH=""
+
+  local tmp_ifs=$IFS
+  IFS=','
+  for field in ${entry}; do
+    case "$field" in
+      name=*) BIN_NAME="${field#name=}" ;;
+      path=*) BIN_PATH="${field#path=}" ;;
+    esac
+  done
+  IFS=$tmp_ifs
+}
+
+manifest_find_bin() {
+  local search_name=$1
+  local binaries
+
+  target_bin_name=""
+  target_bin_path=""
+  binaries=$(manifest_get_binaries)
+
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+
+    if [ -n "${search_name}" ]; then
+      [ "${BIN_NAME}" != "${search_name}" ] && continue
+    fi
+
+    target_bin_name="${BIN_NAME}"
+    target_bin_path="${BIN_PATH}"
+    return 0
+  done <<EOF
+${binaries}
+EOF
 }

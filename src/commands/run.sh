@@ -7,6 +7,7 @@ parser_definition_run() {
   msg -- 'OPTIONS:'
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
+  param  RUN_BIN_NAME      --bin                          -- "Name of the binary target to run"
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
 
   disp   :usage         -h --help                         -- "Print help information"
@@ -45,10 +46,7 @@ run_run() {
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
-  if [ -z "${EXAMPLE_NAME}" ]; then
-    local src_file=src/main.sh
-    local bin_file=target/debug/$MUSH_PACKAGE_NAME
-  else
+  if [ -n "${EXAMPLE_NAME}" ]; then
     local src_file=examples/$EXAMPLE_NAME.sh
     local bin_file=target/debug/examples/$EXAMPLE_NAME
 
@@ -59,6 +57,21 @@ run_run() {
       [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
       exit 101
     fi
+  else
+    local src_file=""
+    local bin_file=""
+    local target_bin_name=""
+    local target_bin_path=""
+
+    manifest_find_bin "${RUN_BIN_NAME:-}"
+
+    if [ -z "${target_bin_name}" ] && [ -n "${RUN_BIN_NAME}" ]; then
+      console_error "no bin target named '${RUN_BIN_NAME}'."
+      exit 101
+    fi
+
+    src_file="${target_bin_path}"
+    bin_file="target/debug/${target_bin_name}"
   fi
 
   console_status "Compiling" "'${bin_file}'"

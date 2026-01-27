@@ -1,12 +1,22 @@
 
 exec_build_release() {
   local target_path
+  local binaries
 
   target_path=${1:-target/release}
+  binaries=$(manifest_get_binaries)
 
-  name=$MUSH_PACKAGE_NAME
+  echo "${binaries}" | while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+    exec_build_release_bin "${BIN_NAME}" "${BIN_PATH}"
+  done
+}
 
-  #echo "NAME: $name"
+exec_build_release_bin() {
+  local name=$1
+  local src_path=$2
 
   local bin_file=bin/${name}
 
@@ -29,7 +39,7 @@ exec_build_release() {
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "src/main.sh" "${build_file}" "" "release"
+  compile_file "${src_path}" "${build_file}" "" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"

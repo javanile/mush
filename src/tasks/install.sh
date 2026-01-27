@@ -1,74 +1,60 @@
 
 exec_install_binaries() {
-  echo "${MUSH_BINARIES}"
-
   local binaries
-  local bin_name
-  local bin_path
-  local tmp_ifs
+  binaries=$(manifest_get_binaries)
 
-  binaries="${MUSH_BINARIES}"
-
-  for bin in $binaries; do
-    bin_name=""
-    bin_path=""
-
-    tmp_ifs=$IFS
-    IFS=','
-    for field in ${bin}; do
-      case "$field" in
-        name=*)
-          bin_name="${field#name=}"
-          ;;
-        path=*)
-          bin_path="${field#path=}"
-          ;;
-      esac
-    done
-    IFS=$tmp_ifs
-
-    echo "name: $bin_name, path: $bin_path"
-  done
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+    echo "name: ${BIN_NAME}, path: ${BIN_PATH}"
+  done <<EOF
+${binaries}
+EOF
 }
 
 
 exec_install() {
   local package_name
   local package_version
-  local bin_name
-  local pwd=$PWD
-  local bin_file
-  local final_file
+  local pwd
   local cp
   local chmod
 
   package_name=$MUSH_PACKAGE_NAME
   package_version=$MUSH_PACKAGE_VERSION
-  bin_name=$MUSH_PACKAGE_NAME
   pwd="${PWD}"
-  bin_file="${MUSH_HOME}/bin/${bin_name}"
-  final_file=target/release/${bin_name}
   cp="cp"
   chmod="chmod"
 
-  #if [[ $EUID -ne 0 ]]; then
-  #    cp="sudo ${cp}"
-  #    chmod="sudo ${chmod}"
-  #fi
-
   mkdir -p "${MUSH_HOME}/bin"
-  ${cp} "${final_file}" "${bin_file}"
-  ${chmod} +x "${bin_file}"
+
+  local binaries
+  binaries=$(manifest_get_binaries)
+
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+
+    local bin_file="${MUSH_HOME}/bin/${BIN_NAME}"
+    local final_file="target/release/${BIN_NAME}"
+
+    ${cp} "${final_file}" "${bin_file}"
+    ${chmod} +x "${bin_file}"
+
+    if [ -f "${bin_file}" ]; then
+      console_status "Replacing" "${bin_file}"
+      console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+    else
+      console_status "Installing" "${bin_file}"
+      console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+    fi
+  done <<EOF
+${binaries}
+EOF
 
   console_status "Finished" "release [optimized] target(s) in 0.18s"
-
-  if [ -f "${bin_file}" ]; then
-    console_status "Replacing" "${bin_file}"
-    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
-  else
-    console_status "Installing" "${bin_file}"
-    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
-  fi
 }
 
 exec_install_from_index() {

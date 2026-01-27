@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-01-27 develop)
-# @build_date: 2026-01-27T18:54:10Z
+# @build_with: Mush v0.2.0 (2025-05-18 develop)
+# @build_date: 2026-01-27T19:19:27Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -13,6 +13,7 @@ public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
 ## BP004: Compile the entrypoint
+# @score: 10
 
 extern package console
 extern package getoptions
@@ -501,29 +502,31 @@ run_build() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
-  local src_file=src/main.sh
-  local bin_file=${MUSH_TARGET_PATH}/${package_name}
   local out_file=${MUSH_TARGET_PATH}/lib.sh
   local lib_file=src/lib.sh
 
   console_status "Compiling" "${package_name} v${package_version} (${pwd})"
 
-  if [ -n "${BUILD_RELEASE}" ]; then
+  if [ -n "${BUILD_RELEASE}" ] || [ "$BUILD_TARGET" = "release" ]; then
     exec_build_release "${MUSH_TARGET_PATH}"
   else
-    if [ "$BUILD_TARGET" = "release" ]; then
-      exec_build_release "${MUSH_TARGET_PATH}"
+    if [ -f "${lib_file}" ]; then
+      [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
+      exec_build_lib_debug "${lib_file}" "${out_file}"
     else
-      if [ -f "${lib_file}" ]; then
-        [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
-        exec_build_lib_debug "${lib_file}" "${out_file}"
-      else
-        local lib_file=
-      fi
-      if [ -f "${src_file}" ]; then
-        exec_build_bin_debug "src/main.sh" "${bin_file}" "${lib_file}"
-      fi
+      lib_file=
     fi
+
+    local binaries
+    binaries=$(manifest_get_binaries)
+
+    echo "${binaries}" | while IFS= read -r bin_entry; do
+      [ -z "${bin_entry}" ] && continue
+      manifest_parse_bin_entry "${bin_entry}"
+      [ -z "${BIN_NAME}" ] && continue
+      local bin_file="${MUSH_TARGET_PATH}/${BIN_NAME}"
+      exec_build_bin_debug "${BIN_PATH}" "${bin_file}" "${lib_file}"
+    done
   fi
 
   #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
@@ -618,9 +621,9 @@ run_init() {
 }
 
 parser_definition_install() {
-  setup   REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
+  setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
+  msg    -- 'USAGE:' "  ${2##*/} install [OPTIONS] [package]..." ''
 
   msg    -- 'OPTIONS:'
   flag   VERBOSE         -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
@@ -646,6 +649,8 @@ run_install() {
   local index_update
 
   mush_env
+
+  [ "${VERBOSE}" -gt 2 ] && console_info "Installing" "with args '$@'"
 
   if [ -n "${LIST}" ]; then
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
@@ -832,6 +837,7 @@ parser_definition_run() {
   msg -- 'OPTIONS:'
   flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
   param  EXAMPLE_NAME      --example                      -- "Name of the example target to run"
+  param  RUN_BIN_NAME      --bin                          -- "Name of the binary target to run"
   flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
 
   disp   :usage         -h --help                         -- "Print help information"
@@ -870,10 +876,7 @@ run_run() {
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
-  if [ -z "${EXAMPLE_NAME}" ]; then
-    local src_file=src/main.sh
-    local bin_file=target/debug/$MUSH_PACKAGE_NAME
-  else
+  if [ -n "${EXAMPLE_NAME}" ]; then
     local src_file=examples/$EXAMPLE_NAME.sh
     local bin_file=target/debug/examples/$EXAMPLE_NAME
 
@@ -884,6 +887,21 @@ run_run() {
       [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
       exit 101
     fi
+  else
+    local src_file=""
+    local bin_file=""
+    local target_bin_name=""
+    local target_bin_path=""
+
+    manifest_find_bin "${RUN_BIN_NAME:-}"
+
+    if [ -z "${target_bin_name}" ] && [ -n "${RUN_BIN_NAME}" ]; then
+      console_error "no bin target named '${RUN_BIN_NAME}'."
+      exit 101
+    fi
+
+    src_file="${target_bin_path}"
+    bin_file="target/debug/${target_bin_name}"
   fi
 
   console_status "Compiling" "'${bin_file}'"
@@ -1247,7 +1265,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:54:08Z
+## @build_date: 2026-01-27T19:19:25Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1543,6 +1561,7 @@ mush_registry_index_update()
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
+  MUSH_REGISTRY_REPO="${MUSH_HOME}/registry/repo"
 
   local packages_file_url
   local packages_cache_hash
@@ -1670,6 +1689,7 @@ public compile
 public publish
 public plugin
 public dependencies
+# @score: 1
 
 exec_build_bin_debug() {
   local src_file
@@ -1702,29 +1722,37 @@ exec_build_bin_debug() {
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
   MUSH_DEBUG_PATH="${PWD}"
 
-  echo "# @build_section: BS002 - Package and debug variables " >> "${build_file}"
-  echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\"" >> "${build_file}"
-  echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\"" >> "${build_file}"
-  echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\"" >> "${build_file}"
-  echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\"" >> "${build_file}"
-  echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\"" >> "${build_file}"
-  echo "" >> "${build_file}"
+  {
+    echo "# @build_section: BS002 - Package and debug variables"
+    echo "MUSH_PACKAGE_NAME=\"${MUSH_PACKAGE_NAME}\""
+    echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
+    echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
+    echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
+    echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    echo ""
+  } >> "${build_file}"
 
   mush_feature_hook "build_debug_head_section" "${build_file}"
 
-  echo "# @build_section: BS003 - Embedding debug api" >> "${build_file}"
-  debug_2022 >> "${build_file}"
-  echo "" >> "${build_file}"
+  {
+    echo "# @build_section: BS003 - Embedding debug api"
+    debug_2022
+    echo ""
+  } >> "${build_file}"
 
   if [ -n "${lib_file}" ]; then
-    echo "# @build_section: BS015 - Appending library" >> "${build_file}"
-    echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\"" >> "${build_file}"
+    {
+      echo "# @build_section: BS015 - Appending library"
+      echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
+    } >> "${build_file}"
   fi
 
-  echo "# @build_section: BS001 - Appending entrypoint to debug build" >> "${build_file}"
-  echo "debug init" >> "${build_file}"
-  echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\"" >> "${build_file}"
-  echo "main \"\$@\"" >> "${build_file}"
+  {
+    echo "# @build_section: BS001 - Appending entrypoint to debug build"
+    echo "debug init"
+    echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\""
+    echo "main \"\$@\""
+  } >> "${build_file}"
 
   mv "${build_file}" "${final_file}"
   chmod +x "${final_file}"
@@ -1756,12 +1784,22 @@ exec_build_lib_debug() {
 
 exec_build_release() {
   local target_path
+  local binaries
 
   target_path=${1:-target/release}
+  binaries=$(manifest_get_binaries)
 
-  name=$MUSH_PACKAGE_NAME
+  echo "${binaries}" | while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+    exec_build_release_bin "${BIN_NAME}" "${BIN_PATH}"
+  done
+}
 
-  #echo "NAME: $name"
+exec_build_release_bin() {
+  local name=$1
+  local src_path=$2
 
   local bin_file=bin/${name}
 
@@ -1784,7 +1822,7 @@ exec_build_release() {
 
   echo "## BP004: Compile the entrypoint" >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "src/main.sh" "${build_file}" "" "release"
+  compile_file "${src_path}" "${build_file}" "" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
 
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
@@ -1860,8 +1898,8 @@ exec_build_lib_from_src() {
   #echo "NAME: $name"
   local lib_file=${package_src}/lib/${package_name}
   local build_date=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-  local build_file=${package_src}/target/releaselib.sh.tmp
-  local final_file=${package_src}/target/releaselib.sh
+  local build_file=${package_src}/target/release/lib.sh.tmp
+  local final_file=${package_src}/target/release/lib.sh
 
   mkdir -p "${package_src}/target/release"
 
@@ -1956,75 +1994,61 @@ exec_init() {
 }
 
 exec_install_binaries() {
-  echo "${MUSH_BINARIES}"
-
   local binaries
-  local bin_name
-  local bin_path
-  local tmp_ifs
+  binaries=$(manifest_get_binaries)
 
-  binaries="${MUSH_BINARIES}"
-
-  for bin in $binaries; do
-    bin_name=""
-    bin_path=""
-
-    tmp_ifs=$IFS
-    IFS=','
-    for field in ${bin}; do
-      case "$field" in
-        name=*)
-          bin_name="${field#name=}"
-          ;;
-        path=*)
-          bin_path="${field#path=}"
-          ;;
-      esac
-    done
-    IFS=$tmp_ifs
-
-    echo "name: $bin_name, path: $bin_path"
-  done
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+    echo "name: ${BIN_NAME}, path: ${BIN_PATH}"
+  done <<EOF
+${binaries}
+EOF
 }
 
 
 exec_install() {
   local package_name
   local package_version
-  local bin_name
-  local pwd=$PWD
-  local bin_file
-  local final_file
+  local pwd
   local cp
   local chmod
 
   package_name=$MUSH_PACKAGE_NAME
   package_version=$MUSH_PACKAGE_VERSION
-  bin_name=$MUSH_PACKAGE_NAME
   pwd="${PWD}"
-  bin_file="${MUSH_HOME}/bin/${bin_name}"
-  final_file=target/release/${bin_name}
   cp="cp"
   chmod="chmod"
 
-  #if [[ $EUID -ne 0 ]]; then
-  #    cp="sudo ${cp}"
-  #    chmod="sudo ${chmod}"
-  #fi
-
   mkdir -p "${MUSH_HOME}/bin"
-  ${cp} "${final_file}" "${bin_file}"
-  ${chmod} +x "${bin_file}"
+
+  local binaries
+  binaries=$(manifest_get_binaries)
+
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+
+    local bin_file="${MUSH_HOME}/bin/${BIN_NAME}"
+    local final_file="target/release/${BIN_NAME}"
+
+    ${cp} "${final_file}" "${bin_file}"
+    ${chmod} +x "${bin_file}"
+
+    if [ -f "${bin_file}" ]; then
+      console_status "Replacing" "${bin_file}"
+      console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+    else
+      console_status "Installing" "${bin_file}"
+      console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+    fi
+  done <<EOF
+${binaries}
+EOF
 
   console_status "Finished" "release [optimized] target(s) in 0.18s"
-
-  if [ -f "${bin_file}" ]; then
-    console_status "Replacing" "${bin_file}"
-    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
-  else
-    console_status "Installing" "${bin_file}"
-    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
-  fi
 }
 
 exec_install_from_index() {
@@ -2039,6 +2063,9 @@ exec_install_from_index() {
   local package_src
   local package_search
   local package_type
+
+  local package_repo
+  local package_repo_id
 
   package_name=$1
   #package_version_constraint=$2
@@ -2060,9 +2087,12 @@ exec_install_from_index() {
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
 
+  package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
+
   package_version=main
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
+  package_repo="${MUSH_REGISTRY_REPO}/${package_repo_id}/${package_version}"
 
   if [ ! -d "${package_src}" ]; then
 
@@ -2166,7 +2196,7 @@ exec_install_lib_from_src() {
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
   local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
-  local final_file=${package_src}/target/releaselib.sh
+  local final_file=${package_src}/target/release/lib.sh
 
   local cp=cp
   local chmod=chmod
@@ -2234,10 +2264,15 @@ exec_legacy_fetch() {
     esac
   done
 }
+# @score: 5
 
 exec_legacy_build() {
-  local target_dir=$1
-  local legacy_dir="${target_dir}/legacy"
+  local target_dir
+  local legacy_dir
+  local temp_pwd
+
+  target_dir=$1
+  legacy_dir="${target_dir}/legacy"
 
   [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
 
@@ -2251,10 +2286,10 @@ exec_legacy_build() {
     if [ ! -f "${package_file}" ]; then
       console_status "Compiling" "$package_name => $package_script ($package_file)"
       mkdir -p "${legacy_dir}"
-      local pwd=$PWD
-      cd "$legacy_dir"
+      temp_pwd=$PWD
+      cd "$legacy_dir" || exit 101
       eval "PATH=${PATH}:${PWD} ${package_script}"
-      cd "$pwd"
+      cd "$temp_pwd" || exit 101
     fi
   done
 }
@@ -2278,7 +2313,7 @@ exec_manifest_lookup() {
     exit 101
   fi
 
-  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ]; then
+  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
@@ -2397,6 +2432,56 @@ manifest_parse() {
       #echo "L: $line"
     done < "${manifest_file}"
     #echo "E."
+}
+
+manifest_get_binaries() {
+  if [ -n "${MUSH_BINARIES}" ]; then
+    echo "${MUSH_BINARIES}"
+  elif [ -f "src/main.sh" ]; then
+    echo "name=${MUSH_PACKAGE_NAME},path=src/main.sh,"
+  fi
+}
+
+manifest_parse_bin_entry() {
+  local entry=$1
+
+  BIN_NAME=""
+  BIN_PATH=""
+
+  local tmp_ifs=$IFS
+  IFS=','
+  for field in ${entry}; do
+    case "$field" in
+      name=*) BIN_NAME="${field#name=}" ;;
+      path=*) BIN_PATH="${field#path=}" ;;
+    esac
+  done
+  IFS=$tmp_ifs
+}
+
+manifest_find_bin() {
+  local search_name=$1
+  local binaries
+
+  target_bin_name=""
+  target_bin_path=""
+  binaries=$(manifest_get_binaries)
+
+  while IFS= read -r bin_entry; do
+    [ -z "${bin_entry}" ] && continue
+    manifest_parse_bin_entry "${bin_entry}"
+    [ -z "${BIN_NAME}" ] && continue
+
+    if [ -n "${search_name}" ]; then
+      [ "${BIN_NAME}" != "${search_name}" ] && continue
+    fi
+
+    target_bin_name="${BIN_NAME}"
+    target_bin_path="${BIN_PATH}"
+    return 0
+  done <<EOF
+${binaries}
+EOF
 }
 
 
@@ -2690,6 +2775,7 @@ exec_publish() {
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
+# @score: 5
 
 exec_plugin_list() {
   local plugins_dir
@@ -2855,7 +2941,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:54:09Z
+## @build_date: 2026-01-27T19:19:26Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2915,7 +3001,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T18:54:10Z
+## @build_date: 2026-01-27T19:19:27Z
 set -e
 use() { return 0; }
 extern() { return 0; }
