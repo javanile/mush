@@ -162,6 +162,9 @@ manifest_parse_bin_entry() {
     esac
   done
   IFS=$tmp_ifs
+
+  # Default path when [[bin]] only specifies name
+  [ -z "${BIN_PATH}" ] && BIN_PATH="src/main.sh"
 }
 
 manifest_find_bin() {
