@@ -164,7 +164,9 @@ manifest_parse_bin_entry() {
   IFS=$tmp_ifs
 
   # Default path when [[bin]] only specifies name
-  [ -z "${BIN_PATH}" ] && BIN_PATH="src/main.sh"
+  if [ -z "${BIN_PATH}" ]; then
+    BIN_PATH="src/main.sh"
+  fi
 }
 
 manifest_find_bin() {

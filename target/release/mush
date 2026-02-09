@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-01-27 develop)
-# @build_date: 2026-01-27T19:23:42Z
+# @build_with: Mush v0.2.0 (2026-02-06 develop)
+# @build_date: 2026-02-06T15:11:50Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -84,6 +84,7 @@ main() {
   fi
 
   if [ -n "${MUSH_DEBUG_TRACE}" ]; then
+    export PS4='+ ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
     set -x
   fi
 
@@ -1265,7 +1266,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:23:40Z
+## @build_date: 2026-02-06T15:11:47Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2457,6 +2458,11 @@ manifest_parse_bin_entry() {
     esac
   done
   IFS=$tmp_ifs
+
+  # Default path when [[bin]] only specifies name
+  if [ -z "${BIN_PATH}" ]; then
+    BIN_PATH="src/main.sh"
+  fi
 }
 
 manifest_find_bin() {
@@ -2941,7 +2947,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:23:41Z
+## @build_date: 2026-02-06T15:11:48Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3001,7 +3007,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-01-27T19:23:42Z
+## @build_date: 2026-02-06T15:11:49Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3306,7 +3312,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2026-01-27 develop)
+Mush v0.2.0 (2026-02-06 develop)
 
 EMBED
         ;;

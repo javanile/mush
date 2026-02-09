@@ -69,6 +69,7 @@ main() {
   fi
 
   if [ -n "${MUSH_DEBUG_TRACE}" ]; then
+    export PS4='+ ${BASH_SOURCE}:${LINENO}: ${FUNCNAME[0]:+${FUNCNAME[0]}(): }'
     set -x
   fi
 
