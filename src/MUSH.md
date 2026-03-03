@@ -1,5 +1,7 @@
 # Mush - Shell Package Manager
 
+> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
+
 ## Project Structure
 - `Manifest.toml` - package manifest (name, version, edition, dependencies)
 - `src/main.sh` - entry point with `main()` function
