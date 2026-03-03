@@ -30,5 +30,5 @@ Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
 - `mush run` - build and run
 
 ## Manifest.toml
-[package] section: name, version (semver), edition ("2022")
-[dependencies] section: `package_name = "version_constraint"`
+- [package] section: name, version (semver), edition ("2022")
+- [dependencies] section: `package_name = "version_constraint"`
