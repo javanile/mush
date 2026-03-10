@@ -16,6 +16,9 @@
 - `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
 - `legacy` - backward compatibility with traditional shell scripting
 
+## Coding Style
+- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
+
 ## Naming Convention
 Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
 - Variables: lowercase snake_case (e.g. `my_variable`)
