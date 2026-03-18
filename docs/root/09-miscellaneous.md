@@ -14,6 +14,7 @@ Explore the miscellaneous contents that enhance your development experience. Fro
 - [Glossary](/glossary/)
 - [Benefits](/benefits/)
 - [Use Cases](/use-cases/)
+- [Installation](/installation/)
 - [Examples](/examples/)
 - [Guidelines](/guidelines/)
 - [Lectures](/lectures/)
