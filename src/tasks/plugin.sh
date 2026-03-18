@@ -23,4 +23,10 @@ exec_plugin_list() {
       echo "${plugin_name}=${plugin_file}"
     done
   fi
+
+  # If current package is a plugin is by default listed
+  #[ "${VERBOSE}" -gt 7 ] && echo "List plugin: ${MUSH_PACKAGE_NAME} ${MUSH_PACKAGE_TYPE}" >&2
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+    echo "${MUSH_PACKAGE_NAME}=${PWD}/src/lib.sh"
+  fi
 }

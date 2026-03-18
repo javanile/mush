@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-02-06 develop)
-# @build_date: 2026-02-06T15:11:50Z
+# @build_with: Mush v0.2.0 (2026-03-18 develop)
+# @build_date: 2026-03-18T21:56:58Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -383,14 +383,18 @@ public script
 
 mush_build_print() {
     case "$1" in
-        a)
-            echo "a"
+        env)
+            printenv | grep 'MUSH_'
+            ;;
+        target-list)
+            echo "ubuntu"
+            echo "bash"
+            echo "zsh"
             ;;
         *)
             local print_options="
-            a   a
-            b   b
-            c   c
+            env           Show MUSH_* variables for package
+            target-list   List all available targets
             "
             console_error "unknown print request '$1'\n\nAvailable print options:\n${print_options}"
     esac
@@ -1266,7 +1270,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-02-06T15:11:47Z
+## @build_date: 2026-03-18T21:56:55Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1320,13 +1324,16 @@ mush_feature_hook() {
 
   feature_hook=$1
 
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@"
+  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@" >&2
 
   echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
     feature_name=${feature%=*}
     feature_value=${feature#*=}
 
-    [ -z "${plugins}" ] && plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
+    if [ -z "${plugins}" ]; then
+      plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
+      [ "${VERBOSE}" -gt 7 ] && [ -n "${plugins}" ] && echo "Loaded plugins: ${plugins}" >&2
+    fi
 
     if [ -n "${plugins}" ]; then
       echo "${plugins}" | while IFS=$'\n' read -r plugin && [ -n "$plugin" ]; do
@@ -1336,7 +1343,7 @@ mush_feature_hook() {
 
         local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}__"
 
-        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'"
+        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'" >&2
 
         if [ -n "$feature_value" ]; then
           [ -f "${plugin_file}" ] && source "${plugin_file}"
@@ -1714,9 +1721,34 @@ exec_build_bin_debug() {
   compile_file "${src_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
 
-  echo "#!/usr/bin/env bash" > "${build_file}"
-  echo "set -e" >> "${build_file}"
-  echo "" >> "${build_file}"
+  # Init debug entrypoint
+  {
+    echo "#!/usr/bin/env bash"
+    echo "set -e"
+    echo ""
+  } > "${build_file}"
+
+  # File meta section
+  {
+    echo "# @section_code: FS002"
+    echo "# @section_name: file-meta"
+    echo "# @file_path: ${final_file}"
+    echo "# @file_type: build-entrypoint"
+    echo ""
+  } >> "${build_file}"
+
+  # Debug entrypoint init
+  {
+    echo "# @section_code: FS003"
+    echo "# @section_name: debug-entrypoint-init"
+
+    mush_feature_hook "debug_entrypoint_init" "${build_file}"
+
+    echo "## DEBUG ENTRYPOINT INIT"
+
+    echo ""
+  } >> "${build_file}"
+
 
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
@@ -1729,7 +1761,8 @@ exec_build_bin_debug() {
     echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
     echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
     echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
-    echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    #echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    echo "MUSH_DEBUG_PATH=\"${MUSH_DEBUG_PATH}\""
     echo ""
   } >> "${build_file}"
 
@@ -1744,7 +1777,7 @@ exec_build_bin_debug() {
   if [ -n "${lib_file}" ]; then
     {
       echo "# @build_section: BS015 - Appending library"
-      echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
+      echo "debug file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
     } >> "${build_file}"
   fi
 
@@ -2806,6 +2839,12 @@ exec_plugin_list() {
       echo "${plugin_name}=${plugin_file}"
     done
   fi
+
+  # If current package is a plugin is by default listed
+  #[ "${VERBOSE}" -gt 7 ] && echo "List plugin: ${MUSH_PACKAGE_NAME} ${MUSH_PACKAGE_TYPE}" >&2
+  if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
+    echo "${MUSH_PACKAGE_NAME}=${PWD}/src/lib.sh"
+  fi
 }
 
 exec_dependencies() {
@@ -2941,13 +2980,15 @@ mush_env() {
   MUSH_FEATURES="${MUSH_FEATURES}build_release=true${newline}"
 
   MUSH_TERM_COLOR="yes"
+
+  MUSH_TARGET="portable"
 }
 
 tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-02-06T15:11:48Z
+## @build_date: 2026-03-18T21:56:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3007,7 +3048,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-02-06T15:11:49Z
+## @build_date: 2026-03-18T21:56:58Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3312,13 +3353,15 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2026-02-06 develop)
+Mush v0.2.0 (2026-03-18 develop)
 
 EMBED
         ;;
       MUSH.md)
         cat <<'EMBED'
 # Mush - Shell Package Manager
+
+> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
 
 ## Project Structure
 - `Manifest.toml` - package manifest (name, version, edition, dependencies)
@@ -3334,6 +3377,9 @@ EMBED
 - `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
 - `legacy` - backward compatibility with traditional shell scripting
 
+## Coding Style
+- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
+
 ## Naming Convention
 Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
 - Variables: lowercase snake_case (e.g. `my_variable`)
@@ -3348,8 +3394,9 @@ Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
 - `mush run` - build and run
 
 ## Manifest.toml
-[package] section: name, version (semver), edition ("2022")
-[dependencies] section: `package_name = "version_constraint"`
+- [package] section: name, version (semver), edition ("2022")
+- [dependencies] section: `package_name = "version_constraint"`
+
 EMBED
         ;;
       *)

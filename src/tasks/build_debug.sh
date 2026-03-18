@@ -22,9 +22,34 @@ exec_build_bin_debug() {
   compile_file "${src_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
 
-  echo "#!/usr/bin/env bash" > "${build_file}"
-  echo "set -e" >> "${build_file}"
-  echo "" >> "${build_file}"
+  # Init debug entrypoint
+  {
+    echo "#!/usr/bin/env bash"
+    echo "set -e"
+    echo ""
+  } > "${build_file}"
+
+  # File meta section
+  {
+    echo "# @section_code: FS002"
+    echo "# @section_name: file-meta"
+    echo "# @file_path: ${final_file}"
+    echo "# @file_type: build-entrypoint"
+    echo ""
+  } >> "${build_file}"
+
+  # Debug entrypoint init
+  {
+    echo "# @section_code: FS003"
+    echo "# @section_name: debug-entrypoint-init"
+
+    mush_feature_hook "debug_entrypoint_init" "${build_file}"
+
+    echo "## DEBUG ENTRYPOINT INIT"
+
+    echo ""
+  } >> "${build_file}"
+
 
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
@@ -37,7 +62,8 @@ exec_build_bin_debug() {
     echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
     echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
     echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
-    echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    #echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
+    echo "MUSH_DEBUG_PATH=\"${MUSH_DEBUG_PATH}\""
     echo ""
   } >> "${build_file}"
 
@@ -52,7 +78,7 @@ exec_build_bin_debug() {
   if [ -n "${lib_file}" ]; then
     {
       echo "# @build_section: BS015 - Appending library"
-      echo "debug_file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
+      echo "debug file \"\${MUSH_DEBUG_PATH}/${lib_file}\""
     } >> "${build_file}"
   fi
 
