@@ -4,14 +4,18 @@ public script
 
 mush_build_print() {
     case "$1" in
-        a)
-            echo "a"
+        env)
+            printenv | grep 'MUSH_'
+            ;;
+        target-list)
+            echo "ubuntu"
+            echo "bash"
+            echo "zsh"
             ;;
         *)
             local print_options="
-            a   a
-            b   b
-            c   c
+            env           Show MUSH_* variables for package
+            target-list   List all available targets
             "
             console_error "unknown print request '$1'\n\nAvailable print options:\n${print_options}"
     esac
