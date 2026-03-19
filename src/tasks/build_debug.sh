@@ -70,6 +70,11 @@ exec_build_bin_debug() {
     echo ""
   } >> "${build_file}"
 
+  {
+    echo "# @build_section: BS001 - Appending entrypoint to debug build"
+    echo "debug init"
+  } >> "${build_file}"
+
   if [ -n "${lib_file}" ]; then
     {
       echo "# @build_section: BS015 - Appending library"
@@ -79,7 +84,6 @@ exec_build_bin_debug() {
 
   {
     echo "# @build_section: BS001 - Appending entrypoint to debug build"
-    echo "debug init"
     echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\""
     echo "main \"\$@\""
   } >> "${build_file}"
