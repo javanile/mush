@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-19 develop)
-# @build_date: 2026-03-19T21:50:57Z
+# @build_with: Mush v0.2.0 (2026-03-20 develop)
+# @build_date: 2026-03-19T23:22:58Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -162,6 +162,7 @@ main() {
 embed debug_2022
 embed release_2022
 embed test_2022
+embed embed_2022
 
 public embed_2022
 
@@ -367,6 +368,65 @@ mush_api_test_2022() {
     echo "Testing: $unit_test"
     eval "$unit_test"
   done
+}
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
+}
+embed_2022() {
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
+mush_api_2022_embed() {
+  local module_name
+  local module_file
+  local inject_type
+  local inject_name
+  local inject_file
+  local inject_data
+  module_name=$1
+  module_file=$2
+  echo "${module_name}() {"
+  echo "  if [ -z \"\$1\" ]; then"
+  echo "    cat <<'EMBED'"
+  #cat "$module_file" | tr -s '\n'
+  sed '/^[[:space:]]*$/d' "${module_file}"
+  echo "EMBED"
+  echo "  else"
+  echo "    case \"\$1\" in"
+  grep -n '^inject [a-z][a-z]* [a-zA-Z0-9][a-zA-Z0-9_\.]*$' "${module_file}" | while read -r line; do
+    inject_type=$(echo "${line#*inject}" | awk '{print $1}')
+    inject_name=$(echo "${line#*inject}" | awk '{print $2}')
+    echo "      ${inject_name})"
+    case "${inject_type}" in
+      file)
+        inject_file="$(dirname "${module_file}")/${inject_name}"
+        echo "        cat <<'EMBED'"
+        cat "$inject_file"
+        echo ""
+        echo "EMBED"
+        ;;
+      env)
+        eval inject_data="\$$inject_name"
+        echo "        echo \"$inject_data\""
+        ;;
+      *)
+        echo "ERROR: Unknown inject type '${inject_type}' in line '${line}'"
+        exit 101
+        ;;
+    esac
+    echo "        ;;"
+  done
+  echo "      *)"
+  echo "        echo \"${inject_type}: ${inject_name}\""
+  echo "        ;;"
+  echo "    esac"
+  echo "  fi"
+  echo "}"
 }
 EMBED
   else
@@ -1270,7 +1330,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T21:50:55Z
+## @build_date: 2026-03-19T23:22:56Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1766,7 +1826,13 @@ exec_build_bin_debug() {
   {
     echo "# @build_section: BS003 - Embedding debug api"
     debug_2022
+    embed_2022
     echo ""
+  } >> "${build_file}"
+
+  {
+    echo "# @build_section: BS001 - Appending entrypoint to debug build"
+    echo "debug init"
   } >> "${build_file}"
 
   if [ -n "${lib_file}" ]; then
@@ -1778,7 +1844,6 @@ exec_build_bin_debug() {
 
   {
     echo "# @build_section: BS001 - Appending entrypoint to debug build"
-    echo "debug init"
     echo "debug file \"\${MUSH_DEBUG_PATH}/${src_file}\""
     echo "main \"\$@\""
   } >> "${build_file}"
@@ -2983,7 +3048,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T21:50:56Z
+## @build_date: 2026-03-19T23:22:57Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3043,7 +3108,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T21:50:57Z
+## @build_date: 2026-03-19T23:22:58Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3348,7 +3413,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2026-03-19 develop)
+Mush v0.2.0 (2026-03-20 develop)
 
 EMBED
         ;;

@@ -67,6 +67,7 @@ exec_build_bin_debug() {
   {
     echo "# @build_section: BS003 - Embedding debug api"
     debug_2022
+    embed_2022
     echo ""
   } >> "${build_file}"
 
