@@ -1,5 +1,6 @@
 ## Mush Leap
 disable=SC2148
+disable=SC2094
 
 ## Tech Debt
 disable=SC2034

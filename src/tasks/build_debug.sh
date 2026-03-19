@@ -42,14 +42,9 @@ exec_build_bin_debug() {
   {
     echo "# @section_code: FS003"
     echo "# @section_name: debug-entrypoint-init"
-
     mush_feature_hook "debug_entrypoint_init" "${build_file}"
-
-    echo "## DEBUG ENTRYPOINT INIT"
-
     echo ""
   } >> "${build_file}"
-
 
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
