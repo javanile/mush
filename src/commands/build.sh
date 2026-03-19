@@ -8,6 +8,7 @@ parser_definition_build() {
   flag  VERBOSE        -v --verbose "counter:true" "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
 
   flag  QUIET          -q --quiet       -- "Do not print mush log messages"
+  param EXAMPLE_NAME      --example     -- "Name of example to build"
   flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
   flag  NO_CACHE          --no-cache    -- "Disables the registry cache when build the package"
 
