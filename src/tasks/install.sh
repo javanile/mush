@@ -45,10 +45,10 @@ exec_install() {
 
     if [ -f "${bin_file}" ]; then
       console_status "Replacing" "${bin_file}"
-      console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+      console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     else
       console_status "Installing" "${bin_file}"
-      console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+      console_status "Installed" "package '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     fi
   done <<EOF
 ${binaries}
@@ -92,7 +92,7 @@ exec_install_from_index() {
 
   package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
 
-  if [ -n "${package_version_constraint}" ]; then
+  if [ -n "${package_version_constraint}" ] && [ "${package_version_constraint}" != "*" ]; then
     package_version="${package_version_constraint}"
   else
     package_version=main

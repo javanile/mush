@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T16:38:03Z
+# @build_date: 2026-03-20T16:48:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1371,7 +1371,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:38:00Z
+## @build_date: 2026-03-20T16:48:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2182,10 +2182,10 @@ exec_install() {
 
     if [ -f "${bin_file}" ]; then
       console_status "Replacing" "${bin_file}"
-      console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+      console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     else
       console_status "Installing" "${bin_file}"
-      console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${BIN_NAME}')"
+      console_status "Installed" "package '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     fi
   done <<EOF
 ${binaries}
@@ -2229,7 +2229,7 @@ exec_install_from_index() {
 
   package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
 
-  if [ -n "${package_version_constraint}" ]; then
+  if [ -n "${package_version_constraint}" ] && [ "${package_version_constraint}" != "*" ]; then
     package_version="${package_version_constraint}"
   else
     package_version=main
@@ -2325,10 +2325,10 @@ exec_install_bin_from_src() {
 
   if [ -f "${bin_file}" ]; then
     console_status "Replacing" "${bin_file}"
-    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+    console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${bin_name}')"
   else
     console_status "Installing" "${bin_file}"
-    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (executable '${bin_name}')"
+    console_status "Installed" "package '${package_name} v${package_version}' (executable '${bin_name}')"
   fi
 }
 
@@ -2370,10 +2370,10 @@ exec_install_lib_from_src() {
 
   if [ -f "${lib_file}" ]; then
     console_status "Replacing" "${lib_file}"
-    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
+    console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (library '${lib_name}')"
   else
     console_status "Installing" "${lib_file}"
-    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
+    console_status "Installed" "package '${package_name} v${package_version}' (library '${lib_name}')"
   fi
 }
 
@@ -3142,7 +3142,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:38:01Z
+## @build_date: 2026-03-20T16:48:11Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3202,7 +3202,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:38:03Z
+## @build_date: 2026-03-20T16:48:13Z
 set -e
 use() { return 0; }
 extern() { return 0; }
