@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T07:43:44Z
+# @build_date: 2026-03-20T07:50:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -583,16 +583,34 @@ run_build() {
       lib_file=
     fi
 
-    local binaries
-    binaries=$(manifest_get_binaries)
+    if [ -n "${EXAMPLE_NAME}" ]; then
+      # Build single example
+      local src_file=examples/$EXAMPLE_NAME.sh
+      local bin_file=target/debug/examples/$EXAMPLE_NAME
 
-    echo "${binaries}" | while IFS= read -r bin_entry; do
-      [ -z "${bin_entry}" ] && continue
-      manifest_parse_bin_entry "${bin_entry}"
-      [ -z "${BIN_NAME}" ] && continue
-      local bin_file="${MUSH_TARGET_PATH}/${BIN_NAME}"
-      exec_build_bin_debug "${BIN_PATH}" "${bin_file}" "${lib_file}"
-    done
+      if [ ! -f "${src_file}" ]; then
+        console_error "no example target named '${EXAMPLE_NAME}'."
+        echo ""
+        local examples=$(find examples/ -type f -name '*.sh' -exec basename {} .sh \; 2>/dev/null | sed 's/^/    /')
+        [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
+        exit 101
+      fi
+
+      exec_build_bin_debug "${src_file}" "${bin_file}" "${lib_file}"
+      compile_file "${src_file}"
+    else
+      # Build all binaries
+      local binaries
+      binaries=$(manifest_get_binaries)
+
+      echo "${binaries}" | while IFS= read -r bin_entry; do
+        [ -z "${bin_entry}" ] && continue
+        manifest_parse_bin_entry "${bin_entry}"
+        [ -z "${BIN_NAME}" ] && continue
+        local bin_file="${MUSH_TARGET_PATH}/${BIN_NAME}"
+        exec_build_bin_debug "${BIN_PATH}" "${bin_file}" "${lib_file}"
+      done
+    fi
   fi
 
   #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
@@ -1331,7 +1349,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T07:43:42Z
+## @build_date: 2026-03-20T07:50:08Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3056,7 +3074,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T07:43:43Z
+## @build_date: 2026-03-20T07:50:09Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3116,7 +3134,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T07:43:44Z
+## @build_date: 2026-03-20T07:50:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }

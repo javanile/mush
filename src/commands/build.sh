@@ -60,16 +60,34 @@ run_build() {
       lib_file=
     fi
 
-    local binaries
-    binaries=$(manifest_get_binaries)
+    if [ -n "${EXAMPLE_NAME}" ]; then
+      # Build single example
+      local src_file=examples/$EXAMPLE_NAME.sh
+      local bin_file=target/debug/examples/$EXAMPLE_NAME
 
-    echo "${binaries}" | while IFS= read -r bin_entry; do
-      [ -z "${bin_entry}" ] && continue
-      manifest_parse_bin_entry "${bin_entry}"
-      [ -z "${BIN_NAME}" ] && continue
-      local bin_file="${MUSH_TARGET_PATH}/${BIN_NAME}"
-      exec_build_bin_debug "${BIN_PATH}" "${bin_file}" "${lib_file}"
-    done
+      if [ ! -f "${src_file}" ]; then
+        console_error "no example target named '${EXAMPLE_NAME}'."
+        echo ""
+        local examples=$(find examples/ -type f -name '*.sh' -exec basename {} .sh \; 2>/dev/null | sed 's/^/    /')
+        [ -n "${examples}" ] && echo -e "Available example targets:\n${examples}\n"
+        exit 101
+      fi
+
+      exec_build_bin_debug "${src_file}" "${bin_file}" "${lib_file}"
+      compile_file "${src_file}"
+    else
+      # Build all binaries
+      local binaries
+      binaries=$(manifest_get_binaries)
+
+      echo "${binaries}" | while IFS= read -r bin_entry; do
+        [ -z "${bin_entry}" ] && continue
+        manifest_parse_bin_entry "${bin_entry}"
+        [ -z "${BIN_NAME}" ] && continue
+        local bin_file="${MUSH_TARGET_PATH}/${BIN_NAME}"
+        exec_build_bin_debug "${BIN_PATH}" "${bin_file}" "${lib_file}"
+      done
+    fi
   fi
 
   #printenv | grep MUSH_ > "${MUSH_TARGET_PATH}/.vars"
