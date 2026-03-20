@@ -1,9 +1,25 @@
 
+mush_url_to_id() {
+  local url="$1"
+  local host owner repo
+
+  host=$(echo "$url" | sed 's|https\?://||' | cut -d'/' -f1)
+  owner=$(echo "$url" | sed 's|https\?://[^/]*/||' | cut -d'/' -f1)
+  repo=$(echo "$url" | sed 's|https\?://[^/]*/||' | cut -d'/' -f2)
+
+  case "$host" in
+    github.com) echo "github-${owner}-${repo}" ;;
+    gitlab.com) echo "gitlab-${owner}-${repo}" ;;
+    bitbucket.org) echo "bitbucket-${owner}-${repo}" ;;
+    *) echo "$url" | tr -s '/:.' '-' ;;
+  esac
+}
+
 mush_registry_index_update()
 {
   MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
   MUSH_REGISTRY_URL=https://github.com/javanile/mush
-  MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
+  MUSH_REGISTRY_ID=$(mush_url_to_id "${MUSH_REGISTRY_URL}")
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
@@ -66,8 +82,8 @@ mush_registry_index_parse() {
   local packages_index
 
   packages_file=$1
-  packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
-  packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  packages_local_file="${MUSH_HOME}/registry/index/$(mush_url_to_id "${packages_file}")"
+  packages_index="${MUSH_HOME}/registry/index/$(mush_url_to_id "${packages_file}")"
 
   curl -s -L -H 'Cache-Control: no-cache, no-store' "${packages_file}" > "${packages_local_file}"
 

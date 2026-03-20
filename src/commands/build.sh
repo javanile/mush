@@ -25,19 +25,19 @@ run_build() {
 
   mush_feature_hook "build"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Profile" "initializing build profile"
   mush_build_profile_init "${BUILD_RELEASE}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Script" "running build script"
   mush_build_script_run "${PWD}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Legacy" "fetching legacy dependencies"
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Legacy build..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Legacy" "building legacy dependencies"
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Resolving" "package dependencies"
   update_strategy=lazy
   exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 

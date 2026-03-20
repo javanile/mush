@@ -44,10 +44,10 @@ exec_install() {
     ${chmod} +x "${bin_file}"
 
     if [ -f "${bin_file}" ]; then
-      console_status "Replacing" "${bin_file}"
+      console_status "Replacing" "$(display_path "${bin_file}")"
       console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     else
-      console_status "Installing" "${bin_file}"
+      console_status "Installing" "$(display_path "${bin_file}")"
       console_status "Installed" "package '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     fi
   done <<EOF
@@ -90,12 +90,21 @@ exec_install_from_index() {
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
 
-  package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
+  package_repo_id=$(mush_url_to_id "${package_url}")
 
   if [ -n "${package_version_constraint}" ] && [ "${package_version_constraint}" != "*" ]; then
     package_version="${package_version_constraint}"
   else
-    package_version=main
+    [ "${VERBOSE}" -gt 2 ] && console_status "Resolving" "latest stable version for '${package_name}'"
+    local latest_semver
+    latest_semver=$(mush_registry_package_versions "${package_url}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+    if [ -n "${latest_semver}" ]; then
+      package_version="${latest_semver}"
+      [ "${VERBOSE}" -gt 0 ] && console_status "Selected" "'${package_name} ${package_version}'"
+    else
+      package_version=main
+      [ "${VERBOSE}" -gt 2 ] && console_status "Selected" "'${package_name}' no semver tags found, using 'main'"
+    fi
   fi
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
@@ -103,7 +112,7 @@ exec_install_from_index() {
 
   if [ ! -d "${package_src}" ]; then
 
-    [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
+    [ "${VERBOSE}" -gt 4 ] && console_status "Cloning" "${package_url}"
 
     git clone --branch "${package_version}" --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
@@ -119,9 +128,16 @@ exec_install_from_index() {
     rm -fr "${package_src}/.git" "${package_src}/.github" || true
   fi
 
-  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
+  local package_nested_src
+  package_nested_src=$(echo "${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}" | tr -s '/')
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
+
+  if ! echo "${package_version}" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
+    if [ "${package_version}" != "${MUSH_PACKAGE_VERSION}" ]; then
+      console_warning "warning" "installed branch '${package_version}' but package manifest declares version '${MUSH_PACKAGE_VERSION}'"
+    fi
+  fi
 
   package_type=$(cat "${package_nested_src}/Manifest.toml" | grep '^type =' | cut -d'"' -f2)
 
@@ -144,7 +160,7 @@ exec_install_from_src() {
 
   exec_manifest_lookup "${package_src}"
 
-  [ "${VERBOSE}" -gt 6 ] && console_status "Installing" "'${MUSH_PACKAGE_NAME}' from source '${package_src}'"
+  [ "${VERBOSE}" -gt 6 ] && console_status "Installing" "'${MUSH_PACKAGE_NAME}' from source '$(display_path "${package_src}")'"
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ] && [ "${dependency_type}" = "prod" ]; then
     console_error "cannot install plugin '${MUSH_PACKAGE_NAME}' as a non dev-dependency, move it from [dependencies] to [dev-dependencies] in your Manifest.toml file."
@@ -201,10 +217,10 @@ exec_install_bin_from_src() {
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
   if [ -f "${bin_file}" ]; then
-    console_status "Replacing" "${bin_file}"
+    console_status "Replacing" "$(display_path "${bin_file}")"
     console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${bin_name}')"
   else
-    console_status "Installing" "${bin_file}"
+    console_status "Installing" "$(display_path "${bin_file}")"
     console_status "Installed" "package '${package_name} v${package_version}' (executable '${bin_name}')"
   fi
 }
@@ -252,10 +268,10 @@ exec_install_lib_from_src() {
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
   if [ -f "${lib_file}" ]; then
-    console_status "Replacing" "${lib_file}"
+    console_status "Replacing" "$(display_path "${lib_file}")"
     console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (library '${lib_name}')"
   else
-    console_status "Installing" "${lib_file}"
+    console_status "Installing" "$(display_path "${lib_file}")"
     console_status "Installed" "package '${package_name} v${package_version}' (library '${lib_name}')"
   fi
 }

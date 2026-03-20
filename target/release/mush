@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-01-05 main)
-# @build_date: 2026-03-20T17:17:10Z
+# @build_with: Mush v0.2.0 (2026-03-20 develop)
+# @build_date: 2026-03-20T17:53:43Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -11,6 +11,7 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
 # @score: 10
 
@@ -225,7 +226,8 @@ mush_api_2022_embed() {
   echo "}"
 }
 debug_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 debug() {
   local api
   api=$1
@@ -330,10 +332,18 @@ debug() {
     *)
   esac
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 release_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
@@ -341,10 +351,18 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 test_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
@@ -355,10 +373,18 @@ mush_api_test_2022() {
     eval "$unit_test"
   done
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 embed_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 mush_api_2022_embed() {
   local module_name
   local module_file
@@ -406,7 +432,14 @@ mush_api_2022_embed() {
   echo "  fi"
   echo "}"
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 
 public profile
@@ -455,7 +488,7 @@ mush_build_script_run() {
   build_script="${pwd}/build.sh"
 
   if [ -f "${build_script}" ]; then
-    [ "$VERBOSE" -gt "3" ] && echo "Running build script"
+    [ "$VERBOSE" -gt "3" ] && console_status "Script" "running '$(display_path "${build_script}")'"
     # shellcheck disable=SC1090
     source "${build_script}" || true
   fi
@@ -469,6 +502,11 @@ mush_color() {
     if [ -n "${MUSH_TERM_COLOR}" ]; then
         printf '%b' "$1"
     fi
+}
+
+display_path() {
+  local path="${1//$HOME/\~}"
+  echo "${path//\/\//\/}"
 }
 
 public add
@@ -519,19 +557,19 @@ run_build() {
 
   mush_feature_hook "build"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Profile" "initializing build profile"
   mush_build_profile_init "${BUILD_RELEASE}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Profile init..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Script" "running build script"
   mush_build_script_run "${PWD}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Legacy fetch..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Legacy" "fetching legacy dependencies"
   exec_legacy_fetch "${MUSH_TARGET_PATH}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Legacy build..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Legacy" "building legacy dependencies"
   exec_legacy_build "${MUSH_TARGET_PATH}"
 
-  [ "$VERBOSE" -gt "3" ] && echo "Dependencies..."
+  [ "$VERBOSE" -gt "3" ] && console_status "Resolving" "package dependencies"
   update_strategy=lazy
   exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 
@@ -1391,7 +1429,7 @@ mush_feature_hook() {
 
   feature_hook=$1
 
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@" >&2
+  [ "${VERBOSE}" -gt 7 ] && console_status "Features" "hook '${feature_hook}'" >&2
 
   echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
     feature_name=${feature%=*}
@@ -1399,7 +1437,7 @@ mush_feature_hook() {
 
     if [ -z "${plugins}" ]; then
       plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
-      [ "${VERBOSE}" -gt 7 ] && [ -n "${plugins}" ] && echo "Loaded plugins: ${plugins}" >&2
+      [ "${VERBOSE}" -gt 7 ] && [ -n "${plugins}" ] && console_status "Plugins" "loaded '${plugins}'" >&2
     fi
 
     if [ -n "${plugins}" ]; then
@@ -1410,7 +1448,7 @@ mush_feature_hook() {
 
         local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
 
-        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'" >&2
+        [ "${VERBOSE}" -gt 7 ] && console_status "Hook" "'${feature_function}'" >&2
 
         if [ -n "$feature_value" ]; then
           [ -f "${plugin_file}" ] && source "${plugin_file}"
@@ -1628,11 +1666,27 @@ github_get_release_id() {
     | grep '"id"' | head -1 | sed 's/[^0-9]*//g'
 }
 
+mush_url_to_id() {
+  local url="$1"
+  local host owner repo
+
+  host=$(echo "$url" | sed 's|https\?://||' | cut -d'/' -f1)
+  owner=$(echo "$url" | sed 's|https\?://[^/]*/||' | cut -d'/' -f1)
+  repo=$(echo "$url" | sed 's|https\?://[^/]*/||' | cut -d'/' -f2)
+
+  case "$host" in
+    github.com) echo "github-${owner}-${repo}" ;;
+    gitlab.com) echo "gitlab-${owner}-${repo}" ;;
+    bitbucket.org) echo "bitbucket-${owner}-${repo}" ;;
+    *) echo "$url" | tr -s '/:.' '-' ;;
+  esac
+}
+
 mush_registry_index_update()
 {
   MUSH_HOME="${MUSH_HOME:-$HOME/.mush}"
   MUSH_REGISTRY_URL=https://github.com/javanile/mush
-  MUSH_REGISTRY_ID=$(echo "${MUSH_REGISTRY_URL}" | tr -s '/:.' '-')
+  MUSH_REGISTRY_ID=$(mush_url_to_id "${MUSH_REGISTRY_URL}")
   MUSH_REGISTRY_INDEX="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.index"
   MUSH_REGISTRY_CACHE="${MUSH_HOME}/registry/index/${MUSH_REGISTRY_ID}.cache"
   MUSH_REGISTRY_SRC="${MUSH_HOME}/registry/src/${MUSH_REGISTRY_ID}"
@@ -1695,8 +1749,8 @@ mush_registry_index_parse() {
   local packages_index
 
   packages_file=$1
-  packages_local_file="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
-  packages_index="${MUSH_HOME}/registry/index/$(echo "${packages_file}" | tr -s '/:.' '-')"
+  packages_local_file="${MUSH_HOME}/registry/index/$(mush_url_to_id "${packages_file}")"
+  packages_index="${MUSH_HOME}/registry/index/$(mush_url_to_id "${packages_file}")"
 
   curl -s -L -H 'Cache-Control: no-cache, no-store' "${packages_file}" > "${packages_local_file}"
 
@@ -2147,10 +2201,10 @@ exec_install() {
     ${chmod} +x "${bin_file}"
 
     if [ -f "${bin_file}" ]; then
-      console_status "Replacing" "${bin_file}"
+      console_status "Replacing" "$(display_path "${bin_file}")"
       console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     else
-      console_status "Installing" "${bin_file}"
+      console_status "Installing" "$(display_path "${bin_file}")"
       console_status "Installed" "package '${package_name} v${package_version}' (executable '${BIN_NAME}')"
     fi
   done <<EOF
@@ -2193,12 +2247,21 @@ exec_install_from_index() {
   package_path=$(echo "${package_entry}" | awk '{print $3}')
   package_version=$(echo "${package_entry}" | awk '{print $4}')
 
-  package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
+  package_repo_id=$(mush_url_to_id "${package_url}")
 
   if [ -n "${package_version_constraint}" ] && [ "${package_version_constraint}" != "*" ]; then
     package_version="${package_version_constraint}"
   else
-    package_version=main
+    [ "${VERBOSE}" -gt 2 ] && console_status "Resolving" "latest stable version for '${package_name}'"
+    local latest_semver
+    latest_semver=$(mush_registry_package_versions "${package_url}" | grep -E '^v?[0-9]+\.[0-9]+\.[0-9]+$' | head -n 1)
+    if [ -n "${latest_semver}" ]; then
+      package_version="${latest_semver}"
+      [ "${VERBOSE}" -gt 0 ] && console_status "Selected" "'${package_name} ${package_version}'"
+    else
+      package_version=main
+      [ "${VERBOSE}" -gt 2 ] && console_status "Selected" "'${package_name}' no semver tags found, using 'main'"
+    fi
   fi
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
@@ -2206,7 +2269,7 @@ exec_install_from_index() {
 
   if [ ! -d "${package_src}" ]; then
 
-    [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
+    [ "${VERBOSE}" -gt 4 ] && console_status "Cloning" "${package_url}"
 
     git clone --branch "${package_version}" --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
 
@@ -2222,13 +2285,14 @@ exec_install_from_index() {
     rm -fr "${package_src}/.git" "${package_src}/.github" || true
   fi
 
-  local package_nested_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}"
+  local package_nested_src
+  package_nested_src=$(echo "${MUSH_REGISTRY_SRC}/${package_name}/${package_version}/${package_path}" | tr -s '/')
 
   exec_install_from_src "${package_nested_src}" "${dependency_type}"
 
   package_type=$(cat "${package_nested_src}/Manifest.toml" | grep '^type =' | cut -d'"' -f2)
 
-  echo "package_type=${package_type}"
+  [ "${VERBOSE}" -gt 6 ] && console_status "Package" "type '${package_type:-lib}'"
 
   if [ "${package_type}" = "plugin" ]; then
     mkdir -p "${MUSH_HOME}/plugins/${package_name}"
@@ -2247,7 +2311,7 @@ exec_install_from_src() {
 
   exec_manifest_lookup "${package_src}"
 
-  [ "${VERBOSE}" -gt 6 ] && echo "Installing '${MUSH_PACKAGE_NAME}' from source '${package_src}' for '${dependency_type}'"
+  [ "${VERBOSE}" -gt 6 ] && console_status "Installing" "'${MUSH_PACKAGE_NAME}' from source '$(display_path "${package_src}")'"
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ] && [ "${dependency_type}" = "prod" ]; then
     console_error "cannot install plugin '${MUSH_PACKAGE_NAME}' as a non dev-dependency, move it from [dependencies] to [dev-dependencies] in your Manifest.toml file."
@@ -2304,10 +2368,10 @@ exec_install_bin_from_src() {
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
   if [ -f "${bin_file}" ]; then
-    console_status "Replacing" "${bin_file}"
+    console_status "Replacing" "$(display_path "${bin_file}")"
     console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (executable '${bin_name}')"
   else
-    console_status "Installing" "${bin_file}"
+    console_status "Installing" "$(display_path "${bin_file}")"
     console_status "Installed" "package '${package_name} v${package_version}' (executable '${bin_name}')"
   fi
 }
@@ -2355,10 +2419,10 @@ exec_install_lib_from_src() {
   console_status "Finished" "release [optimized] target(s) in 0.18s"
 
   if [ -f "${lib_file}" ]; then
-    console_status "Replacing" "${lib_file}"
+    console_status "Replacing" "$(display_path "${lib_file}")"
     console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (library '${lib_name}')"
   else
-    console_status "Installing" "${lib_file}"
+    console_status "Installing" "$(display_path "${lib_file}")"
     console_status "Installed" "package '${package_name} v${package_version}' (library '${lib_name}')"
   fi
 }
@@ -2384,7 +2448,7 @@ exec_legacy_fetch() {
       file)
         package_file=${legacy_dir}/${package_name}.sh
         if [ ! -f "${package_file}" ]; then
-          console_status "Downloading" "$package_name => $package_url ($package_file)"
+          console_status "Downloading" "$package_name => $package_url ($(display_path "${package_file}"))"
           mkdir -p "${legacy_dir}"
           curl -s -L -X GET -o "${package_file}" "${package_url}"
           ln "${package_file}" "${package_bin}"
@@ -2408,7 +2472,7 @@ exec_legacy_build() {
   target_dir=$1
   legacy_dir="${target_dir}/legacy"
 
-  [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
+  [ "${VERBOSE}" -gt 5 ] && console_status "Legacy" "fetch: ${MUSH_LEGACY_FETCH} build: ${MUSH_LEGACY_BUILD}"
 
   echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
     package_name=${package%=*}
@@ -2636,7 +2700,7 @@ compile_file() {
   manifest_directory=${3:-$PWD}
   build_mode=${4:-debug}
 
-  [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
+  [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'$(display_path "${src_file}")' [${build_mode}]"
 
   # Deduplication: skip if already compiled
   local real_path
@@ -3483,10 +3547,66 @@ getoptions_help() {
 	echo "}"
 }
 global() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 inject file VERSION
 inject file MUSH.md
-EOF
+EMBED
+  else
+    case "$1" in
+      VERSION)
+        cat <<'EMBED'
+Mush v0.2.0 (2026-03-20 develop)
+
+EMBED
+        ;;
+      MUSH.md)
+        cat <<'EMBED'
+# Mush - Shell Package Manager
+
+> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
+
+## Project Structure
+- `Manifest.toml` - package manifest (name, version, edition, dependencies)
+- `src/main.sh` - entry point with `main()` function
+- `src/<module>.sh` - single-file modules
+- `src/<module>/module.sh` - folder modules with submodules
+
+## Keywords
+- `module <name>` - load a module from src/
+- `public <name>` - expose a submodule outside its parent module
+- `extern package <name>` - declare external dependency
+- `embed <name>` - embed module source in the final binary
+- `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
+- `legacy` - backward compatibility with traditional shell scripting
+
+## Coding Style
+- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
+
+## Naming Convention
+Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
+- Variables: lowercase snake_case (e.g. `my_variable`)
+- Constants: UPPERCASE (e.g. `PI=3.14`)
+- Functions: snake_case (e.g. `my_function`)
+
+## Commands
+- `mush new <name>` - create new project
+- `mush init` - init project in existing directory
+- `mush build` - build debug binary to target/debug/
+- `mush build --release` - build release binary
+- `mush run` - build and run
+
+## Manifest.toml
+- [package] section: name, version (semver), edition ("2022")
+- [dependencies] section: `package_name = "version_constraint"`
+
+EMBED
+        ;;
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
 ## BP005: Execute the entrypoint
 main "$@"

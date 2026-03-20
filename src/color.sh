@@ -4,3 +4,8 @@ mush_color() {
         printf '%b' "$1"
     fi
 }
+
+display_path() {
+  local path="${1//$HOME/\~}"
+  echo "${path//\/\//\/}"
+}

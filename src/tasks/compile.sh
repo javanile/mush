@@ -12,7 +12,7 @@ compile_file() {
   manifest_directory=${3:-$PWD}
   build_mode=${4:-debug}
 
-  [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'${src_file}' [${build_mode}]"
+  [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'$(display_path "${src_file}")' [${build_mode}]"
 
   # Deduplication: skip if already compiled
   local real_path

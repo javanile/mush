@@ -20,7 +20,7 @@ exec_legacy_fetch() {
       file)
         package_file=${legacy_dir}/${package_name}.sh
         if [ ! -f "${package_file}" ]; then
-          console_status "Downloading" "$package_name => $package_url ($package_file)"
+          console_status "Downloading" "$package_name => $package_url ($(display_path "${package_file}"))"
           mkdir -p "${legacy_dir}"
           curl -s -L -X GET -o "${package_file}" "${package_url}"
           ln "${package_file}" "${package_bin}"
