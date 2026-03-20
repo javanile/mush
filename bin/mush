@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T17:53:43Z
+# @build_with: Mush 0.2.0 (2025-01-05 main)
+# @build_date: 2026-03-20T18:02:38Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -11,7 +11,6 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-inject() { return 0; }
 ## BP004: Compile the entrypoint
 # @score: 10
 
@@ -226,8 +225,7 @@ mush_api_2022_embed() {
   echo "}"
 }
 debug_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 debug() {
   local api
   api=$1
@@ -332,18 +330,10 @@ debug() {
     *)
   esac
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 release_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
@@ -351,18 +341,10 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 test_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
@@ -373,18 +355,10 @@ mush_api_test_2022() {
     eval "$unit_test"
   done
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 embed_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 mush_api_2022_embed() {
   local module_name
   local module_file
@@ -432,14 +406,7 @@ mush_api_2022_embed() {
   echo "  fi"
   echo "}"
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 
 public profile
@@ -1376,7 +1343,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T17:17:06Z
+## @build_date: 2026-03-20T18:02:35Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2292,7 +2259,7 @@ exec_install_from_index() {
 
   if ! echo "${package_version}" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
     if [ "${package_version}" != "${MUSH_PACKAGE_VERSION}" ]; then
-      console_warning "warning" "installed branch '${package_version}' but package manifest declares version '${MUSH_PACKAGE_VERSION}'"
+      console_warning "Warning" "installed branch '${package_version}' but package manifest declares version '${MUSH_PACKAGE_VERSION}'"
     fi
   fi
 
@@ -3199,7 +3166,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T17:17:07Z
+## @build_date: 2026-03-20T18:02:36Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3258,7 +3225,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T17:17:10Z
+## @build_date: 2026-03-20T18:02:38Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3553,66 +3520,10 @@ getoptions_help() {
 	echo "}"
 }
 global() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 inject file VERSION
 inject file MUSH.md
-EMBED
-  else
-    case "$1" in
-      VERSION)
-        cat <<'EMBED'
-Mush v0.2.0 (2026-03-20 develop)
-
-EMBED
-        ;;
-      MUSH.md)
-        cat <<'EMBED'
-# Mush - Shell Package Manager
-
-> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
-
-## Project Structure
-- `Manifest.toml` - package manifest (name, version, edition, dependencies)
-- `src/main.sh` - entry point with `main()` function
-- `src/<module>.sh` - single-file modules
-- `src/<module>/module.sh` - folder modules with submodules
-
-## Keywords
-- `module <name>` - load a module from src/
-- `public <name>` - expose a submodule outside its parent module
-- `extern package <name>` - declare external dependency
-- `embed <name>` - embed module source in the final binary
-- `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
-- `legacy` - backward compatibility with traditional shell scripting
-
-## Coding Style
-- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
-
-## Naming Convention
-Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
-- Variables: lowercase snake_case (e.g. `my_variable`)
-- Constants: UPPERCASE (e.g. `PI=3.14`)
-- Functions: snake_case (e.g. `my_function`)
-
-## Commands
-- `mush new <name>` - create new project
-- `mush init` - init project in existing directory
-- `mush build` - build debug binary to target/debug/
-- `mush build --release` - build release binary
-- `mush run` - build and run
-
-## Manifest.toml
-- [package] section: name, version (semver), edition ("2022")
-- [dependencies] section: `package_name = "version_constraint"`
-
-EMBED
-        ;;
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 ## BP005: Execute the entrypoint
 main "$@"
