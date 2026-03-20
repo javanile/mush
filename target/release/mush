@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush 0.2.0 (2025-01-05 main)
-# @build_date: 2026-03-20T18:02:38Z
+# @build_with: Mush v0.2.0 (2026-03-20 develop)
+# @build_date: 2026-03-20T18:44:48Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -11,7 +11,9 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
+inject() { return 0; }
 ## BP004: Compile the entrypoint
+
 # @score: 10
 
 extern package console
@@ -162,12 +164,14 @@ main() {
   fi
 }
 
+
 embed debug_2022
 embed release_2022
 embed test_2022
 embed embed_2022
 
 public embed_2022
+
 
 mush_api_2022_embed() {
   local module_name
@@ -224,8 +228,10 @@ mush_api_2022_embed() {
 
   echo "}"
 }
+
 debug_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 debug() {
   local api
   api=$1
@@ -330,10 +336,19 @@ debug() {
     *)
   esac
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
+
 release_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
@@ -341,10 +356,19 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
+
 test_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
@@ -355,10 +379,19 @@ mush_api_test_2022() {
     eval "$unit_test"
   done
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
+
 embed_2022() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 mush_api_2022_embed() {
   local module_name
   local module_file
@@ -406,8 +439,16 @@ mush_api_2022_embed() {
   echo "  fi"
   echo "}"
 }
-EOF
+EMBED
+  else
+    case "$1" in
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
+
 
 public profile
 public script
@@ -431,6 +472,7 @@ mush_build_print() {
     esac
 }
 
+
 mush_build_profile_init() {
   local profile
   local target_dir
@@ -448,6 +490,7 @@ mush_build_profile_init() {
   MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
 }
 
+
 mush_build_script_run() {
   local pwd
 
@@ -461,9 +504,11 @@ mush_build_script_run() {
   fi
 }
 
+
 mush_space_iterable() {
     echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
+
 
 mush_color() {
     if [ -n "${MUSH_TERM_COLOR}" ]; then
@@ -475,6 +520,7 @@ display_path() {
   local path="${1//$HOME/\~}"
   echo "${path//\/\//\/}"
 }
+
 
 public add
 public build
@@ -495,9 +541,11 @@ public uninstall
 public info
 public index
 
+
 test0 () {
   echo "TEST"
 }
+
 parser_definition_build() {
   setup REST help:usage abbr:true -- "Compile the current package" ''
 
@@ -594,6 +642,7 @@ run_build() {
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
 
+
 parser_definition_check() {
 	setup   REST help:usage abbr:true -- "Check a local package and all of its dependencies for errors" ''
 
@@ -624,6 +673,7 @@ run_check() {
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
 
+
 parser_definition_fetch() {
   setup   REST help:usage abbr:true -- "Fetch dependencies of a package from the network" ''
 
@@ -653,6 +703,7 @@ run_fetch() {
   exec_dependencies
 }
 
+
 parser_definition_init() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
 
@@ -679,6 +730,7 @@ run_init() {
 
   exec_init
 }
+
 
 parser_definition_install() {
   setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
@@ -772,6 +824,7 @@ run_install() {
   fi
 }
 
+
 parser_definition_legacy() {
   setup   REST help:usage abbr:true -- \
     "Usage: ${2##*/} legacy [options...] [arguments...]"
@@ -824,6 +877,7 @@ run_legacy() {
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
 }
 
+
 parser_definition_metadata() {
 	setup REST help:usage abbr:true -- "Output the resolved dependencies of a package, the concrete used versions including overrides" ''
 
@@ -863,6 +917,7 @@ run_metadata() {
   fi
 }
 
+
 parser_definition_new() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
 
@@ -894,6 +949,7 @@ run_new() {
 
   exec_init
 }
+
 
 parser_definition_run() {
   setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
@@ -988,6 +1044,7 @@ run_run() {
   exec "${bin_file}" "$@"
 }
 
+
 parser_definition_pkgid() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
 
@@ -1009,6 +1066,7 @@ run_pkgid() {
 
 
 }
+
 
 parser_definition_publish() {
 	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
@@ -1043,6 +1101,7 @@ run_publish() {
   exec_publish
 }
 
+
 parser_definition_read_manifest() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
 
@@ -1064,6 +1123,7 @@ run_read_manifest() {
 
   exec_manifest_lookup
 }
+
 
 parser_definition_search() {
   setup   REST help:usage abbr:true -- "Search registry for package" ''
@@ -1107,6 +1167,7 @@ run_search() {
   reset=$(mush_color '\033[0m')
   echo "${cyan}note${reset}: to learn more about a package, run '${cyan}mush info <name>${reset}'" >&2
 }
+
 
 parser_definition_test() {
 	setup   REST help:usage abbr:true -- "Execute all unit and integration tests and build examples of a local package" ''
@@ -1155,6 +1216,7 @@ run_test() {
   exec "$bin_file" "$@"
 }
 
+
 parser_definition_uninstall() {
   setup  REST help:usage abbr:true -- "Remove a mush installed binary" ''
 
@@ -1191,6 +1253,7 @@ run_uninstall() {
 
   exec_uninstall "$package_name" "$package_version"
 }
+
 parser_definition_info() {
 	setup REST help:usage abbr:true -- "Display information about a package in the registry" ''
 
@@ -1269,6 +1332,7 @@ run_info() {
   fi
 }
 
+
 parser_definition_index() {
 	setup REST help:usage abbr:true -- "Show or manage the index status of current registry" ''
 
@@ -1289,6 +1353,7 @@ run_index() {
 
   cat "$MUSH_REGISTRY_INDEX"
 }
+
 
 extern package code_dumper
 
@@ -1340,6 +1405,7 @@ console_error_code() {
 console_hint() {
   echo -e "${ESCAPE}[1;39m$1${ESCAPE}[0m" >&2
 }
+
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -1382,6 +1448,7 @@ code_dumper() {
   fi
   echo ""
 }
+
 
 mush_feature_hook() {
   local feature
@@ -1430,6 +1497,7 @@ mush_feature_hook() {
   #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
 
+
 public apt
 public basher
 public bpkg
@@ -1437,6 +1505,9 @@ public git
 public mush
 public pip
 public path
+
+
+
 
 bpkg_dependency() {
   local pwd
@@ -1478,6 +1549,7 @@ bpkg_dependency() {
   fi
 }
 
+
 git_dependency() {
   local pwd=$PWD
   local package_dir=$1
@@ -1490,6 +1562,7 @@ git_dependency() {
 
   cd "${pwd}" || exit 101
 }
+
 
 mush_dependency() {
   local package_name
@@ -1511,6 +1584,8 @@ mush_dependency() {
   exec_install_from_index "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
 }
 
+
+
 mush_path_dependency() {
   local pwd
   local package_name
@@ -1529,8 +1604,10 @@ mush_path_dependency() {
   echo "Path: $package_name"
 }
 
+
 public github
 public index
+
 
 github_get_repository() {
   local repository_url
@@ -1632,6 +1709,7 @@ github_get_release_id() {
     "https://api.github.com/repos/${repository}/releases/tags/${release_tag}" \
     | grep '"id"' | head -1 | sed 's/[^0-9]*//g'
 }
+
 
 mush_url_to_id() {
   local url="$1"
@@ -1773,6 +1851,7 @@ mush_registry_package_versions() {
 
 
   }
+
 public build_debug
 public build_release
 public build_test
@@ -1786,6 +1865,7 @@ public publish
 public plugin
 public dependencies
 public uninstall
+
 # @score: 1
 
 exec_build_bin_debug() {
@@ -1905,6 +1985,7 @@ exec_build_lib_debug() {
   mv "${build_file}" "${final_file}"
 }
 
+
 exec_build_release() {
   local target_path
   local binaries
@@ -1955,6 +2036,7 @@ exec_build_release_bin() {
   compile_file "${src_path}" "${build_file}" "" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
 
+  printf '\n' >> "${build_file}"
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
@@ -2008,6 +2090,7 @@ exec_build_bin_from_src() {
   compile_file "${package_src}/src/main.sh" "${build_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
 
+  printf '\n' >> "${build_file}"
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
@@ -2057,6 +2140,7 @@ exec_build_lib_from_src() {
   chmod +x "${lib_file}"
 }
 
+
 exec_build_test() {
   local name=$MUSH_PACKAGE_NAME
 
@@ -2094,6 +2178,7 @@ exec_build_test() {
   chmod +x "${final_file}"
 }
 
+
 exec_init() {
   local package_name=$(basename "$PWD")
   local manifest_file=Manifest.toml
@@ -2122,6 +2207,7 @@ exec_init() {
 
   console_status "Created" "binary (application) package"
 }
+
 
 exec_install_binaries() {
   local binaries
@@ -2400,6 +2486,7 @@ exec_install_lib_from_src() {
   fi
 }
 
+
 exec_legacy_fetch() {
   local target_dir=$1
   local legacy_dir="${target_dir}/legacy"
@@ -2435,6 +2522,7 @@ exec_legacy_fetch() {
     esac
   done
 }
+
 # @score: 5
 
 exec_legacy_build() {
@@ -2464,6 +2552,7 @@ exec_legacy_build() {
     fi
   done
 }
+
 
 exec_manifest_lookup() {
   local manifest_dir
@@ -2662,6 +2751,7 @@ EOF
 
 
 
+
 compile_file() {
   local src_file
   local build_file
@@ -2691,6 +2781,7 @@ compile_file() {
   mush_feature_hook compile_file "${src_file}"
 
   if [ -n "${build_file}" ]; then
+    printf '\n' >> "${build_file}"
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
@@ -2719,6 +2810,7 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
+        printf '\n' >> "${build_file}"
         #cat "${legacy_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
@@ -2810,6 +2902,7 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
+        printf '\n' >> "${build_file}"
         #cat "${package_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
@@ -2838,6 +2931,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
+        printf '\n' >> "${build_file}"
         mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else
@@ -2849,6 +2943,7 @@ compile_scan_embed() {
 
   return 0
 }
+
 
 exec_publish() {
   local bin_name
@@ -2951,6 +3046,7 @@ exec_publish() {
 
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
+
 # @score: 5
 
 exec_plugin_list() {
@@ -2983,6 +3079,7 @@ exec_plugin_list() {
     echo "${MUSH_PACKAGE_NAME}=${PWD}/lib/${MUSH_PACKAGE_NAME}"
   fi
 }
+
 
 exec_dependencies() {
   local update_strategy
@@ -3105,6 +3202,7 @@ process_dependencies_build() {
   done
 }
 
+
 exec_uninstall() {
   local package_name="$1"
   local bin_name="${BIN_NAME:-$1}"
@@ -3145,6 +3243,7 @@ exec_uninstall() {
     [ "${purged}" -eq 0 ] && [ "${VERBOSE}" -gt 0 ] && console_status "Purge" "no registry cache found for '${package_name}'"
   fi
 }
+
 mush_env() {
   local newline
 
@@ -3162,7 +3261,9 @@ mush_env() {
   MUSH_TARGET="portable"
 }
 
+
 tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
+
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -3222,6 +3323,7 @@ console_print() {
     echo -e "$1 $2" >&2
   fi
 }
+
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -3519,11 +3621,69 @@ getoptions_help() {
 	echo "GETOPTIONSHERE"
 	echo "}"
 }
+
 global() {
-  cat <<'EOF'
+  if [ -z "$1" ]; then
+    cat <<'EMBED'
 inject file VERSION
 inject file MUSH.md
-EOF
+EMBED
+  else
+    case "$1" in
+      VERSION)
+        cat <<'EMBED'
+Mush v0.2.0 (2026-03-20 develop)
+
+EMBED
+        ;;
+      MUSH.md)
+        cat <<'EMBED'
+# Mush - Shell Package Manager
+
+> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
+
+## Project Structure
+- `Manifest.toml` - package manifest (name, version, edition, dependencies)
+- `src/main.sh` - entry point with `main()` function
+- `src/<module>.sh` - single-file modules
+- `src/<module>/module.sh` - folder modules with submodules
+
+## Keywords
+- `module <name>` - load a module from src/
+- `public <name>` - expose a submodule outside its parent module
+- `extern package <name>` - declare external dependency
+- `embed <name>` - embed module source in the final binary
+- `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
+- `legacy` - backward compatibility with traditional shell scripting
+
+## Coding Style
+- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
+
+## Naming Convention
+Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
+- Variables: lowercase snake_case (e.g. `my_variable`)
+- Constants: UPPERCASE (e.g. `PI=3.14`)
+- Functions: snake_case (e.g. `my_function`)
+
+## Commands
+- `mush new <name>` - create new project
+- `mush init` - init project in existing directory
+- `mush build` - build debug binary to target/debug/
+- `mush build --release` - build release binary
+- `mush run` - build and run
+
+## Manifest.toml
+- [package] section: name, version (semver), edition ("2022")
+- [dependencies] section: `package_name = "version_constraint"`
+
+EMBED
+        ;;
+      *)
+        echo ": "
+        ;;
+    esac
+  fi
 }
+
 ## BP005: Execute the entrypoint
 main "$@"

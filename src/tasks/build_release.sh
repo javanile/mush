@@ -49,6 +49,7 @@ exec_build_release_bin() {
   compile_file "${src_path}" "${build_file}" "" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
 
+  printf '\n' >> "${build_file}"
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
@@ -102,6 +103,7 @@ exec_build_bin_from_src() {
   compile_file "${package_src}/src/main.sh" "${build_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
 
+  printf '\n' >> "${build_file}"
   echo "## BP005: Execute the entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
