@@ -233,9 +233,9 @@ exec_install_lib_from_src() {
 
   if [ -f "${lib_file}" ]; then
     console_status "Replacing" "${lib_file}"
-    console_status "Replaced" "package '${package_name} v${package_version} (${pwd})' with '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
+    console_status "Replaced" "package '${package_name} v${package_version}' with '${package_name} v${package_version}' (library '${lib_name}')"
   else
     console_status "Installing" "${lib_file}"
-    console_status "Installed" "package '${package_name} v${package_version} (${pwd})' (library '${lib_name}')"
+    console_status "Installed" "package '${package_name} v${package_version}' (library '${lib_name}')"
   fi
 }
