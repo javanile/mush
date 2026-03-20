@@ -30,6 +30,7 @@ compile_file() {
   mush_feature_hook compile_file "${src_file}"
 
   if [ -n "${build_file}" ]; then
+    printf '\n' >> "${build_file}"
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
@@ -58,6 +59,7 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
+        printf '\n' >> "${build_file}"
         #cat "${legacy_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
@@ -149,6 +151,7 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
+        printf '\n' >> "${build_file}"
         #cat "${package_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
@@ -177,6 +180,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
+        printf '\n' >> "${build_file}"
         mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else
