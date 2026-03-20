@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T09:01:19Z
+# @build_with: Mush v0.2.0 (2025-10-16 develop)
+# @build_date: 2026-03-20T09:58:55Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -740,7 +740,7 @@ run_install() {
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
       temp_pwd=$PWD
       cd "$MUSH_HOME/registry/src" || exit 1
-      find . -maxdepth 3 -type d | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
+      find . -maxdepth 3 -type d | sort | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
       cd "$temp_pwd" || exit 1
     else
       tree -d -L 3 "$MUSH_HOME/registry/src" | sed '$d'
@@ -1349,7 +1349,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:01:17Z
+## @build_date: 2026-03-20T09:58:43Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3074,7 +3074,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:01:18Z
+## @build_date: 2026-03-20T09:58:48Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3134,7 +3134,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:01:19Z
+## @build_date: 2026-03-20T09:58:54Z
 set -e
 use() { return 0; }
 extern() { return 0; }

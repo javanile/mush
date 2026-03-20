@@ -35,7 +35,7 @@ run_install() {
     if [ -z "$(command -v tree 2>/dev/null || true)" ]; then
       temp_pwd=$PWD
       cd "$MUSH_HOME/registry/src" || exit 1
-      find . -maxdepth 3 -type d | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
+      find . -maxdepth 3 -type d | sort | sed -e 's;[^/]*/;|__;g;s;__|;  |;g'
       cd "$temp_pwd" || exit 1
     else
       tree -d -L 3 "$MUSH_HOME/registry/src" | sed '$d'
