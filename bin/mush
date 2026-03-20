@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T18:44:48Z
+# @build_date: 2026-03-20T18:52:04Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -2217,7 +2217,7 @@ exec_install_binaries() {
     [ -z "${bin_entry}" ] && continue
     manifest_parse_bin_entry "${bin_entry}"
     [ -z "${BIN_NAME}" ] && continue
-    echo "name: ${BIN_NAME}, path: ${BIN_PATH}"
+    [ "${VERBOSE}" -gt 6 ] && console_status "Binary" "'${BIN_NAME}' at '${BIN_PATH}'"
   done <<EOF
 ${binaries}
 EOF
