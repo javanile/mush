@@ -7,7 +7,7 @@ exec_install_binaries() {
     [ -z "${bin_entry}" ] && continue
     manifest_parse_bin_entry "${bin_entry}"
     [ -z "${BIN_NAME}" ] && continue
-    [ "${VERBOSE}" -gt 6 ] && console_status "Binary" "'${BIN_NAME}' at '${BIN_PATH}'"
+    if [ "${VERBOSE}" -gt 6 ]; then console_status "Binary" "'${BIN_NAME}' at '${BIN_PATH}'"; fi
   done <<EOF
 ${binaries}
 EOF
