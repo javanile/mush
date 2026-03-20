@@ -125,7 +125,7 @@ exec_install_from_index() {
 
   package_type=$(cat "${package_nested_src}/Manifest.toml" | grep '^type =' | cut -d'"' -f2)
 
-  echo "package_type=${package_type}"
+  [ "${VERBOSE}" -gt 6 ] && console_status "Package" "type '${package_type:-lib}'"
 
   if [ "${package_type}" = "plugin" ]; then
     mkdir -p "${MUSH_HOME}/plugins/${package_name}"
@@ -137,13 +137,14 @@ exec_install_from_index() {
 exec_install_from_src() {
   local package_src
   local dependency_type
+  local reset_deps_dir=0
 
   package_src=$1
   dependency_type=$2
 
   exec_manifest_lookup "${package_src}"
 
-  [ "${VERBOSE}" -gt 6 ] && echo "Installing '${MUSH_PACKAGE_NAME}' from source '${package_src}' for '${dependency_type}'"
+  [ "${VERBOSE}" -gt 6 ] && console_status "Installing" "'${MUSH_PACKAGE_NAME}' from source '${package_src}'"
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ] && [ "${dependency_type}" = "prod" ]; then
     console_error "cannot install plugin '${MUSH_PACKAGE_NAME}' as a non dev-dependency, move it from [dependencies] to [dev-dependencies] in your Manifest.toml file."
@@ -153,6 +154,14 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
+  if [ -z "${MUSH_DEPS_DIR}" ]; then
+    MUSH_TARGET_PATH="${package_src}/target/release"
+    MUSH_DEPS_DIR="${MUSH_TARGET_PATH}/packages"
+    reset_deps_dir=1
+  fi
+
+  exec_dependencies
+
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -161,6 +170,11 @@ exec_install_from_src() {
 
   if [ -f "${package_src}/src/main.sh" ]; then
     exec_install_bin_from_src "${package_src}"
+  fi
+
+  if [ "${reset_deps_dir}" -eq 1 ]; then
+    MUSH_DEPS_DIR=""
+    MUSH_TARGET_PATH=""
   fi
 }
 
@@ -222,6 +236,12 @@ exec_install_lib_from_src() {
   ${cp} "${final_file}" "${lib_package_file}"
 
   ${chmod} +x "${lib_file}" "${lib_package_file}"
+
+  if [ -n "${MUSH_DEPS_DIR}" ]; then
+    mkdir -p "${MUSH_DEPS_DIR}/${lib_name}"
+    ${cp} "${final_file}" "${MUSH_DEPS_DIR}/${lib_name}/lib.sh"
+    ${chmod} +x "${MUSH_DEPS_DIR}/${lib_name}/lib.sh"
+  fi
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
     mkdir -p "${lib_plugin_dir}"

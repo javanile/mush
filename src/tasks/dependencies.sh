@@ -44,7 +44,8 @@ process_dependencies() {
     package_name="${dependency%=*}"
     package_signature="${dependency#*=}"
 
-    if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+    if [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+      mkdir -p "${MUSH_DEPS_DIR}/${package_name}"
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
   done

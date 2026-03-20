@@ -12,7 +12,7 @@ mush_feature_hook() {
 
   feature_hook=$1
 
-  [ "${VERBOSE}" -gt 7 ] && echo "Loaded features: ${MUSH_FEATURES} args: $@" >&2
+  [ "${VERBOSE}" -gt 7 ] && console_status "Features" "hook '${feature_hook}'" >&2
 
   echo "${MUSH_FEATURES}" | while IFS=$'\n' read -r feature && [ -n "$feature" ]; do
     feature_name=${feature%=*}
@@ -20,7 +20,7 @@ mush_feature_hook() {
 
     if [ -z "${plugins}" ]; then
       plugins=$(exec_plugin_list "${MUSH_TARGET_PATH}")
-      [ "${VERBOSE}" -gt 7 ] && [ -n "${plugins}" ] && echo "Loaded plugins: ${plugins}" >&2
+      [ "${VERBOSE}" -gt 7 ] && [ -n "${plugins}" ] && console_status "Plugins" "loaded '${plugins}'" >&2
     fi
 
     if [ -n "${plugins}" ]; then
@@ -31,7 +31,7 @@ mush_feature_hook() {
 
         local feature_function="__plugin_${plugin_name}__feature_${feature_name}__hook_${feature_hook}"
 
-        [ "${VERBOSE}" -gt 7 ] && echo "Looking for feature function '${feature_function}' with value '${feature_value}'" >&2
+        [ "${VERBOSE}" -gt 7 ] && console_status "Hook" "'${feature_function}'" >&2
 
         if [ -n "$feature_value" ]; then
           [ -f "${plugin_file}" ] && source "${plugin_file}"

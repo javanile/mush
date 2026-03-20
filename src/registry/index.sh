@@ -19,14 +19,14 @@ mush_registry_index_update()
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
-      [ "$VERBOSE" -gt "2" ] && echo "Entry cache: ${line}"
       [ -z "${line}" ] && continue
       [ "$(echo "$line" | cut -c1)" = "#" ] && continue
       packages_file_url="$(echo "${line}" | awk '{print $1}')"
       packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
+      [ "$VERBOSE" -gt "2" ] && console_status "Checking" "${packages_file_url}"
       packages_hash="$(curl -I -s -L -H "Pragma: no-cache" -H "Cache-Control: no-cache" "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
       if [ "${packages_cache_hash}" = "${packages_hash}" ]; then
-        [ "$VERBOSE" -gt "3" ] && echo "Entry cache: ${line} [unchanged]"
+        [ "$VERBOSE" -gt "3" ] && console_status "Cached" "${packages_file_url}"
       else
         rm -fr "${MUSH_HOME}/registry/index" && true
       fi

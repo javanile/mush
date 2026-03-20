@@ -8,7 +8,7 @@ exec_legacy_build() {
   target_dir=$1
   legacy_dir="${target_dir}/legacy"
 
-  [ "${VERBOSE}" -gt 5 ] && echo -e "FETCH:\n${MUSH_LEGACY_FETCH}\nBUILD:\n${MUSH_LEGACY_BUILD}"
+  [ "${VERBOSE}" -gt 5 ] && console_status "Legacy" "fetch: ${MUSH_LEGACY_FETCH} build: ${MUSH_LEGACY_BUILD}"
 
   echo "${MUSH_LEGACY_BUILD}" | while IFS=$'\n' read -r package && [ -n "$package" ]; do
     package_name=${package%=*}

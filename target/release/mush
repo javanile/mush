@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-20T16:48:13Z
+# @build_with: Mush 0.2.0 (2025-01-05 main)
+# @build_date: 2026-03-20T17:17:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -11,7 +11,6 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-inject() { return 0; }
 ## BP004: Compile the entrypoint
 # @score: 10
 
@@ -226,8 +225,7 @@ mush_api_2022_embed() {
   echo "}"
 }
 debug_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 debug() {
   local api
   api=$1
@@ -332,18 +330,10 @@ debug() {
     *)
   esac
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 release_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
@@ -351,18 +341,10 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 test_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 mush_api_test_2022() {
   echo "Filter: $1"
   echo "Functions:"
@@ -373,18 +355,10 @@ mush_api_test_2022() {
     eval "$unit_test"
   done
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 embed_2022() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 mush_api_2022_embed() {
   local module_name
   local module_file
@@ -432,14 +406,7 @@ mush_api_2022_embed() {
   echo "  fi"
   echo "}"
 }
-EMBED
-  else
-    case "$1" in
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 
 public profile
@@ -1371,7 +1338,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:48:10Z
+## @build_date: 2026-03-20T17:17:06Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1379,7 +1346,6 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-inject() { return 0; }
 ## BP004: Compile the entrypoint
 code_dumper() {
   local file
@@ -1682,14 +1648,14 @@ mush_registry_index_update()
 
   if [ -f "${MUSH_REGISTRY_CACHE}" ]; then
     while read -r line; do
-      [ "$VERBOSE" -gt "2" ] && echo "Entry cache: ${line}"
       [ -z "${line}" ] && continue
       [ "$(echo "$line" | cut -c1)" = "#" ] && continue
       packages_file_url="$(echo "${line}" | awk '{print $1}')"
       packages_cache_hash="$(echo "${line}" | awk '{print $2}')"
+      [ "$VERBOSE" -gt "2" ] && console_status "Checking" "${packages_file_url}"
       packages_hash="$(curl -I -s -L -H "Pragma: no-cache" -H "Cache-Control: no-cache" "${packages_file_url}" | grep -i ETag | awk '{print $2}' | tr -d '"')"
       if [ "${packages_cache_hash}" = "${packages_hash}" ]; then
-        [ "$VERBOSE" -gt "3" ] && echo "Entry cache: ${line} [unchanged]"
+        [ "$VERBOSE" -gt "3" ] && console_status "Cached" "${packages_file_url}"
       else
         rm -fr "${MUSH_HOME}/registry/index" && true
       fi
@@ -2274,6 +2240,7 @@ exec_install_from_index() {
 exec_install_from_src() {
   local package_src
   local dependency_type
+  local reset_deps_dir=0
 
   package_src=$1
   dependency_type=$2
@@ -2290,6 +2257,14 @@ exec_install_from_src() {
   exec_legacy_fetch "${package_src}/target/release"
   exec_legacy_build "${package_src}/target/release"
 
+  if [ -z "${MUSH_DEPS_DIR}" ]; then
+    MUSH_TARGET_PATH="${package_src}/target/release"
+    MUSH_DEPS_DIR="${MUSH_TARGET_PATH}/packages"
+    reset_deps_dir=1
+  fi
+
+  exec_dependencies
+
   exec_build_from_src "${package_src}"
 
   if [ -f "${package_src}/src/lib.sh" ]; then
@@ -2298,6 +2273,11 @@ exec_install_from_src() {
 
   if [ -f "${package_src}/src/main.sh" ]; then
     exec_install_bin_from_src "${package_src}"
+  fi
+
+  if [ "${reset_deps_dir}" -eq 1 ]; then
+    MUSH_DEPS_DIR=""
+    MUSH_TARGET_PATH=""
   fi
 }
 
@@ -2359,6 +2339,12 @@ exec_install_lib_from_src() {
   ${cp} "${final_file}" "${lib_package_file}"
 
   ${chmod} +x "${lib_file}" "${lib_package_file}"
+
+  if [ -n "${MUSH_DEPS_DIR}" ]; then
+    mkdir -p "${MUSH_DEPS_DIR}/${lib_name}"
+    ${cp} "${final_file}" "${MUSH_DEPS_DIR}/${lib_name}/lib.sh"
+    ${chmod} +x "${MUSH_DEPS_DIR}/${lib_name}/lib.sh"
+  fi
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
     mkdir -p "${lib_plugin_dir}"
@@ -3006,7 +2992,8 @@ process_dependencies() {
     package_name="${dependency%=*}"
     package_signature="${dependency#*=}"
 
-    if [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+    if [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+      mkdir -p "${MUSH_DEPS_DIR}/${package_name}"
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
   done
@@ -3142,7 +3129,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:48:11Z
+## @build_date: 2026-03-20T17:17:07Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3150,7 +3137,6 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-inject() { return 0; }
 ## BP004: Compile the entrypoint
 # FATAL
 # ERROR
@@ -3202,7 +3188,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T16:48:13Z
+## @build_date: 2026-03-20T17:17:10Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3210,7 +3196,6 @@ legacy() { return 0; }
 module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
-inject() { return 0; }
 ## BP004: Compile the entrypoint
 legacy getoptions
 # [getoptions] License: Creative Commons Zero v1.0 Universal
@@ -3498,66 +3483,10 @@ getoptions_help() {
 	echo "}"
 }
 global() {
-  if [ -z "$1" ]; then
-    cat <<'EMBED'
+  cat <<'EOF'
 inject file VERSION
 inject file MUSH.md
-EMBED
-  else
-    case "$1" in
-      VERSION)
-        cat <<'EMBED'
-Mush v0.2.0 (2026-03-20 develop)
-
-EMBED
-        ;;
-      MUSH.md)
-        cat <<'EMBED'
-# Mush - Shell Package Manager
-
-> Mush is inspired by Rust and Cargo as developer experience: it brings structured modules, a manifest file, and a build pipeline to shell scripting. The `target/` directory contains all build outputs (debug builds in `target/debug/`, release builds in `target/release/`).
-
-## Project Structure
-- `Manifest.toml` - package manifest (name, version, edition, dependencies)
-- `src/main.sh` - entry point with `main()` function
-- `src/<module>.sh` - single-file modules
-- `src/<module>/module.sh` - folder modules with submodules
-
-## Keywords
-- `module <name>` - load a module from src/
-- `public <name>` - expose a submodule outside its parent module
-- `extern package <name>` - declare external dependency
-- `embed <name>` - embed module source in the final binary
-- `inject file <name>` / `inject env <VAR>` - inject files or env vars at build time
-- `legacy` - backward compatibility with traditional shell scripting
-
-## Coding Style
-- `local` only declares a variable; assignment must be on a separate line — `local x; x="$1"` not `local x="$1"` — because `local` swallows the exit code and silently breaks `set -e`
-
-## Naming Convention
-Functions follow the pattern: `<projectname>_<modulename>_<functionname>`
-- Variables: lowercase snake_case (e.g. `my_variable`)
-- Constants: UPPERCASE (e.g. `PI=3.14`)
-- Functions: snake_case (e.g. `my_function`)
-
-## Commands
-- `mush new <name>` - create new project
-- `mush init` - init project in existing directory
-- `mush build` - build debug binary to target/debug/
-- `mush build --release` - build release binary
-- `mush run` - build and run
-
-## Manifest.toml
-- [package] section: name, version (semver), edition ("2022")
-- [dependencies] section: `package_name = "version_constraint"`
-
-EMBED
-        ;;
-      *)
-        echo ": "
-        ;;
-    esac
-  fi
+EOF
 }
 ## BP005: Execute the entrypoint
 main "$@"

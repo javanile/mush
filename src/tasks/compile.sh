@@ -12,7 +12,7 @@ compile_file() {
   manifest_directory=${3:-$PWD}
   build_mode=${4:-debug}
 
-  [ "${VERBOSE}" -gt 5 ] && echo "Compile file '${src_file}' for '${build_mode}' to '${build_file}' from '${manifest_directory}'"
+  [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'${src_file}' [${build_mode}]"
 
   # Deduplication: skip if already compiled
   local real_path
