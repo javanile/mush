@@ -11,3 +11,4 @@ public compile
 public publish
 public plugin
 public dependencies
+public uninstall

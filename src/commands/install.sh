@@ -80,7 +80,13 @@ run_install() {
     else
       [ -n "${FORCE}" ] && index_update=full
       mush_registry_index_update "${index_update}"
-      exec_install_from_index "$1" "${PACKAGE_VERSION}"
+      local package_name="$1"
+      local package_version="${PACKAGE_VERSION}"
+      if echo "$package_name" | grep -q '@'; then
+        package_version="${package_name##*@}"
+        package_name="${package_name%%@*}"
+      fi
+      exec_install_from_index "$package_name" "$package_version"
     fi
   fi
 }

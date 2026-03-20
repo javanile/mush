@@ -31,18 +31,19 @@ parser_definition() {
   flag  QUIET       -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage      -h --help                         -- "Print help information"
 
-  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build   -- "Compile the current package"
-  cmd   check   -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch   -- "Fetch dependencies of a package from the network"
-  cmd   init    -- "Create a new package in an existing directory"
-  cmd   install -- "Build and install a Mush binary"
-  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new     -- "Create a new Mush package"
-  cmd   run     -- "Run a binary or example of the local package"
-  cmd   test    -- "Run the tests"
-  cmd   search  -- "Search registry for packages"
-  cmd   publish -- "Package and upload this package to the registry"
+  msg             -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build     -- "Compile the current package"
+  cmd   check     -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch     -- "Fetch dependencies of a package from the network"
+  cmd   init      -- "Create a new package in an existing directory"
+  cmd   install   -- "Build and install a Mush binary"
+  cmd   uninstall -- "Uninstall a Mush binary"
+  cmd   legacy    -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new       -- "Create a new Mush package"
+  cmd   run       -- "Run a binary or example of the local package"
+  cmd   test      -- "Run the tests"
+  cmd   search    -- "Search registry for packages"
+  cmd   publish   -- "Package and upload this package to the registry"
 
   cmd   metadata hidden:true -- "Print package metadata"
   cmd   info     hidden:true -- "Show information of a package in the registry"
@@ -105,6 +106,9 @@ main() {
         ;;
       install)
         run_install "$@"
+        ;;
+      uninstall)
+        run_uninstall "$@"
         ;;
       legacy)
         run_legacy "$@"

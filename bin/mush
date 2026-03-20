@@ -2,8 +2,8 @@
 # @BP010: Release metadata
 # @package: mush
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2025-10-16 develop)
-# @build_date: 2026-03-20T09:58:55Z
+# @build_with: Mush v0.2.0 (2026-03-20 develop)
+# @build_date: 2026-03-20T16:38:03Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -46,18 +46,19 @@ parser_definition() {
   flag  QUIET       -q --quiet                        -- "Do not print cargo log messages"
   disp  :usage      -h --help                         -- "Print help information"
 
-  msg           -- '' "See '${2##*/} <command> --help' for more information on a specific command."
-  cmd   build   -- "Compile the current package"
-  cmd   check   -- "Analyze the current package and report errors, but don't build it"
-  cmd   fetch   -- "Fetch dependencies of a package from the network"
-  cmd   init    -- "Create a new package in an existing directory"
-  cmd   install -- "Build and install a Mush binary"
-  cmd   legacy  -- "Add legacy dependencies to a Manifest.toml file"
-  cmd   new     -- "Create a new Mush package"
-  cmd   run     -- "Run a binary or example of the local package"
-  cmd   test    -- "Run the tests"
-  cmd   search  -- "Search registry for packages"
-  cmd   publish -- "Package and upload this package to the registry"
+  msg             -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   build     -- "Compile the current package"
+  cmd   check     -- "Analyze the current package and report errors, but don't build it"
+  cmd   fetch     -- "Fetch dependencies of a package from the network"
+  cmd   init      -- "Create a new package in an existing directory"
+  cmd   install   -- "Build and install a Mush binary"
+  cmd   uninstall -- "Uninstall a Mush binary"
+  cmd   legacy    -- "Add legacy dependencies to a Manifest.toml file"
+  cmd   new       -- "Create a new Mush package"
+  cmd   run       -- "Run a binary or example of the local package"
+  cmd   test      -- "Run the tests"
+  cmd   search    -- "Search registry for packages"
+  cmd   publish   -- "Package and upload this package to the registry"
 
   cmd   metadata hidden:true -- "Print package metadata"
   cmd   info     hidden:true -- "Show information of a package in the registry"
@@ -120,6 +121,9 @@ main() {
         ;;
       install)
         run_install "$@"
+        ;;
+      uninstall)
+        run_uninstall "$@"
         ;;
       legacy)
         run_legacy "$@"
@@ -785,7 +789,13 @@ run_install() {
     else
       [ -n "${FORCE}" ] && index_update=full
       mush_registry_index_update "${index_update}"
-      exec_install_from_index "$1" "${PACKAGE_VERSION}"
+      local package_name="$1"
+      local package_version="${PACKAGE_VERSION}"
+      if echo "$package_name" | grep -q '@'; then
+        package_version="${package_name##*@}"
+        package_name="${package_name%%@*}"
+      fi
+      exec_install_from_index "$package_name" "$package_version"
     fi
   fi
 }
@@ -1174,29 +1184,41 @@ run_test() {
 }
 
 parser_definition_uninstall() {
-	setup   REST help:usage abbr:true -- "Compile the current package" ''
+  setup  REST help:usage abbr:true -- "Remove a mush installed binary" ''
 
-  msg   -- 'USAGE:' "  ${2##*/} build [OPTIONS] [SUBCOMMAND]" ''
+  msg    -- 'USAGE:' "  ${2##*/} uninstall [OPTIONS] [package]..." ''
 
-	msg -- 'OPTIONS:'
-	flag    FLAG_C       -c --flag-c
-	param   MODULE_NAME  -n --name
-	param   BUILD_TARGET -t --target
-	disp    :usage       -h --help
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE  -v --verbose counter:true "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET    -q --quiet                                   -- "Do not print mush log messages"
+  param  BIN_NAME    --bin                                     -- "Only uninstall the specified binary"
+  flag   PURGE       --purge                                   -- "Also remove the local registry cache for the package"
+
+  disp   :usage   -h --help                                    -- "Print help information"
 }
 
 run_uninstall() {
-  eval "$(getoptions parser_definition_install parse "$0")"
+  eval "$(getoptions parser_definition_uninstall parse "$0")"
   parse "$@"
   eval "set -- $REST"
-  #echo "FLAG_C: $FLAG_C"
-  #echo "MODULE_NAME: $MODULE_NAME"
-  #echo "BUILD_TARGET: $BUILD_TARGET"
 
+  mush_env
 
-  cosnole_status "Removing" "/home/francesco/.cargo/bin/cask"
+  if [ "$#" -eq 0 ]; then
+    console_error "must specify a package to uninstall"
+    exit 1
+  fi
+
+  local package_name="$1"
+  local package_version=""
+
+  if echo "$package_name" | grep -q '@'; then
+    package_version="${package_name##*@}"
+    package_name="${package_name%%@*}"
+  fi
+
+  exec_uninstall "$package_name" "$package_version"
 }
-
 parser_definition_info() {
 	setup REST help:usage abbr:true -- "Display information about a package in the registry" ''
 
@@ -1349,7 +1371,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:58:43Z
+## @build_date: 2026-03-20T16:38:00Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1776,6 +1798,7 @@ public compile
 public publish
 public plugin
 public dependencies
+public uninstall
 # @score: 1
 
 exec_build_bin_debug() {
@@ -2175,11 +2198,10 @@ exec_install_from_index() {
   local package_entry
   local package_name
   local package_url
-  #local package_version_constraint
+  local package_version_constraint
   local dependency_type
   local package_path
   local package_version
-  #local package_version_selected
   local package_src
   local package_search
   local package_type
@@ -2188,18 +2210,16 @@ exec_install_from_index() {
   local package_repo_id
 
   package_name=$1
-  #package_version_constraint=$2
+  package_version_constraint=$2
   dependency_type=$3
 
   package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
   if [ -z "${package_search}" ]; then
-    console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '*'"
+    local version_label="${package_version_constraint:-*}"
+    console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '${version_label}'"
     exit 101
   fi
-
-  ## TODO: Implement version constraint
-  #package_version_selected=1
 
   package_entry=$(echo "${package_search}" | cut -d'#' -f1)
   package_name=$(echo "${package_entry}" | awk '{print $1}')
@@ -2209,7 +2229,11 @@ exec_install_from_index() {
 
   package_repo_id=$(echo "${package_url}" | tr -s '/:.' '-')
 
-  package_version=main
+  if [ -n "${package_version_constraint}" ]; then
+    package_version="${package_version_constraint}"
+  else
+    package_version=main
+  fi
 
   package_src="${MUSH_REGISTRY_SRC}/${package_name}/${package_version}"
   package_repo="${MUSH_REGISTRY_REPO}/${package_repo_id}/${package_version}"
@@ -2218,7 +2242,11 @@ exec_install_from_index() {
 
     [ "${VERBOSE}" -gt 4 ] && echo "Cloning: ${package_url}"
 
-    git clone --branch main --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
+    git clone --branch "${package_version}" --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
+
+    if [ ! -d "${package_src}" ]; then
+      git clone --branch "v${package_version}" --single-branch "${package_url}" "${package_src}" > /dev/null 2>&1 && true
+    fi
 
     if [ ! -d "${package_src}" ]; then
       console_error "failed to retrieve '${package_name}' at version '${package_version}' from '${package_url}'"
@@ -3053,6 +3081,46 @@ process_dependencies_build() {
   done
 }
 
+exec_uninstall() {
+  local package_name="$1"
+  local bin_name="${BIN_NAME:-$1}"
+  local bin_file="${MUSH_HOME}/bin/${bin_name}"
+  local plugin_dir="${MUSH_HOME}/plugins/${package_name}"
+  local found=0
+
+  if [ -f "${bin_file}" ]; then
+    rm -f "${bin_file}"
+    console_status "Removing" "${bin_file}"
+    console_status "Removed" "package '${package_name}' (executable '${bin_name}')"
+    found=1
+  fi
+
+  if [ -d "${plugin_dir}" ]; then
+    rm -rf "${plugin_dir}"
+    console_status "Removing" "${plugin_dir}"
+    console_status "Removed" "plugin '${package_name}'"
+    found=1
+  fi
+
+  if [ "${found}" -eq 0 ]; then
+    console_error "package '${package_name}' is not installed"
+    exit 101
+  fi
+
+  if [ -n "${PURGE}" ]; then
+    local registry_src="${MUSH_HOME}/registry/src"
+    local purged=0
+    for registry_dir in "${registry_src}"/*/; do
+      local cache_dir="${registry_dir}${package_name}"
+      if [ -d "${cache_dir}" ]; then
+        rm -rf "${cache_dir}"
+        console_status "Purging" "${cache_dir}"
+        purged=1
+      fi
+    done
+    [ "${purged}" -eq 0 ] && [ "${VERBOSE}" -gt 0 ] && console_status "Purge" "no registry cache found for '${package_name}'"
+  fi
+}
 mush_env() {
   local newline
 
@@ -3074,7 +3142,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:58:48Z
+## @build_date: 2026-03-20T16:38:01Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3134,7 +3202,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-20T09:58:54Z
+## @build_date: 2026-03-20T16:38:03Z
 set -e
 use() { return 0; }
 extern() { return 0; }
