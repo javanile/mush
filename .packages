@@ -70,6 +70,7 @@ package tpkg https://github.com/francescobianco/tpkg.git
 #------------------------------------------------------------------------------
 
 package make.sh https://github.com/francescobianco/make.sh.git
+package varlint https://github.com/francescobianco/varlint.git
 
 #------------------------------------------------------------------------------
 # MISCELLANEOUS PACKAGES
