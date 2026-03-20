@@ -6,6 +6,13 @@ exec_build_release() {
   target_path=${1:-target/release}
   binaries=$(manifest_get_binaries)
 
+  # Build library
+  if [ -f "src/lib.sh" ]; then
+    [ "$VERBOSE" -gt "3" ] && echo "Building release lib from: ${PWD}" >&2
+    exec_build_lib_from_src "$PWD"
+  fi
+
+  # Build binaries
   echo "${binaries}" | while IFS= read -r bin_entry; do
     [ -z "${bin_entry}" ] && continue
     manifest_parse_bin_entry "${bin_entry}"

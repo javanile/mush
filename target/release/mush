@@ -3,7 +3,7 @@
 # @package: mush
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-20 develop)
-# @build_date: 2026-03-19T23:22:58Z
+# @build_date: 2026-03-20T07:43:44Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -531,6 +531,7 @@ parser_definition_build() {
   flag  VERBOSE        -v --verbose "counter:true" "init:=${VERBOSE}" -- "Use verbose output (-vv or -vvv to increase level)"
 
   flag  QUIET          -q --quiet       -- "Do not print mush log messages"
+  param EXAMPLE_NAME      --example     -- "Name of example to build"
   flag  BUILD_RELEASE  -r --release     -- "Build artifacts in release mode, with optimizations"
   flag  NO_CACHE          --no-cache    -- "Disables the registry cache when build the package"
 
@@ -576,7 +577,7 @@ run_build() {
     exec_build_release "${MUSH_TARGET_PATH}"
   else
     if [ -f "${lib_file}" ]; then
-      [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
+      [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}" >&2
       exec_build_lib_debug "${lib_file}" "${out_file}"
     else
       lib_file=
@@ -1330,7 +1331,7 @@ console_hint() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T23:22:56Z
+## @build_date: 2026-03-20T07:43:42Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -1883,6 +1884,13 @@ exec_build_release() {
   target_path=${1:-target/release}
   binaries=$(manifest_get_binaries)
 
+  # Build library
+  if [ -f "src/lib.sh" ]; then
+    [ "$VERBOSE" -gt "3" ] && echo "Building release lib from: ${PWD}" >&2
+    exec_build_lib_from_src "$PWD"
+  fi
+
+  # Build binaries
   echo "${binaries}" | while IFS= read -r bin_entry; do
     [ -z "${bin_entry}" ] && continue
     manifest_parse_bin_entry "${bin_entry}"
@@ -3048,7 +3056,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T23:22:57Z
+## @build_date: 2026-03-20T07:43:43Z
 set -e
 use() { return 0; }
 extern() { return 0; }
@@ -3108,7 +3116,7 @@ console_print() {
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
-## @build_date: 2026-03-19T23:22:58Z
+## @build_date: 2026-03-20T07:43:44Z
 set -e
 use() { return 0; }
 extern() { return 0; }

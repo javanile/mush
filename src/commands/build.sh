@@ -54,7 +54,7 @@ run_build() {
     exec_build_release "${MUSH_TARGET_PATH}"
   else
     if [ -f "${lib_file}" ]; then
-      [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}"
+      [ "$VERBOSE" -gt "3" ] && echo "Building lib: ${lib_file}" >&2
       exec_build_lib_debug "${lib_file}" "${out_file}"
     else
       lib_file=
