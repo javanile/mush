@@ -51,6 +51,84 @@ process_dependencies() {
   done
 }
 
+process_system_dependency() {
+  local package_name=$1
+  local package_signature=$2
+  local binary_exists
+
+  # Check if binary is already available on PATH (isolated for set -e)
+  binary_exists=$(command -v "$package_name" || true)
+  if [ -n "$binary_exists" ]; then
+    [ "${VERBOSE}" -gt 4 ] && echo "System dependency '$package_name' already installed, skipping..."
+    return 0
+  fi
+
+  # Parse multi-registry syntax: "apt jq | yum jq | brew jq"
+  local registry_list
+  local registry
+  local registry_package
+
+  # Split by | and try each registry
+  echo "$package_signature" | tr '|' '\n' | while read -r registry_entry; do
+    registry_entry=$(echo "$registry_entry" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+    registry="${registry_entry%% *}"
+    registry_package="${registry_entry#* }"
+
+    # Check if this registry is available
+    case "$registry" in
+      apt)
+        if apt_is_available; then
+          apt_install "$registry_package"
+          return $?
+        fi
+        ;;
+      yum)
+        if yum_is_available; then
+          yum_install "$registry_package"
+          return $?
+        fi
+        ;;
+      brew)
+        if brew_is_available; then
+          brew_install "$registry_package"
+          return $?
+        fi
+        ;;
+      pacman)
+        if pacman_is_available; then
+          pacman_install "$registry_package"
+          return $?
+        fi
+        ;;
+      pip)
+        if pip_is_available; then
+          pip_install "$registry_package"
+          return $?
+        fi
+        ;;
+    esac
+  done
+
+  console_error "No supported package manager found to install '$package_name'"
+  return 1
+}
+
+is_system_dependency() {
+  local package_signature=$1
+
+  # Check if signature contains | (multi-registry) or starts with a known system PM
+  case "$package_signature" in
+    *"|"*)
+      return 0
+      ;;
+    apt\ *|yum\ *|brew\ *|pacman\ *|pip\ *)
+      return 0
+      ;;
+  esac
+
+  return 1
+}
+
 process_dependency() {
   local dependency_type
   local package_name
@@ -60,6 +138,12 @@ process_dependency() {
 
   dependency_type="$1"
   package_name="$2"
+
+  # Handle system dependencies (multi-registry syntax)
+  if is_system_dependency "$3"; then
+    process_system_dependency "$package_name" "$3"
+    return $?
+  fi
 
   if [ "$3" = "*" ]; then
     package_source="mush"
