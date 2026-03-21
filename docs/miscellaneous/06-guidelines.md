@@ -82,6 +82,89 @@ if [ ! -f "$file" ]; then
 fi
 ```
 
+## The `set -e` Pattern in Mush
+
+Mush operates with `set -e` enabled, which means the script exits immediately when any command returns a non-zero exit code. This behavior requires special attention when writing conditional checks.
+
+### The Problem
+
+With `set -e`, commands that fail inside conditional expressions can unexpectedly terminate the script:
+
+```bash
+# WRONG: This will exit the script if "mycommand" is not found
+if command -v mycommand > /dev/null 2>&1; then
+    echo "Found"
+fi
+```
+
+Even though the command is inside an `if` statement, the `command -v` failure triggers `set -e` and terminates execution.
+
+### Safe Patterns
+
+#### Pattern 1: Explicit return with fallback
+
+Use `|| return 1` to catch the error and return explicitly:
+
+```bash
+my_command_is_available() {
+    command -v mycommand > /dev/null 2>&1 || return 1
+    return 0
+}
+```
+
+#### Pattern 2: Success-first with explicit fallback
+
+Check for success first, then provide a fallback:
+
+```bash
+pip_is_available() {
+    command -v pip > /dev/null 2>&1 && return 0
+    command -v pip3 > /dev/null 2>&1 && return 0
+    return 1
+}
+```
+
+#### Pattern 3: Capture output with `|| true`
+
+Isolate the command result in a variable:
+
+```bash
+process_dependency() {
+    local binary_exists
+
+    # The || true ensures the command never fails
+    binary_exists=$(command -v "$package_name" || true)
+
+    if [ -n "$binary_exists" ]; then
+        echo "Binary found"
+    fi
+}
+```
+
+### Summary Table
+
+| Pattern | Use Case | Example |
+|---------|----------|---------|
+| `cmd \|\| return 1` | Boolean check functions | `command -v x \|\| return 1` |
+| `cmd && return 0` | Multiple fallback checks | `command -v pip && return 0` |
+| `$(cmd \|\| true)` | Capture output safely | `result=$(cmd \|\| true)` |
+| `cmd \|\| true` | Ignore failure entirely | `rm -f file \|\| true` |
+
+### What to Avoid
+
+```bash
+# AVOID: Direct command in if condition
+if command -v git > /dev/null 2>&1; then
+
+# AVOID: Unprotected command substitution
+result=$(command -v git)
+
+# AVOID: Chained commands without protection
+command -v git && echo "found"
+```
+
+Always isolate commands that may fail using one of the safe patterns above.
+
 ### Useful References
 
 Here are some useful references for improving your shell scripting skills:
