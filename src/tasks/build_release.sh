@@ -56,11 +56,11 @@ exec_build_release_bin() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES=$(mktemp)
-  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  export MUSH_COMPILED_MODULES="target/release/modules.log"
+  > "${MUSH_COMPILED_MODULES}"
+  export MUSH_SOURCE_INDEX_FILE="target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_path}" "${build_file}" "" "release" "entrypoint"
-  rm -f "${MUSH_COMPILED_MODULES}"
   rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
@@ -126,11 +126,11 @@ exec_build_bin_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES=$(mktemp)
-  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  > "${MUSH_COMPILED_MODULES}"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/main.sh" "${build_file}" "" "" "entrypoint"
-  rm -f "${MUSH_COMPILED_MODULES}"
   rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
@@ -182,11 +182,11 @@ exec_build_lib_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES=$(mktemp)
-  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  > "${MUSH_COMPILED_MODULES}"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release" "lib"
-  rm -f "${MUSH_COMPILED_MODULES}"
   rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   ## Generate binary on target

@@ -18,11 +18,11 @@ exec_build_bin_debug() {
   local build_file="${bin_file}.tmp"
   local final_file="${bin_file}"
 
-  export MUSH_COMPILED_MODULES=$(mktemp)
-  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  export MUSH_COMPILED_MODULES="$(dirname "${bin_file}")/modules.log"
+  > "${MUSH_COMPILED_MODULES}"
+  export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
-  rm -f "${MUSH_COMPILED_MODULES}"
   rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   # Init debug entrypoint
@@ -116,11 +116,10 @@ exec_build_lib_debug() {
   lib_file="$1"
   out_file="$2"
 
-  export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "${lib_file}"
-  rm -f "${MUSH_COMPILED_MODULES}"
-
   mkdir -p "$(dirname "${out_file}")"
+  export MUSH_COMPILED_MODULES="$(dirname "${out_file}")/modules.log"
+  > "${MUSH_COMPILED_MODULES}"
+  compile_file "${lib_file}"
 
   build_file="${out_file}.tmp"
   final_file="${out_file}"
