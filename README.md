@@ -103,6 +103,8 @@ For further details, please consult the [Reference documentation](https://mush.j
 
 See [CONTRIBUTING.md in the repo](https://github.com/javanile/mush/blob/main/CONTRIBUTING.md), obviously pull-request are welcome.
 
+**Important:** Before contributing, please read the [Coding Style Guidelines](https://mush.javanile.org/guidelines/) to understand the patterns and conventions used in Mush, especially the `set -e` safe patterns.
+
 ## Security Vulnerabilities
 
 If you discover a security vulnerability within Laravel, please send an e-mail to Francesco Bianco via bianco@javanile.org. All security vulnerabilities will be promptly addressed.
