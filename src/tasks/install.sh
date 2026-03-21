@@ -178,14 +178,19 @@ exec_install_from_src() {
 
   exec_dependencies
 
-  exec_build_from_src "${package_src}"
+  if [ "${MUSH_PACKAGE_TYPE}" = "meta" ]; then
+    console_status "Installed" "meta package '${MUSH_PACKAGE_NAME} v${MUSH_PACKAGE_VERSION}'"
+    console_status "Finished" "release [optimized] target(s) in 0.18s"
+  else
+    exec_build_from_src "${package_src}"
 
-  if [ -f "${package_src}/src/lib.sh" ]; then
-    exec_install_lib_from_src "${package_src}"
-  fi
+    if [ -f "${package_src}/src/lib.sh" ]; then
+      exec_install_lib_from_src "${package_src}"
+    fi
 
-  if [ -f "${package_src}/src/main.sh" ]; then
-    exec_install_bin_from_src "${package_src}"
+    if [ -f "${package_src}/src/main.sh" ]; then
+      exec_install_bin_from_src "${package_src}"
+    fi
   fi
 
   if [ "${reset_deps_dir}" -eq 1 ]; then
