@@ -135,7 +135,7 @@ exec_install_from_index() {
 
   if ! echo "${package_version}" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
     if [ "${package_version}" != "${MUSH_PACKAGE_VERSION}" ]; then
-      console_warning "Warning" "installed branch '${package_version}' but package manifest declares version '${MUSH_PACKAGE_VERSION}'"
+      console_warning "Warning" "installed branch '${package_version}' but manifest declares '${MUSH_PACKAGE_VERSION}'"
     fi
   fi
 

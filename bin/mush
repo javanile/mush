@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-21T23:33:47Z
+# @build_date: 2026-03-21T23:37:53Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -2768,7 +2768,7 @@ exec_install_from_index() {
 
   if ! echo "${package_version}" | grep -qE '^v?[0-9]+\.[0-9]+\.[0-9]+$'; then
     if [ "${package_version}" != "${MUSH_PACKAGE_VERSION}" ]; then
-      console_warning "Warning" "installed branch '${package_version}' but package manifest declares version '${MUSH_PACKAGE_VERSION}'"
+      console_warning "Warning" "installed branch '${package_version}' but manifest declares '${MUSH_PACKAGE_VERSION}'"
     fi
   fi
 
