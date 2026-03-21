@@ -61,7 +61,6 @@ run_install() {
       elif [ "${MUSH_PACKAGE_TYPE}" = "meta" ]; then
         exec_dependencies
         console_status "Installed" "meta package '${MUSH_PACKAGE_NAME} v${MUSH_PACKAGE_VERSION}'"
-        console_status "Finished" "release [optimized] target(s) in 0.18s"
       else
         MUSH_TARGET_PATH=target/release
         exec_legacy_fetch "${MUSH_TARGET_PATH}"

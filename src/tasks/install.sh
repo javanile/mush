@@ -180,7 +180,6 @@ exec_install_from_src() {
 
   if [ "${MUSH_PACKAGE_TYPE}" = "meta" ]; then
     console_status "Installed" "meta package '${MUSH_PACKAGE_NAME} v${MUSH_PACKAGE_VERSION}'"
-    console_status "Finished" "release [optimized] target(s) in 0.18s"
   else
     exec_build_from_src "${package_src}"
 
