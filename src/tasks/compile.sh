@@ -1,16 +1,45 @@
 
 
 
+compile_next_source_index() {
+  local source_index=0
+  if [ -n "${MUSH_SOURCE_INDEX_FILE:-}" ]; then
+    source_index=$(cat "${MUSH_SOURCE_INDEX_FILE}")
+    source_index=$((source_index + 1))
+    echo "${source_index}" > "${MUSH_SOURCE_INDEX_FILE}"
+  fi
+  echo "${source_index}"
+}
+
+compile_emit_source_section() {
+  local build_file=$1
+  local src_file=$2
+  local portion_type=$3
+  local source_index
+  source_index=$(compile_next_source_index)
+  # The leading newline guards against source files that lack a trailing newline:
+  # appending content directly after the last byte of a file without a newline
+  # would corrupt the artifact by merging two lines into one.
+  printf '\n' >> "${build_file}"
+  echo "# @section_code: SC007" >> "${build_file}"
+  echo "# @section_name: source" >> "${build_file}"
+  echo "# @source_index: ${source_index}" >> "${build_file}"
+  echo "# @source_file: ${src_file}" >> "${build_file}"
+  echo "# @portion_type: ${portion_type}" >> "${build_file}"
+}
+
 compile_file() {
   local src_file
   local build_file
   local manifest_directory
   local build_mode
+  local portion_type
 
   src_file=$1
   build_file=$2
   manifest_directory=${3:-$PWD}
   build_mode=${4:-debug}
+  portion_type=${5:-module}
 
   [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'$(display_path "${src_file}")' [${build_mode}]"
 
@@ -30,7 +59,7 @@ compile_file() {
   mush_feature_hook compile_file "${src_file}"
 
   if [ -n "${build_file}" ]; then
-    printf '\n' >> "${build_file}"
+    compile_emit_source_section "${build_file}" "${src_file}" "${portion_type}"
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
@@ -59,7 +88,7 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${legacy_file}" "legacy"
         #cat "${legacy_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
@@ -87,10 +116,10 @@ compile_scan_public() {
 
     if [ -e "${public_file}" ]; then
       console_info "Public" "file '${public_file}' as module file"
-      compile_file "${public_file}" "${build_file}"
+      compile_file "${public_file}" "${build_file}" "" "" "public"
     elif [ -e "${public_dir_file}" ]; then
       console_info "Public" "file '${public_dir_file}' as directory module file"
-      compile_file "${public_dir_file}" "${build_file}"
+      compile_file "${public_dir_file}" "${build_file}" "" "" "public"
     else
       console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
@@ -121,13 +150,13 @@ compile_scan_module() {
 
     if [ -e "${module_file}" ]; then
       console_info "Import" "file '${module_file}' as module file"
-      compile_file "${module_file}" "${build_file}"
+      compile_file "${module_file}" "${build_file}" "" "" "module"
     elif [ -e "${module_dir_file}" ]; then
       console_info "Import" "file '${module_dir_file}' as directory module file"
-      compile_file "${module_dir_file}" "${build_file}"
+      compile_file "${module_dir_file}" "${build_file}" "" "" "module"
     elif [ -n "${root_src_file}" ]; then
       console_info "Import" "file '${root_src_file}' as module file"
-      compile_file "${root_src_file}" "${build_file}"
+      compile_file "${root_src_file}" "${build_file}" "" "" "module"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
@@ -151,7 +180,7 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${package_file}" "extern"
         #cat "${package_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
@@ -180,7 +209,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${module_file}" "embed"
         mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else

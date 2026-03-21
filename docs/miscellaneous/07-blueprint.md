@@ -95,8 +95,32 @@ A section begins with:
 
 Rules:
 
-* `section_code` MUST be unique within the file
+* `section_code` MUST be unique within the file, **except for repeatable sections** (see §4.4)
 * `section_name` defines the semantic role of the section
+
+
+### 4.4 Repeatable Sections
+
+Some section types MAY appear multiple times within the same file (e.g. one per appended source portion).
+
+These are called **repeatable sections** and follow additional rules:
+
+* They MUST include a `@source_index` attribute — a 1-based integer, unique within all instances of the same `section_code`
+* Uniqueness is determined by the composite key `section_code + source_index`
+* They MUST include a `@source_file` attribute identifying the origin file of the portion
+* They MUST include a `@portion_type` attribute describing the role of the portion within the artifact
+
+> **Note:** Only the final artifact is a *file*. Each appended chunk is a *portion*.
+
+```
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/utils.sh
+# @portion_type: lib
+```
+
+Repeatable section codes are explicitly marked in the Standard Section Codes table (§8).
 
  
 
@@ -166,15 +190,16 @@ There is no implicit meaning associated with attribute names outside the declare
 
 This specification defines the following standard section codes:
 
-| Code  | Name       | Description                             |
-|  -- | ---------- | --------------------------------------- |
-| SC000 | blueprint  | Bootstrap section (mandatory)           |
-| SC001 | file-meta  | File metadata                           |
-| SC002 | execution  | Main script logic                       |
-| SC003 | config     | Configuration data                      |
-| SC004 | doc        | Documentation                           |
-| SC005 | functions  | Function declarations                   |
-| SC006 | entrypoint | Logical entrypoint (e.g. `main "$@"`)   |
+| Code  | Repeatable | Name       | Description                                      |
+| ----- | ---------- | ---------- | ------------------------------------------------ |
+| SC000 | no         | blueprint  | Bootstrap section (mandatory)                    |
+| SC001 | no         | file-meta  | File metadata                                    |
+| SC002 | no         | execution  | Main script logic                                |
+| SC003 | no         | config     | Configuration data                               |
+| SC004 | no         | doc        | Documentation                                    |
+| SC005 | no         | functions  | Function declarations                            |
+| SC006 | no         | entrypoint | Logical entrypoint (e.g. `main "$@"`)            |
+| SC007 | **yes**    | source     | A portion appended from a source file (see §4.4) |
 
 Additional section codes MAY be defined by custom Blueprints.
 
@@ -202,8 +227,24 @@ GREETING="Hello World"
 # @section_code: SC005
 # @section_name: functions
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/lib/greet.sh
+# @portion_type: lib
+
 greet() {
   echo "${GREETING}"
+}
+
+# @section_code: SC007
+# @section_name: source
+# @source_index: 2
+# @source_file: src/main.sh
+# @portion_type: entrypoint
+
+main() {
+  greet
 }
 
 # @section_code: SC006

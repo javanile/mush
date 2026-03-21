@@ -19,8 +19,11 @@ exec_build_bin_debug() {
   local final_file="${bin_file}"
 
   export MUSH_COMPILED_MODULES=$(mktemp)
+  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
+  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   # Init debug entrypoint
   {
