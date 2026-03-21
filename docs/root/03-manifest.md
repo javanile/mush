@@ -23,6 +23,7 @@ Every manifest file consists of the following sections:
     * [`description`](#the-description-field) — A short description of the package.
     * [`license`](#the-license-field) — The package license identifier.
     * [`edition`](#the-edition-field) — The Mush edition.
+    * [`type`](#the-type-field) — The package type (`bin`, `plugin`, `meta`).
 
 * Dependency tables:
     * [`[dependencies]`](#the-dependencies-section) — Runtime dependencies.
@@ -116,6 +117,62 @@ edition = "2022"
 
 If omitted, the oldest supported edition is assumed for backwards compatibility.
 [`mush new`] always sets `edition` explicitly to the latest stable value.
+
+### The `type` field
+
+The `type` field declares the nature of the package. It controls what mush
+expects to find in the package directory and what it will do with it.
+
+| Value | Description |
+| ----- | ----------- |
+| `"bin"` | A runnable binary package (default). Must contain source files. |
+| `"plugin"` | A mush plugin that extends the mush CLI itself. |
+| `"meta"` | A dependency-only package with no source code (see below). |
+
+If `type` is omitted, `"bin"` is assumed.
+
+```toml
+[package]
+type = "meta"
+```
+
+#### The `meta` type
+
+A **meta package** carries no source code of its own. Its sole purpose is to
+act as a named shortcut for a curated set of dependencies — think of it as a
+reusable dependency list with a version and a name.
+
+```toml
+[package]
+name = "web-stack"
+version = "1.0.0"
+type = "meta"
+description = "Full web stack: nginx + php + mysql."
+
+[dependencies]
+nginx = "apt nginx | yum nginx"
+php   = "apt php8.2 | yum php"
+mysql = "apt mysql-server | yum mysql-server"
+```
+
+Installing `web-stack` installs the entire stack in one command:
+
+```sh
+mush install web-stack
+```
+
+**Rules enforced for `type = "meta"`:**
+
+* A `src/` directory MUST NOT be present — mush will error if sources are found.
+* Only `[dependencies]` and `[dev-dependencies]` are meaningful; all other
+  sections (`[run]`, `[bin]`, `[lib]`, etc.) are ignored with a warning.
+* The package produces no compiled artifact and cannot be executed directly.
+
+**Typical use cases:**
+
+* Environment presets (`ci-tools`, `dev-environment`, `production-stack`)
+* System dependency bundles (`build-essentials`, `monitoring-stack`)
+* Opinionated collections that a team wants to version and share
 
 ---
 

@@ -12,8 +12,8 @@ set -e
 # @package: mush
 # @file_type: build-entrypoint
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-21 develop)
-# @build_date: 2026-03-21T21:06:49Z
+# @build_with: Mush v0.2.0 (2026-03-22 develop)
+# @build_date: 2026-03-21T23:33:47Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -897,6 +897,10 @@ run_install() {
       exec_manifest_lookup "${package_path}"
       if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
         echo "Install plugin: $MUSH_PACKAGE_NAME"
+      elif [ "${MUSH_PACKAGE_TYPE}" = "meta" ]; then
+        exec_dependencies
+        console_status "Installed" "meta package '${MUSH_PACKAGE_NAME} v${MUSH_PACKAGE_VERSION}'"
+        console_status "Finished" "release [optimized] target(s) in 0.18s"
       else
         MUSH_TARGET_PATH=target/release
         exec_legacy_fetch "${MUSH_TARGET_PATH}"
@@ -1713,12 +1717,7 @@ apt_install() {
   if [ "$(id -u)" = "0" ]; then
     apt-get update -qq && apt-get install -y -qq "$package_name"
   else
-    echo "[mush] Dependency '$package_name' is not installed."
-    echo "[mush] Run the following command to install it:"
-    echo ""
-    echo "    sudo apt install $package_name"
-    echo ""
-    echo "[mush] Then re-run: mush install"
+    system_dependency_not_root "$package_name" "sudo apt install $package_name"
     return 1
   fi
 }
@@ -1852,12 +1851,7 @@ pacman_install() {
   if [ "$(id -u)" = "0" ]; then
     pacman -S --noconfirm "$package_name"
   else
-    echo "[mush] Dependency '$package_name' is not installed."
-    echo "[mush] Run the following command to install it:"
-    echo ""
-    echo "    sudo pacman -S $package_name"
-    echo ""
-    echo "[mush] Then re-run: mush install"
+    system_dependency_not_root "$package_name" "sudo pacman -S $package_name"
     return 1
   fi
 }
@@ -1923,15 +1917,11 @@ yum_install() {
   if [ "$(id -u)" = "0" ]; then
     yum install -y -q "$package_name"
   else
-    echo "[mush] Dependency '$package_name' is not installed."
-    echo "[mush] Run the following command to install it:"
-    echo ""
-    echo "    sudo yum install $package_name"
-    echo ""
-    echo "[mush] Then re-run: mush install"
+    system_dependency_not_root "$package_name" "sudo yum install $package_name"
     return 1
   fi
 }
+
 # @section_code: SC007
 # @section_name: source
 # @source_index: 46
@@ -3021,7 +3011,7 @@ exec_manifest_lookup() {
     exit 101
   fi
 
-  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
+  if [ "${MUSH_PACKAGE_TYPE}" != "meta" ] && [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi
@@ -3578,6 +3568,16 @@ exec_plugin_list() {
 # @source_file: src/tasks/dependencies.sh
 # @portion_type: public
 
+system_dependency_not_root() {
+  local package_name=$1
+  local install_cmd=$2
+
+  console_error "dependency '${package_name}' is not installed"
+  console_hint "run the following command to install it:"
+  printf "\n    %s\n\n" "${install_cmd}" >&2
+  console_hint "then re-run: mush install"
+}
+
 exec_dependencies() {
   local update_strategy
   ## TODO: Expected output
@@ -3618,12 +3618,15 @@ process_dependencies() {
   update_strategy="${2:-lazy}"
 
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
-    [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
-
     package_name="${dependency%=*}"
     package_signature="${dependency#*=}"
 
-    if [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+    [ "${VERBOSE}" -gt 4 ] && console_info "Checking" "dependency '${package_name}'"
+
+    if is_system_dependency "${package_signature}"; then
+      # System dependencies are processed regardless of MUSH_DEPS_DIR
+      process_system_dependency "${package_name}" "${package_signature}"
+    elif [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       mkdir -p "${MUSH_DEPS_DIR}/${package_name}"
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
@@ -3638,7 +3641,7 @@ process_system_dependency() {
   # Check if binary is already available on PATH (isolated for set -e)
   binary_exists=$(command -v "$package_name" || true)
   if [ -n "$binary_exists" ]; then
-    [ "${VERBOSE}" -gt 4 ] && echo "System dependency '$package_name' already installed, skipping..."
+    [ "${VERBOSE}" -gt 4 ] && console_info "Satisfied" "system dependency '${package_name}' already installed"
     return 0
   fi
 
@@ -4245,7 +4248,7 @@ EMBED
     case "$1" in
       VERSION)
         cat <<'EMBED'
-Mush v0.2.0 (2026-03-21 develop)
+Mush v0.2.0 (2026-03-22 develop)
 
 EMBED
         ;;

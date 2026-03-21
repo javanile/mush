@@ -18,7 +18,7 @@ exec_manifest_lookup() {
     exit 101
   fi
 
-  if [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
+  if [ "${MUSH_PACKAGE_TYPE}" != "meta" ] && [ ! -f "${manifest_dir}/src/lib.sh" ] && [ ! -f "${manifest_dir}/src/main.sh" ] && [ -z "${MUSH_BINARIES}" ]; then
     console_error "failed to parse manifest at '${manifest_dir}/Manifest.toml'\n\nCaused by:\n  no targets specified in the manifest\n  either src/lib.sh, src/main.sh, a [lib] section, or [[bin]] section must be present"
     exit 101
   fi

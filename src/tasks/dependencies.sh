@@ -1,4 +1,14 @@
 
+system_dependency_not_root() {
+  local package_name=$1
+  local install_cmd=$2
+
+  console_error "dependency '${package_name}' is not installed"
+  console_hint "run the following command to install it:"
+  printf "\n    %s\n\n" "${install_cmd}" >&2
+  console_hint "then re-run: mush install"
+}
+
 exec_dependencies() {
   local update_strategy
   ## TODO: Expected output
@@ -39,12 +49,15 @@ process_dependencies() {
   update_strategy="${2:-lazy}"
 
   echo "${dependencies_list}" | while IFS=$'\n' read -r dependency && [ -n "$dependency" ]; do
-    [ "${VERBOSE}" -gt 4 ] && echo "Parsing dependency '$dependency'"
-
     package_name="${dependency%=*}"
     package_signature="${dependency#*=}"
 
-    if [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
+    [ "${VERBOSE}" -gt 4 ] && console_info "Checking" "dependency '${package_name}'"
+
+    if is_system_dependency "${package_signature}"; then
+      # System dependencies are processed regardless of MUSH_DEPS_DIR
+      process_system_dependency "${package_name}" "${package_signature}"
+    elif [ -n "${MUSH_DEPS_DIR}" ] && [ ! -d "${MUSH_DEPS_DIR}/${package_name}" ]; then
       mkdir -p "${MUSH_DEPS_DIR}/${package_name}"
       process_dependency "${dependencies_type}" "${package_name}" "${package_signature}" "${update_strategy}"
     fi
@@ -59,7 +72,7 @@ process_system_dependency() {
   # Check if binary is already available on PATH (isolated for set -e)
   binary_exists=$(command -v "$package_name" || true)
   if [ -n "$binary_exists" ]; then
-    [ "${VERBOSE}" -gt 4 ] && echo "System dependency '$package_name' already installed, skipping..."
+    [ "${VERBOSE}" -gt 4 ] && console_info "Satisfied" "system dependency '${package_name}' already installed"
     return 0
   fi
 

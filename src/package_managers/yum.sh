@@ -10,12 +10,7 @@ yum_install() {
   if [ "$(id -u)" = "0" ]; then
     yum install -y -q "$package_name"
   else
-    echo "[mush] Dependency '$package_name' is not installed."
-    echo "[mush] Run the following command to install it:"
-    echo ""
-    echo "    sudo yum install $package_name"
-    echo ""
-    echo "[mush] Then re-run: mush install"
+    system_dependency_not_root "$package_name" "sudo yum install $package_name"
     return 1
   fi
 }

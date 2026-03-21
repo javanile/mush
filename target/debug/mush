@@ -1,22 +1,30 @@
 #!/usr/bin/env bash
 set -e
 
-# @section_code: FS002
+# @section_code: SC000
+# @section_name: blueprint
+# @blueprint_name: SSP
+# @blueprint_version: 1.0
+# @blueprint_url: https://mush.javanile.org/blueprint/
+
+# @section_code: SC001
 # @section_name: file-meta
 # @file_path: target/debug/mush
 # @file_type: build-entrypoint
 
-# @section_code: FS003
+# @section_code: SC002
 # @section_name: debug-entrypoint-init
 
-# @build_section: BS002 - Package and debug variables
+# @section_code: SC003
+# @section_name: config
 MUSH_PACKAGE_NAME="mush"
 MUSH_TARGET_FILE="target/debug/mush"
 MUSH_TARGET_PATH="target/debug"
 MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
 MUSH_DEBUG_PATH="/home/francesco/Develop/Javanile/mush"
 
-# @build_section: BS003 - Embedding debug api
+# @section_code: SC004
+# @section_name: debug-api
 debug() {
   local api
   api=$1
@@ -169,8 +177,8 @@ mush_api_2022_embed() {
   echo "}"
 }
 
-# @build_section: BS001 - Appending entrypoint to debug build
+# @section_code: SC005
+# @section_name: execution
 debug init
-# @build_section: BS001 - Appending entrypoint to debug build
 debug file "${MUSH_DEBUG_PATH}/src/main.sh"
 main "$@"
