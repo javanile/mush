@@ -166,13 +166,15 @@ There is no implicit meaning associated with attribute names outside the declare
 
 This specification defines the following standard section codes:
 
-| Code  | Name      | Description                   |
-|  -- | --------- | ----------------------------- |
-| SC000 | blueprint | Bootstrap section (mandatory) |
-| SC001 | file-meta | File metadata                 |
-| SC002 | execution | Main script logic             |
-| SC003 | config    | Configuration data            |
-| SC004 | doc       | Documentation                 |
+| Code  | Name       | Description                             |
+|  -- | ---------- | --------------------------------------- |
+| SC000 | blueprint  | Bootstrap section (mandatory)           |
+| SC001 | file-meta  | File metadata                           |
+| SC002 | execution  | Main script logic                       |
+| SC003 | config     | Configuration data                      |
+| SC004 | doc        | Documentation                           |
+| SC005 | functions  | Function declarations                   |
+| SC006 | entrypoint | Logical entrypoint (e.g. `main "$@"`)   |
 
 Additional section codes MAY be defined by custom Blueprints.
 
@@ -192,10 +194,22 @@ Additional section codes MAY be defined by custom Blueprints.
 # @file_name: script.sh
 # @file_type: sh
 
-# @section_code: SC002
-# @section_name: execution
+# @section_code: SC003
+# @section_name: config
 
-echo "Hello World"
+GREETING="Hello World"
+
+# @section_code: SC005
+# @section_name: functions
+
+greet() {
+  echo "${GREETING}"
+}
+
+# @section_code: SC006
+# @section_name: entrypoint
+
+main "$@"
 ```
 
  

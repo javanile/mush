@@ -33,24 +33,36 @@ exec_build_release_bin() {
 
   mkdir -p target/release
 
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "# @BP010: Release metadata" >> "${build_file}"
+  echo "#!/usr/bin/env bash" > "${build_file}"
+  echo "set -e" >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  echo "# @section_code: SC000" >> "${build_file}"
+  echo "# @section_name: blueprint" >> "${build_file}"
+  echo "# @blueprint_name: SSP" >> "${build_file}"
+  echo "# @blueprint_version: 1.0" >> "${build_file}"
+  echo "# @blueprint_url: https://mush.javanile.org/blueprint/" >> "${build_file}"
+  echo "" >> "${build_file}"
+
+  echo "# @section_code: SC001" >> "${build_file}"
+  echo "# @section_name: file-meta" >> "${build_file}"
   echo "# @package: ${name}" >> "${build_file}"
+  echo "# @file_type: build-entrypoint" >> "${build_file}"
   echo "# @build_type: bin" >> "${build_file}"
   echo "# @build_with: ${VERSION}" >> "${build_file}"
   echo "# @build_date: ${build_date}" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "set -e" >> $build_file
-
-  release_2022 >> $build_file
-
-  echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  echo "# @section_code: SC005" >> "${build_file}"
+  echo "# @section_name: functions" >> "${build_file}"
+  release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${src_path}" "${build_file}" "" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
 
-  printf '\n' >> "${build_file}"
-  echo "## BP005: Execute the entrypoint" >> "${build_file}"
+  echo "" >> "${build_file}"
+  echo "# @section_code: SC006" >> "${build_file}"
+  echo "# @section_name: entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   ## Generate binary on target
@@ -89,22 +101,35 @@ exec_build_bin_from_src() {
 
   mkdir -p "${package_src}/target/release"
 
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "## BP010: Release metadata" >> "${build_file}"
-  echo "## @build_type: bin" >> "${build_file}"
-  echo "## @build_date: ${build_date}" >> "${build_file}"
+  echo "#!/usr/bin/env bash" > "${build_file}"
+  echo "set -e" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "set -e" >> $build_file
+  echo "# @section_code: SC000" >> "${build_file}"
+  echo "# @section_name: blueprint" >> "${build_file}"
+  echo "# @blueprint_name: SSP" >> "${build_file}"
+  echo "# @blueprint_version: 1.0" >> "${build_file}"
+  echo "# @blueprint_url: https://mush.javanile.org/blueprint/" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  release_2022 >> $build_file
+  echo "# @section_code: SC001" >> "${build_file}"
+  echo "# @section_name: file-meta" >> "${build_file}"
+  echo "# @package: ${package_name}" >> "${build_file}"
+  echo "# @file_type: build-entrypoint" >> "${build_file}"
+  echo "# @build_type: bin" >> "${build_file}"
+  echo "# @build_date: ${build_date}" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  echo "# @section_code: SC005" >> "${build_file}"
+  echo "# @section_name: functions" >> "${build_file}"
+  release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/main.sh" "${build_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
 
-  printf '\n' >> "${build_file}"
-  echo "## BP005: Execute the entrypoint" >> "${build_file}"
+  echo "" >> "${build_file}"
+  echo "# @section_code: SC006" >> "${build_file}"
+  echo "# @section_name: entrypoint" >> "${build_file}"
   echo "main \"\$@\"" >> "${build_file}"
 
   ## Generate binary on target
@@ -129,16 +154,28 @@ exec_build_lib_from_src() {
 
   mkdir -p "${package_src}/target/release"
 
-  echo "#!/usr/bin/env bash" > $build_file
-  echo "## BP010: Release metadata" >> "${build_file}"
-  echo "## @build_type: lib" >> "${build_file}"
-  echo "## @build_date: ${build_date}" >> "${build_file}"
+  echo "#!/usr/bin/env bash" > "${build_file}"
+  echo "set -e" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "set -e" >> $build_file
+  echo "# @section_code: SC000" >> "${build_file}"
+  echo "# @section_name: blueprint" >> "${build_file}"
+  echo "# @blueprint_name: SSP" >> "${build_file}"
+  echo "# @blueprint_version: 1.0" >> "${build_file}"
+  echo "# @blueprint_url: https://mush.javanile.org/blueprint/" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  release_2022 >> $build_file
+  echo "# @section_code: SC001" >> "${build_file}"
+  echo "# @section_name: file-meta" >> "${build_file}"
+  echo "# @package: ${package_name}" >> "${build_file}"
+  echo "# @file_type: build-library" >> "${build_file}"
+  echo "# @build_type: lib" >> "${build_file}"
+  echo "# @build_date: ${build_date}" >> "${build_file}"
+  echo "" >> "${build_file}"
 
-  echo "## BP004: Compile the entrypoint" >> "${build_file}"
+  echo "# @section_code: SC005" >> "${build_file}"
+  echo "# @section_name: functions" >> "${build_file}"
+  release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
   rm -f "${MUSH_COMPILED_MODULES}"
