@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-21 develop)
-# @build_date: 2026-03-21T20:28:08Z
+# @build_date: 2026-03-21T20:35:13Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -25,6 +25,11 @@ public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/main.sh
+# @portion_type: entrypoint
 # @score: 10
 
 extern package console
@@ -175,6 +180,11 @@ main() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 2
+# @source_file: src/api/module.sh
+# @portion_type: module
 
 embed debug_2022
 embed release_2022
@@ -183,6 +193,11 @@ embed embed_2022
 
 public embed_2022
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 3
+# @source_file: src/api/embed_2022.sh
+# @portion_type: public
 
 mush_api_2022_embed() {
   local module_name
@@ -240,6 +255,11 @@ mush_api_2022_embed() {
   echo "}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 4
+# @source_file: src/api/debug_2022.sh
+# @portion_type: embed
 debug_2022() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
@@ -357,6 +377,11 @@ EMBED
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 5
+# @source_file: src/api/release_2022.sh
+# @portion_type: embed
 release_2022() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
@@ -377,6 +402,11 @@ EMBED
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 6
+# @source_file: src/api/test_2022.sh
+# @portion_type: embed
 test_2022() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
@@ -400,6 +430,11 @@ EMBED
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 7
+# @source_file: src/api/embed_2022.sh
+# @portion_type: embed
 embed_2022() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
@@ -460,6 +495,11 @@ EMBED
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 8
+# @source_file: src/build/module.sh
+# @portion_type: module
 
 public profile
 public script
@@ -483,6 +523,11 @@ mush_build_print() {
     esac
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 9
+# @source_file: src/build/profile.sh
+# @portion_type: public
 
 mush_build_profile_init() {
   local profile
@@ -501,6 +546,11 @@ mush_build_profile_init() {
   MUSH_TARGET_PATH="${target_dir}/${MUSH_PROFILE}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 10
+# @source_file: src/build/script.sh
+# @portion_type: public
 
 mush_build_script_run() {
   local pwd
@@ -515,11 +565,21 @@ mush_build_script_run() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 11
+# @source_file: src/collections/module.sh
+# @portion_type: module
 
 mush_space_iterable() {
     echo "$1" | tr '\n' ' ' | tr -s ' ' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//'
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 12
+# @source_file: src/color.sh
+# @portion_type: module
 
 mush_color() {
     if [ -n "${MUSH_TERM_COLOR}" ]; then
@@ -532,6 +592,11 @@ display_path() {
   echo "${path//\/\//\/}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 13
+# @source_file: src/commands/module.sh
+# @portion_type: module
 
 public add
 public build
@@ -552,10 +617,20 @@ public uninstall
 public info
 public index
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 14
+# @source_file: src/commands/add.sh
+# @portion_type: public
 
 test0 () {
   echo "TEST"
 }
+# @section_code: SC007
+# @section_name: source
+# @source_index: 15
+# @source_file: src/commands/build.sh
+# @portion_type: public
 
 parser_definition_build() {
   setup REST help:usage abbr:true -- "Compile the current package" ''
@@ -653,6 +728,11 @@ run_build() {
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 16
+# @source_file: src/commands/check.sh
+# @portion_type: public
 
 parser_definition_check() {
 	setup   REST help:usage abbr:true -- "Check a local package and all of its dependencies for errors" ''
@@ -684,6 +764,11 @@ run_check() {
   console_status "Finished" "dev [unoptimized + debuginfo] target(s) in 0.00s"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 17
+# @source_file: src/commands/fetch.sh
+# @portion_type: public
 
 parser_definition_fetch() {
   setup   REST help:usage abbr:true -- "Fetch dependencies of a package from the network" ''
@@ -714,6 +799,11 @@ run_fetch() {
   exec_dependencies
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 18
+# @source_file: src/commands/init.sh
+# @portion_type: public
 
 parser_definition_init() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
@@ -742,6 +832,11 @@ run_init() {
   exec_init
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 19
+# @source_file: src/commands/install.sh
+# @portion_type: public
 
 parser_definition_install() {
   setup  REST help:usage abbr:true -- "Install a Mush binary. Default location is \$HOME/.mush/bin" ''
@@ -835,6 +930,11 @@ run_install() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 20
+# @source_file: src/commands/legacy.sh
+# @portion_type: public
 
 parser_definition_legacy() {
   setup   REST help:usage abbr:true -- \
@@ -888,6 +988,11 @@ run_legacy() {
   #curl -sL https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions -o target/debug/legacy/gengetoptions
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 21
+# @source_file: src/commands/metadata.sh
+# @portion_type: public
 
 parser_definition_metadata() {
 	setup REST help:usage abbr:true -- "Output the resolved dependencies of a package, the concrete used versions including overrides" ''
@@ -928,6 +1033,11 @@ run_metadata() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 22
+# @source_file: src/commands/new.sh
+# @portion_type: public
 
 parser_definition_new() {
 	setup   REST help:usage abbr:true -- "Compile the current package" ''
@@ -961,6 +1071,11 @@ run_new() {
   exec_init
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 23
+# @source_file: src/commands/run.sh
+# @portion_type: public
 
 parser_definition_run() {
   setup   REST error:run_args_error help:usage abbr:true -- "Run a binary or example of the local package" ''
@@ -1055,6 +1170,11 @@ run_run() {
   exec "${bin_file}" "$@"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 24
+# @source_file: src/commands/pkgid.sh
+# @portion_type: public
 
 parser_definition_pkgid() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
@@ -1078,6 +1198,11 @@ run_pkgid() {
 
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 25
+# @source_file: src/commands/publish.sh
+# @portion_type: public
 
 parser_definition_publish() {
 	setup   REST help:usage abbr:true -- "Package and upload this package to the registry" ''
@@ -1112,6 +1237,11 @@ run_publish() {
   exec_publish
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 26
+# @source_file: src/commands/read_manifest.sh
+# @portion_type: public
 
 parser_definition_read_manifest() {
 	setup   REST help:usage abbr:true -- "Create a new mush package in an existing directory" ''
@@ -1135,6 +1265,11 @@ run_read_manifest() {
   exec_manifest_lookup
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 27
+# @source_file: src/commands/search.sh
+# @portion_type: public
 
 parser_definition_search() {
   setup   REST help:usage abbr:true -- "Search registry for package" ''
@@ -1179,6 +1314,11 @@ run_search() {
   echo "${cyan}note${reset}: to learn more about a package, run '${cyan}mush info <name>${reset}'" >&2
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 28
+# @source_file: src/commands/test.sh
+# @portion_type: public
 
 parser_definition_test() {
 	setup   REST help:usage abbr:true -- "Execute all unit and integration tests and build examples of a local package" ''
@@ -1227,6 +1367,11 @@ run_test() {
   exec "$bin_file" "$@"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 29
+# @source_file: src/commands/uninstall.sh
+# @portion_type: public
 
 parser_definition_uninstall() {
   setup  REST help:usage abbr:true -- "Remove a mush installed binary" ''
@@ -1264,6 +1409,11 @@ run_uninstall() {
 
   exec_uninstall "$package_name" "$package_version"
 }
+# @section_code: SC007
+# @section_name: source
+# @source_index: 30
+# @source_file: src/commands/info.sh
+# @portion_type: public
 
 parser_definition_info() {
 	setup REST help:usage abbr:true -- "Display information about a package in the registry" ''
@@ -1343,6 +1493,11 @@ run_info() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 31
+# @source_file: src/commands/index.sh
+# @portion_type: public
 
 parser_definition_index() {
 	setup REST help:usage abbr:true -- "Show or manage the index status of current registry" ''
@@ -1365,6 +1520,11 @@ run_index() {
   cat "$MUSH_REGISTRY_INDEX"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 32
+# @source_file: src/errors/module.sh
+# @portion_type: module
 
 extern package code_dumper
 
@@ -1417,6 +1577,11 @@ console_hint() {
   echo -e "${ESCAPE}[1;39m$1${ESCAPE}[0m" >&2
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 33
+# @source_file: target/release/packages/code_dumper/lib.sh
+# @portion_type: extern
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -1460,6 +1625,11 @@ code_dumper() {
   echo ""
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 34
+# @source_file: src/features/module.sh
+# @portion_type: module
 
 mush_feature_hook() {
   local feature
@@ -1508,6 +1678,11 @@ mush_feature_hook() {
   #echo "Warning: Feature '${feature_name}' has no '${feature_hook}' hook defined. Expected '${feature_function}'"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 35
+# @source_file: src/package_managers/module.sh
+# @portion_type: module
 
 public apt
 public basher
@@ -1517,8 +1692,23 @@ public mush
 public pip
 public path
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 36
+# @source_file: src/package_managers/apt.sh
+# @portion_type: public
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 37
+# @source_file: src/package_managers/basher.sh
+# @portion_type: public
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 38
+# @source_file: src/package_managers/bpkg.sh
+# @portion_type: public
 
 bpkg_dependency() {
   local pwd
@@ -1560,6 +1750,11 @@ bpkg_dependency() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 39
+# @source_file: src/package_managers/git.sh
+# @portion_type: public
 
 git_dependency() {
   local pwd=$PWD
@@ -1574,6 +1769,11 @@ git_dependency() {
   cd "${pwd}" || exit 101
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 40
+# @source_file: src/package_managers/mush.sh
+# @portion_type: public
 
 mush_dependency() {
   local package_name
@@ -1595,7 +1795,17 @@ mush_dependency() {
   exec_install_from_index "${package_full_name}" "${package_version_constraint}" "${dependency_type}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 41
+# @source_file: src/package_managers/pip.sh
+# @portion_type: public
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 42
+# @source_file: src/package_managers/path.sh
+# @portion_type: public
 
 mush_path_dependency() {
   local pwd
@@ -1615,10 +1825,20 @@ mush_path_dependency() {
   echo "Path: $package_name"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 43
+# @source_file: src/registry/module.sh
+# @portion_type: module
 
 public github
 public index
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 44
+# @source_file: src/registry/github.sh
+# @portion_type: public
 
 github_get_repository() {
   local repository_url
@@ -1721,6 +1941,11 @@ github_get_release_id() {
     | grep '"id"' | head -1 | sed 's/[^0-9]*//g'
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 45
+# @source_file: src/registry/index.sh
+# @portion_type: public
 
 mush_url_to_id() {
   local url="$1"
@@ -1862,6 +2087,11 @@ mush_registry_package_versions() {
 
 
   }
+# @section_code: SC007
+# @section_name: source
+# @source_index: 46
+# @source_file: src/tasks/module.sh
+# @portion_type: module
 
 public build_debug
 public build_release
@@ -1877,6 +2107,11 @@ public plugin
 public dependencies
 public uninstall
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 47
+# @source_file: src/tasks/build_debug.sh
+# @portion_type: public
 # @score: 1
 
 exec_build_bin_debug() {
@@ -1898,8 +2133,11 @@ exec_build_bin_debug() {
   local final_file="${bin_file}"
 
   export MUSH_COMPILED_MODULES=$(mktemp)
+  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
   rm -f "${MUSH_COMPILED_MODULES}"
+  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   # Init debug entrypoint
   {
@@ -2007,6 +2245,11 @@ exec_build_lib_debug() {
   mv "${build_file}" "${final_file}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 48
+# @source_file: src/tasks/build_release.sh
+# @portion_type: public
 
 exec_build_release() {
   local target_path
@@ -2066,8 +2309,11 @@ exec_build_release_bin() {
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "${src_path}" "${build_file}" "" "release"
+  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
+  compile_file "${src_path}" "${build_file}" "" "release" "entrypoint"
   rm -f "${MUSH_COMPILED_MODULES}"
+  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
   echo "# @section_code: SC006" >> "${build_file}"
@@ -2133,8 +2379,11 @@ exec_build_bin_from_src() {
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "${package_src}/src/main.sh" "${build_file}"
+  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
+  compile_file "${package_src}/src/main.sh" "${build_file}" "" "" "entrypoint"
   rm -f "${MUSH_COMPILED_MODULES}"
+  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
   echo "# @section_code: SC006" >> "${build_file}"
@@ -2186,8 +2435,11 @@ exec_build_lib_from_src() {
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
   export MUSH_COMPILED_MODULES=$(mktemp)
-  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release"
+  export MUSH_SOURCE_INDEX_FILE=$(mktemp)
+  echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
+  compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release" "lib"
   rm -f "${MUSH_COMPILED_MODULES}"
+  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"
@@ -2199,6 +2451,11 @@ exec_build_lib_from_src() {
   chmod +x "${lib_file}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 49
+# @source_file: src/tasks/build_test.sh
+# @portion_type: public
 
 exec_build_test() {
   local name=$MUSH_PACKAGE_NAME
@@ -2237,6 +2494,11 @@ exec_build_test() {
   chmod +x "${final_file}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 50
+# @source_file: src/tasks/init.sh
+# @portion_type: public
 
 exec_init() {
   local package_name=$(basename "$PWD")
@@ -2267,6 +2529,11 @@ exec_init() {
   console_status "Created" "binary (application) package"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 51
+# @source_file: src/tasks/install.sh
+# @portion_type: public
 
 exec_install_binaries() {
   local binaries
@@ -2545,6 +2812,11 @@ exec_install_lib_from_src() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 52
+# @source_file: src/tasks/legacy_fetch.sh
+# @portion_type: public
 
 exec_legacy_fetch() {
   local target_dir=$1
@@ -2582,6 +2854,11 @@ exec_legacy_fetch() {
   done
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 53
+# @source_file: src/tasks/legacy_build.sh
+# @portion_type: public
 # @score: 5
 
 exec_legacy_build() {
@@ -2612,6 +2889,11 @@ exec_legacy_build() {
   done
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 54
+# @source_file: src/tasks/manifest_lookup.sh
+# @portion_type: public
 
 exec_manifest_lookup() {
   local manifest_dir
@@ -2808,19 +3090,53 @@ ${binaries}
 EOF
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 55
+# @source_file: src/tasks/compile.sh
+# @portion_type: public
 
 
+
+compile_next_source_index() {
+  local source_index=0
+  if [ -n "${MUSH_SOURCE_INDEX_FILE:-}" ]; then
+    source_index=$(cat "${MUSH_SOURCE_INDEX_FILE}")
+    source_index=$((source_index + 1))
+    echo "${source_index}" > "${MUSH_SOURCE_INDEX_FILE}"
+  fi
+  echo "${source_index}"
+}
+
+compile_emit_source_section() {
+  local build_file=$1
+  local src_file=$2
+  local portion_type=$3
+  local source_index
+  source_index=$(compile_next_source_index)
+  # The leading newline guards against source files that lack a trailing newline:
+  # appending content directly after the last byte of a file without a newline
+  # would corrupt the artifact by merging two lines into one.
+  printf '\n' >> "${build_file}"
+  echo "# @section_code: SC007" >> "${build_file}"
+  echo "# @section_name: source" >> "${build_file}"
+  echo "# @source_index: ${source_index}" >> "${build_file}"
+  echo "# @source_file: ${src_file}" >> "${build_file}"
+  echo "# @portion_type: ${portion_type}" >> "${build_file}"
+}
 
 compile_file() {
   local src_file
   local build_file
   local manifest_directory
   local build_mode
+  local portion_type
 
   src_file=$1
   build_file=$2
   manifest_directory=${3:-$PWD}
   build_mode=${4:-debug}
+  portion_type=${5:-module}
 
   [ "${VERBOSE}" -gt 5 ] && console_status "Compiling" "'$(display_path "${src_file}")' [${build_mode}]"
 
@@ -2840,7 +3156,7 @@ compile_file() {
   mush_feature_hook compile_file "${src_file}"
 
   if [ -n "${build_file}" ]; then
-    printf '\n' >> "${build_file}"
+    compile_emit_source_section "${build_file}" "${src_file}" "${portion_type}"
     cat "${src_file}" >> "${build_file}"
     #sed '/^[[:space:]]*$/d' "${src_file}" >> "${build_file}"
   fi
@@ -2869,7 +3185,7 @@ compile_scan_legacy() {
     if [ -e "${legacy_file}" ]; then
       console_info "Legacy" "file '${legacy_file}' as module file"
       if [ -n "${build_file}" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${legacy_file}" "legacy"
         #cat "${legacy_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${legacy_file}" >> "${build_file}"
       fi
@@ -2897,10 +3213,10 @@ compile_scan_public() {
 
     if [ -e "${public_file}" ]; then
       console_info "Public" "file '${public_file}' as module file"
-      compile_file "${public_file}" "${build_file}"
+      compile_file "${public_file}" "${build_file}" "" "" "public"
     elif [ -e "${public_dir_file}" ]; then
       console_info "Public" "file '${public_dir_file}' as directory module file"
-      compile_file "${public_dir_file}" "${build_file}"
+      compile_file "${public_dir_file}" "${build_file}" "" "" "public"
     else
       console_error "File not found for module '${public_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${public_name}', create file '${public_file}' or '${public_dir_file}'."
@@ -2931,13 +3247,13 @@ compile_scan_module() {
 
     if [ -e "${module_file}" ]; then
       console_info "Import" "file '${module_file}' as module file"
-      compile_file "${module_file}" "${build_file}"
+      compile_file "${module_file}" "${build_file}" "" "" "module"
     elif [ -e "${module_dir_file}" ]; then
       console_info "Import" "file '${module_dir_file}' as directory module file"
-      compile_file "${module_dir_file}" "${build_file}"
+      compile_file "${module_dir_file}" "${build_file}" "" "" "module"
     elif [ -n "${root_src_file}" ]; then
       console_info "Import" "file '${root_src_file}' as module file"
-      compile_file "${root_src_file}" "${build_file}"
+      compile_file "${root_src_file}" "${build_file}" "" "" "module"
     else
       console_error "File not found for module '${module_name}'. Look at '${src_file}' on line ${line%:*}"
       console_log  "To create the module '${module_name}', create file '${module_file}' or '${module_dir_file}'."
@@ -2961,7 +3277,7 @@ compile_scan_extern_package() {
     if [ -e "${package_file}" ]; then
       console_info "Import" "file '${package_file}' as package file"
       if [ -n "${build_file}" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${package_file}" "extern"
         #cat "${package_file}" >> "${build_file}"
         sed '/^[[:space:]]*$/d' "${package_file}" >> "${build_file}"
       fi
@@ -2990,7 +3306,7 @@ compile_scan_embed() {
     if [ -e "${module_file}" ]; then
       console_info "Embed" "file '${module_file}' as module file"
       if [ -n "$build_file" ]; then
-        printf '\n' >> "${build_file}"
+        compile_emit_source_section "${build_file}" "${module_file}" "embed"
         mush_api_2022_embed "$module_name" "$module_file" >> "${build_file}"
       fi
     else
@@ -3003,6 +3319,11 @@ compile_scan_embed() {
   return 0
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 56
+# @source_file: src/tasks/publish.sh
+# @portion_type: public
 
 exec_publish() {
   local bin_name
@@ -3106,6 +3427,11 @@ exec_publish() {
   console_status "Uploaded" "${package_name} v${release_tag} to registry at ${download_url}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 57
+# @source_file: src/tasks/plugin.sh
+# @portion_type: public
 # @score: 5
 
 exec_plugin_list() {
@@ -3139,6 +3465,11 @@ exec_plugin_list() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 58
+# @source_file: src/tasks/dependencies.sh
+# @portion_type: public
 
 exec_dependencies() {
   local update_strategy
@@ -3261,6 +3592,11 @@ process_dependencies_build() {
   done
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 59
+# @source_file: src/tasks/uninstall.sh
+# @portion_type: public
 
 exec_uninstall() {
   local package_name="$1"
@@ -3302,6 +3638,11 @@ exec_uninstall() {
     [ "${purged}" -eq 0 ] && [ "${VERBOSE}" -gt 0 ] && console_status "Purge" "no registry cache found for '${package_name}'"
   fi
 }
+# @section_code: SC007
+# @section_name: source
+# @source_index: 60
+# @source_file: src/env.sh
+# @portion_type: module
 
 mush_env() {
   local newline
@@ -3320,9 +3661,19 @@ mush_env() {
   MUSH_TARGET="portable"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 61
+# @source_file: src/polyfill.sh
+# @portion_type: module
 
 tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 62
+# @source_file: target/release/packages/console/lib.sh
+# @portion_type: extern
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -3383,6 +3734,11 @@ console_print() {
   fi
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 63
+# @source_file: target/release/packages/getoptions/lib.sh
+# @portion_type: extern
 #!/usr/bin/env bash
 ## BP010: Release metadata
 ## @build_type: lib
@@ -3681,6 +4037,11 @@ getoptions_help() {
 	echo "}"
 }
 
+# @section_code: SC007
+# @section_name: source
+# @source_index: 64
+# @source_file: src/global.sh
+# @portion_type: embed
 global() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
