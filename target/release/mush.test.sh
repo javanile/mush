@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T17:38:18Z
+# @build_date: 2026-03-22T17:37:07Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -2260,7 +2260,6 @@ public install
 public legacy_fetch
 public legacy_build
 public manifest_lookup
-public manifest_write
 public compile
 public publish
 public plugin
@@ -3265,42 +3264,6 @@ EOF
 # @section_code: SC007
 # @section_name: source
 # @source_index: 58
-# @source_file: src/tasks/manifest_write.sh
-# @portion_type: public
-
-manifest_add_dependency() {
-  local package_name="$1"
-  local package_version="$2"
-  local dep_section="$3"
-  local manifest="${MUSH_MANIFEST_DIR}/Manifest.toml"
-  local signature tmp_file
-
-  if [ -n "${package_version}" ]; then
-    signature="mush ${package_name} ${package_version}"
-  else
-    signature="mush ${package_name} *"
-  fi
-
-  tmp_file="${manifest}.tmp"
-
-  # Remove any existing entry for this package
-  grep -v "^${package_name} =" "${manifest}" > "${tmp_file}"
-  mv "${tmp_file}" "${manifest}"
-
-  if grep -q "^\[${dep_section}\]" "${manifest}"; then
-    local section_line
-    section_line=$(grep -n "^\[${dep_section}\]" "${manifest}" | head -1 | cut -d: -f1)
-    head -n "${section_line}" "${manifest}" > "${tmp_file}"
-    echo "${package_name} = \"${signature}\"" >> "${tmp_file}"
-    tail -n "+$((section_line + 1))" "${manifest}" >> "${tmp_file}"
-    mv "${tmp_file}" "${manifest}"
-  else
-    printf '\n[%s]\n%s = "%s"\n' "${dep_section}" "${package_name}" "${signature}" >> "${manifest}"
-  fi
-}
-# @section_code: SC007
-# @section_name: source
-# @source_index: 59
 # @source_file: src/tasks/compile.sh
 # @portion_type: public
 
@@ -3529,7 +3492,7 @@ compile_scan_embed() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 60
+# @source_index: 59
 # @source_file: src/tasks/publish.sh
 # @portion_type: public
 
@@ -3637,7 +3600,7 @@ exec_publish() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 61
+# @source_index: 60
 # @source_file: src/tasks/plugin.sh
 # @portion_type: public
 # @score: 5
@@ -3674,7 +3637,7 @@ exec_plugin_list() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 62
+# @source_index: 61
 # @source_file: src/tasks/dependencies.sh
 # @portion_type: public
 
@@ -3898,7 +3861,7 @@ process_dependencies_build() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 63
+# @source_index: 62
 # @source_file: src/tasks/uninstall.sh
 # @portion_type: public
 
@@ -3944,7 +3907,7 @@ exec_uninstall() {
 }
 # @section_code: SC007
 # @section_name: source
-# @source_index: 64
+# @source_index: 63
 # @source_file: src/env.sh
 # @portion_type: module
 
@@ -3967,7 +3930,7 @@ mush_env() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 65
+# @source_index: 64
 # @source_file: src/polyfill.sh
 # @portion_type: module
 
@@ -3975,7 +3938,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 66
+# @source_index: 65
 # @source_file: target/release/packages/console/lib.sh
 # @portion_type: extern
 #!/usr/bin/env bash
@@ -4041,7 +4004,7 @@ console_print() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 67
+# @source_index: 66
 # @source_file: target/release/packages/getoptions/lib.sh
 # @portion_type: extern
 #!/usr/bin/env bash
@@ -4345,7 +4308,7 @@ getoptions_help() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 68
+# @source_index: 67
 # @source_file: src/global.sh
 # @portion_type: embed
 global() {

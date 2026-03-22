@@ -32,6 +32,7 @@ parser_definition() {
   disp  :usage      -h --help                         -- "Print help information"
 
   msg             -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   add       -- "Add a dependency to the current package"
   cmd   build     -- "Compile the current package"
   cmd   check     -- "Analyze the current package and report errors, but don't build it"
   cmd   fetch     -- "Fetch dependencies of a package from the network"
@@ -92,6 +93,9 @@ main() {
     cmd=$1
     shift
     case $cmd in
+      add)
+        run_add "$@"
+        ;;
       build)
         run_build "$@"
         ;;

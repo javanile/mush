@@ -50,6 +50,7 @@
 /home/francesco/Develop/Javanile/mush/src/tasks/legacy_fetch.sh
 /home/francesco/Develop/Javanile/mush/src/tasks/legacy_build.sh
 /home/francesco/Develop/Javanile/mush/src/tasks/manifest_lookup.sh
+/home/francesco/Develop/Javanile/mush/src/tasks/manifest_write.sh
 /home/francesco/Develop/Javanile/mush/src/tasks/compile.sh
 /home/francesco/Develop/Javanile/mush/src/tasks/publish.sh
 /home/francesco/Develop/Javanile/mush/src/tasks/plugin.sh

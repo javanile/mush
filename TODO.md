@@ -9,3 +9,6 @@ The following keyword-specific scenarios need dedicated test fixtures and verifi
 - [ ] `embed` - Two files embedding the same module (embedded function generated once)
 - [ ] `legacy` - Two files importing the same legacy module (legacy code included once)
 - [ ] `extern package` - Two files declaring the same extern package (package code included once)
+
+
+mush add name_convention@develop --dev

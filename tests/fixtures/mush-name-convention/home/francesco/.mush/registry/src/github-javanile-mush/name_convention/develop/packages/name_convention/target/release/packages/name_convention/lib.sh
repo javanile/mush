@@ -12,7 +12,7 @@ set -e
 # @package: name_convention
 # @file_type: build-library
 # @build_type: lib
-# @build_date: 2026-03-22T08:08:51Z
+# @build_date: 2026-03-22T17:38:21Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -27,7 +27,7 @@ inject() { return 0; }
 # @section_code: SC007
 # @section_name: source
 # @source_index: 1
-# @source_file: /home/francesco/Develop/Javanile/mush/packages/name_convention/src/lib.sh
+# @source_file: /home/francesco/.mush/registry/src/github-javanile-mush/name_convention/develop/packages/name_convention/src/lib.sh
 # @portion_type: lib
 
 # Plugin: name_convention

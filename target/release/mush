@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T08:09:51Z
+# @build_date: 2026-03-22T17:38:18Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -64,6 +64,7 @@ parser_definition() {
   disp  :usage      -h --help                         -- "Print help information"
 
   msg             -- '' "See '${2##*/} <command> --help' for more information on a specific command."
+  cmd   add       -- "Add a dependency to the current package"
   cmd   build     -- "Compile the current package"
   cmd   check     -- "Analyze the current package and report errors, but don't build it"
   cmd   fetch     -- "Fetch dependencies of a package from the network"
@@ -124,6 +125,9 @@ main() {
     cmd=$1
     shift
     case $cmd in
+      add)
+        run_add "$@"
+        ;;
       build)
         run_build "$@"
         ;;
@@ -623,8 +627,59 @@ public index
 # @source_file: src/commands/add.sh
 # @portion_type: public
 
-test0 () {
-  echo "TEST"
+parser_definition_add() {
+  setup   REST help:usage abbr:true -- "Add a dependency to the current package" ''
+
+  msg   -- 'USAGE:' "  ${2##*/} add [OPTIONS] <package[@version]>..." ''
+
+  msg    -- 'OPTIONS:'
+  flag   VERBOSE        -v --verbose counter:true init:=0 -- "Use verbose output (-vv or -vvv to increase level)"
+  flag   QUIET          -q --quiet                        -- "Do not print mush log messages"
+  flag   DEV               --dev                          -- "Add as a dev-dependency"
+  disp   :usage         -h --help                         -- "Print help information"
+}
+
+run_add() {
+  eval "$(getoptions parser_definition_add parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+
+  if [ $# -eq 0 ]; then
+    console_error "no packages specified\n\n    Usage: mush add <package[@version]>... [--dev]"
+    exit 101
+  fi
+
+  exec_manifest_lookup "${PWD}"
+  mush_registry_index_update
+
+  local dep_type dep_section
+  if [ -n "${DEV}" ]; then
+    dep_type="dev"
+    dep_section="dev-dependencies"
+  else
+    dep_type="prod"
+    dep_section="dependencies"
+  fi
+
+  while [ $# -gt 0 ]; do
+    local package_name package_version
+    package_name="$1"
+    package_version=""
+
+    if echo "$package_name" | grep -q '@'; then
+      package_version="${package_name##*@}"
+      package_name="${package_name%%@*}"
+    fi
+
+    [ "${VERBOSE}" -gt 0 ] && console_status "Adding" "'${package_name}' to [${dep_section}]"
+
+    exec_install_from_index "${package_name}" "${package_version}" "${dep_type}"
+    manifest_add_dependency "${package_name}" "${package_version}" "${dep_section}"
+
+    console_status "Added" "'${package_name}' to [${dep_section}] in 'Manifest.toml'"
+
+    shift
+  done
 }
 # @section_code: SC007
 # @section_name: source
@@ -2205,6 +2260,7 @@ public install
 public legacy_fetch
 public legacy_build
 public manifest_lookup
+public manifest_write
 public compile
 public publish
 public plugin
@@ -3209,6 +3265,42 @@ EOF
 # @section_code: SC007
 # @section_name: source
 # @source_index: 58
+# @source_file: src/tasks/manifest_write.sh
+# @portion_type: public
+
+manifest_add_dependency() {
+  local package_name="$1"
+  local package_version="$2"
+  local dep_section="$3"
+  local manifest="${MUSH_MANIFEST_DIR}/Manifest.toml"
+  local signature tmp_file
+
+  if [ -n "${package_version}" ]; then
+    signature="mush ${package_name} ${package_version}"
+  else
+    signature="mush ${package_name} *"
+  fi
+
+  tmp_file="${manifest}.tmp"
+
+  # Remove any existing entry for this package
+  grep -v "^${package_name} =" "${manifest}" > "${tmp_file}"
+  mv "${tmp_file}" "${manifest}"
+
+  if grep -q "^\[${dep_section}\]" "${manifest}"; then
+    local section_line
+    section_line=$(grep -n "^\[${dep_section}\]" "${manifest}" | head -1 | cut -d: -f1)
+    head -n "${section_line}" "${manifest}" > "${tmp_file}"
+    echo "${package_name} = \"${signature}\"" >> "${tmp_file}"
+    tail -n "+$((section_line + 1))" "${manifest}" >> "${tmp_file}"
+    mv "${tmp_file}" "${manifest}"
+  else
+    printf '\n[%s]\n%s = "%s"\n' "${dep_section}" "${package_name}" "${signature}" >> "${manifest}"
+  fi
+}
+# @section_code: SC007
+# @section_name: source
+# @source_index: 59
 # @source_file: src/tasks/compile.sh
 # @portion_type: public
 
@@ -3437,7 +3529,7 @@ compile_scan_embed() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 59
+# @source_index: 60
 # @source_file: src/tasks/publish.sh
 # @portion_type: public
 
@@ -3545,7 +3637,7 @@ exec_publish() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 60
+# @source_index: 61
 # @source_file: src/tasks/plugin.sh
 # @portion_type: public
 # @score: 5
@@ -3582,7 +3674,7 @@ exec_plugin_list() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 61
+# @source_index: 62
 # @source_file: src/tasks/dependencies.sh
 # @portion_type: public
 
@@ -3806,7 +3898,7 @@ process_dependencies_build() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 62
+# @source_index: 63
 # @source_file: src/tasks/uninstall.sh
 # @portion_type: public
 
@@ -3852,7 +3944,7 @@ exec_uninstall() {
 }
 # @section_code: SC007
 # @section_name: source
-# @source_index: 63
+# @source_index: 64
 # @source_file: src/env.sh
 # @portion_type: module
 
@@ -3875,7 +3967,7 @@ mush_env() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 64
+# @source_index: 65
 # @source_file: src/polyfill.sh
 # @portion_type: module
 
@@ -3883,7 +3975,7 @@ tac() { awk '{ line[NR] = $0 } END { for (i = NR; i > 0; i--) print line[i] }'; 
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 65
+# @source_index: 66
 # @source_file: target/release/packages/console/lib.sh
 # @portion_type: extern
 #!/usr/bin/env bash
@@ -3949,7 +4041,7 @@ console_print() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 66
+# @source_index: 67
 # @source_file: target/release/packages/getoptions/lib.sh
 # @portion_type: extern
 #!/usr/bin/env bash
@@ -4253,7 +4345,7 @@ getoptions_help() {
 
 # @section_code: SC007
 # @section_name: source
-# @source_index: 67
+# @source_index: 68
 # @source_file: src/global.sh
 # @portion_type: embed
 global() {
