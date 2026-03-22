@@ -1,0 +1,5 @@
+[package]
+name = "mush-examples"
+version = "0.1.0"
+edition = "2022"
+description = "Fixture package demonstrating mush examples."
