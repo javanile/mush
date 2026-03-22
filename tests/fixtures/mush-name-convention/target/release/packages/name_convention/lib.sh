@@ -12,7 +12,7 @@ set -e
 # @package: name_convention
 # @file_type: build-library
 # @build_type: lib
-# @build_date: 2026-03-22T08:08:13Z
+# @build_date: 2026-03-22T08:08:51Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -153,8 +153,19 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
         printf '%s \e[1;36m|\e[0m \e[1;31m%s%s\e[0m function must start with \e[1m%s\e[0m\n' \
           "${line_pad}" "${col_pad}" "${underline}" "${prefix}" >&2
         printf '%s \e[1;36m|\e[0m\n' "${line_pad}" >&2
+        # Derive a clean suggestion by stripping any partial wrong prefix
+        # (e.g. greeting_greet → greet, pluto_hello → hello)
+        local suggest="${func_name}"
+        case "${suggest}" in
+          "${MUSH_PACKAGE_NAME}_"*) suggest="${suggest#${MUSH_PACKAGE_NAME}_}" ;;
+        esac
+        if [ -n "${module_name}" ]; then
+          case "${suggest}" in
+            "${module_name}_"*) suggest="${suggest#${module_name}_}" ;;
+          esac
+        fi
         printf '%s \e[1;36m=\e[0m \e[1;39mhelp:\e[0m rename to \e[1m%s%s\e[0m\n' \
-          "${line_pad}" "${prefix}" "${func_name}" >&2
+          "${line_pad}" "${prefix}" "${suggest}" >&2
         ;;
     esac
   done < "${src_file}"
