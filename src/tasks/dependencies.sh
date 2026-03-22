@@ -158,14 +158,20 @@ process_dependency() {
     return $?
   fi
 
-  if [ "$3" = "*" ]; then
+  # @branch shorthand: "@develop" → mush <package_name> develop
+  local signature="$3"
+  case "${signature}" in
+    @*) signature="mush ${package_name} ${signature#@}" ;;
+  esac
+
+  if [ "${signature}" = "*" ]; then
     package_source="mush"
     package_full_name="${package_name}"
     package_version_constraint="*"
   else
-    package_source="${3%% *}"
-    package_full_name=$(echo "$3" | awk '{print $2}')
-    package_version_constraint=$(echo "$3" | awk '{print $3}')
+    package_source="${signature%% *}"
+    package_full_name=$(echo "${signature}" | awk '{print $2}')
+    package_version_constraint=$(echo "${signature}" | awk '{print $3}')
   fi
 
   update_strategy=${1:-lazy}

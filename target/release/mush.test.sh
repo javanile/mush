@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T17:50:09Z
+# @build_date: 2026-03-22T17:54:29Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -673,10 +673,12 @@ run_add() {
 
     [ "${VERBOSE}" -gt 0 ] && console_status "Adding" "'${package_name}' to [${dep_section}]"
 
+    local project_manifest_dir="${MUSH_MANIFEST_DIR}"
     MUSH_TARGET_PATH="target/release"
     MUSH_DEPS_DIR="${PWD}/target/release/packages"
     mkdir -p "${MUSH_DEPS_DIR}"
     exec_install_from_index "${package_name}" "${package_version}" "${dep_type}"
+    MUSH_MANIFEST_DIR="${project_manifest_dir}"
     manifest_add_dependency "${package_name}" "${package_version}" "${dep_section}"
 
     console_status "Added" "'${package_name}' to [${dep_section}] in 'Manifest.toml'"
@@ -3286,8 +3288,12 @@ manifest_add_dependency() {
 
   tmp_file="${manifest}.tmp"
 
-  # Remove any existing entry for this package
-  grep -v "^${package_name} =" "${manifest}" > "${tmp_file}"
+  # Remove any existing entry for this package only within the target section
+  awk -v section="${dep_section}" -v pkg="${package_name}" '
+    /^\[/ { current = substr($0, 2, index($0, "]") - 2) }
+    current == section && /^[a-z]/ && substr($0, 1, length(pkg) + 2) == pkg " =" { next }
+    { print }
+  ' "${manifest}" > "${tmp_file}"
   mv "${tmp_file}" "${manifest}"
 
   if grep -q "^\[${dep_section}\]" "${manifest}"; then

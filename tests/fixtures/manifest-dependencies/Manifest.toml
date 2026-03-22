@@ -1,0 +1,8 @@
+[package]
+name = "manifest_dependencies"
+version = "0.1.0"
+edition = "2022"
+description = "Fixture for testing all dependency declaration syntaxes."
+
+[dev-dependencies]
+name_convention = "path ../../../packages/name_convention"

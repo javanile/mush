@@ -5,6 +5,7 @@ edition = "2022"
 description = "Fixture for testing the name_convention plugin."
 
 [features]
+name_convention = true
 
 
 [dev-dependencies]

@@ -14,8 +14,12 @@ manifest_add_dependency() {
 
   tmp_file="${manifest}.tmp"
 
-  # Remove any existing entry for this package
-  grep -v "^${package_name} =" "${manifest}" > "${tmp_file}"
+  # Remove any existing entry for this package only within the target section
+  awk -v section="${dep_section}" -v pkg="${package_name}" '
+    /^\[/ { current = substr($0, 2, index($0, "]") - 2) }
+    current == section && /^[a-z]/ && substr($0, 1, length(pkg) + 2) == pkg " =" { next }
+    { print }
+  ' "${manifest}" > "${tmp_file}"
   mv "${tmp_file}" "${manifest}"
 
   if grep -q "^\[${dep_section}\]" "${manifest}"; then
