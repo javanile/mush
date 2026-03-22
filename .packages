@@ -52,13 +52,16 @@ index https://github.com/francescobianco/sev-utils
 # Main package
 package mush https://github.com/javanile/mush.git
 
-# Core components
+# Core packages
 package console https://github.com/javanile/mush.git packages/console           # Rush-style console output
 package getoptions https://github.com/javanile/mush.git packages/getoptions      # Option parsing support
 package code_dumper https://github.com/javanile/mush.git packages/code_dumper    # Code inspection utilities
 package error_trace https://github.com/javanile/mush.git packages/error_trace    # Error handling framework
 package build_logger https://github.com/javanile/mush.git packages/build_logger  # Build process logging
-package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit # Testing framework
+
+# Core plugins
+package test_with_bashunit https://github.com/javanile/mush.git packages/test_with_bashunit   # Bashunit testing framework
+package name_convention https://github.com/javanile/mush.git packages/name_convention         # Name convention for shell projects
 
 #------------------------------------------------------------------------------
 # PACKAGE MANAGERS
