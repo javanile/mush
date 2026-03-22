@@ -10,15 +10,16 @@ bash target/release/mush.test.sh build --release
 echo "====[ Test: mush add name_convention@develop --dev ]======================"
 cd tests/fixtures/mush-name-convention
 
-## Clean previous state
+## Clean previous state: remove target, lib, and the entire [dev-dependencies] section
 rm -fr target lib
-sed -i '/^name_convention/d' Manifest.toml
+awk 'BEGIN{s=0} /^\[dev-dependencies\]/{s=1;next} /^\[/{s=0} !s' Manifest.toml > Manifest.toml.tmp && mv Manifest.toml.tmp Manifest.toml
 
 ## Run mush add as a human would
 bash ../../../target/release/mush add name_convention@develop --dev
 
 ## Verify the plugin is listed in Manifest.toml under [dev-dependencies]
-grep -q 'name_convention' Manifest.toml
+grep -q '^\[dev-dependencies\]' Manifest.toml
+grep -q '^name_convention = ' Manifest.toml
 
 ## Verify the plugin files are present in the expected locations
 test -f lib/name_convention

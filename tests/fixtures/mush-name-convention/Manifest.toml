@@ -6,4 +6,6 @@ description = "Fixture for testing the name_convention plugin."
 
 [features]
 
+
 [dev-dependencies]
+name_convention = "mush name_convention develop"

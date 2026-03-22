@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T17:38:18Z
+# @build_date: 2026-03-22T17:50:09Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -673,6 +673,9 @@ run_add() {
 
     [ "${VERBOSE}" -gt 0 ] && console_status "Adding" "'${package_name}' to [${dep_section}]"
 
+    MUSH_TARGET_PATH="target/release"
+    MUSH_DEPS_DIR="${PWD}/target/release/packages"
+    mkdir -p "${MUSH_DEPS_DIR}"
     exec_install_from_index "${package_name}" "${package_version}" "${dep_type}"
     manifest_add_dependency "${package_name}" "${package_version}" "${dep_section}"
 
