@@ -63,9 +63,10 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
       *[^a-zA-Z0-9_]*) continue ;;
     esac
 
-    # Skip internal/hook functions prefixed with __
+    # Skip internal/hook functions prefixed with __ and reserved mush entrypoints
     case "${func_name}" in
       __*) continue ;;
+      main) continue ;;
     esac
 
     # Check naming convention: must start with <package_name>_
