@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T07:51:45Z
+# @build_date: 2026-03-22T07:56:45Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -672,6 +672,7 @@ run_build() {
 
   [ "$VERBOSE" -gt "3" ] && console_status "Resolving" "package dependencies"
   update_strategy=lazy
+  MUSH_DEPS_DIR="${MUSH_TARGET_PATH}/packages"
   exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 
   local package_name="${MUSH_PACKAGE_NAME}"
@@ -1882,21 +1883,28 @@ pip_install() {
 # @portion_type: public
 
 mush_path_dependency() {
-  local pwd
-  local package_name
-  local package_full_name
-  local package_version_constraint
-  local dependency_type
-  local package_cache_file
-  local package_cache_hash
+  local package_name=$1
+  local package_path=$2
+  local dependency_type=$4
 
-  pwd=$PWD
-  package_name=$1
-  package_full_name=$2
-  package_version_constraint=$3
-  dependency_type=$4
+  local resolved_path
+  resolved_path=$(cd "${package_path}" 2>/dev/null && pwd)
 
-  echo "Path: $package_name"
+  if [ -z "${resolved_path}" ] || [ ! -d "${resolved_path}" ]; then
+    console_error "path dependency '${package_name}' not found at '${package_path}'"
+    exit 101
+  fi
+
+  # Ensure MUSH_DEPS_DIR is set so exec_install_from_src does not reset
+  # MUSH_TARGET_PATH to the dependency's own target directory.  Keeping
+  # MUSH_TARGET_PATH pointing at the caller project's target tree is what
+  # makes exec_install_lib_from_src place the plugin under the right path:
+  #   <project>/target/release/plugins/<name>/plugin.sh
+  if [ -z "${MUSH_DEPS_DIR}" ]; then
+    MUSH_DEPS_DIR="${MUSH_TARGET_PATH}/packages"
+  fi
+
+  exec_install_from_src "${resolved_path}" "${dependency_type}"
 }
 
 # @section_code: SC007
@@ -3560,7 +3568,6 @@ exec_plugin_list() {
   plugins_dir="$1/plugins"
   if [ -d "$plugins_dir" ]; then
     find "$plugins_dir" -type f -name "plugin.sh" | while IFS=$'\n' read -r plugin_file; do
-      echo "Found plugin: ${plugin_file}" >&2
       plugin_name="$(basename "$(dirname "${plugin_file}")")"
       echo "${plugin_name}=${plugin_file}"
     done

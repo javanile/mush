@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -e
+
+# @section_code: SC000
+# @section_name: blueprint
+# @blueprint_name: SSP
+# @blueprint_version: 1.0
+# @blueprint_url: https://mush.javanile.org/blueprint/
+
+# @section_code: SC001
+# @section_name: file-meta
+# @package: greeting
+# @file_type: build-entrypoint
+# @build_type: bin
+# @build_with: Mush v0.2.0 (2026-03-22 develop)
+# @build_date: 2026-03-22T07:53:13Z
+
+# @section_code: SC005
+# @section_name: functions
+use() { return 0; }
+extern() { return 0; }
+legacy() { return 0; }
+module() { return 0; }
+public() { return 0; }
+embed() { return 0; }
+inject() { return 0; }
+
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/main.sh
+# @portion_type: entrypoint
+
+# This file intentionally contains naming convention violations.
+# With the name_convention plugin enabled (via [features]), the build
+# should fail with E0100 errors for the non-compliant functions.
+#
+# Package name: greeting  →  all functions must start with  greeting_
+
+# GOOD: compliant function
+greeting_hello() {
+  echo "Hello, ${1:-World}!"
+}
+
+# BAD: missing package prefix → should trigger E0100
+greet() {
+  echo "hi"
+}
+
+# BAD: wrong prefix → should trigger E0100
+say_hello() {
+  echo "hello"
+}
+
+# GOOD: compliant entrypoint
+main() {
+  greeting_hello "$@"
+}
+
+# @section_code: SC006
+# @section_name: entrypoint
+main "$@"

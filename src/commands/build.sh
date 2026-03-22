@@ -39,6 +39,7 @@ run_build() {
 
   [ "$VERBOSE" -gt "3" ] && console_status "Resolving" "package dependencies"
   update_strategy=lazy
+  MUSH_DEPS_DIR="${MUSH_TARGET_PATH}/packages"
   exec_dependencies "${MUSH_TARGET_PATH}" "${update_strategy}"
 
   local package_name="${MUSH_PACKAGE_NAME}"

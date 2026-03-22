@@ -85,13 +85,13 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
         printf '\n' >&2
         printf '\e[1;31merror\e[0m[E0100]: function \e[1m%s\e[0m violates naming convention\n' \
           "${func_name}" >&2
-        printf ' %s \e[1;36m-->\e[0m %s:%d\n' "${line_pad}" "${src_file}" "${line_num}" >&2
-        printf ' %s \e[1;36m|\e[0m\n' "${line_pad}" >&2
+        printf '%s \e[1;36m-->\e[0m %s:%d\n' "${line_pad}" "${src_file}" "${line_num}" >&2
+        printf '%s \e[1;36m|\e[0m\n' "${line_pad}" >&2
         printf '\e[1;36m%s\e[0m \e[1;36m|\e[0m %s\n' "${line_num}" "${line_content}" >&2
-        printf ' %s \e[1;36m|\e[0m \e[1;31m%s%s\e[0m function must start with \e[1m%s\e[0m\n' \
+        printf '%s \e[1;36m|\e[0m \e[1;31m%s%s\e[0m function must start with \e[1m%s\e[0m\n' \
           "${line_pad}" "${col_pad}" "${underline}" "${prefix}" >&2
-        printf ' %s \e[1;36m|\e[0m\n' "${line_pad}" >&2
-        printf ' %s \e[1;36m=\e[0m \e[1;39mhelp:\e[0m rename to \e[1m%s_%s\e[0m\n' \
+        printf '%s \e[1;36m|\e[0m\n' "${line_pad}" >&2
+        printf '%s \e[1;36m=\e[0m \e[1;39mhelp:\e[0m rename to \e[1m%s_%s\e[0m\n' \
           "${line_pad}" "${MUSH_PACKAGE_NAME}" "${func_name}" >&2
         ;;
     esac
