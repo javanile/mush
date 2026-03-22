@@ -49,7 +49,7 @@ run_build() {
   local out_file=${MUSH_TARGET_PATH}/lib.sh
   local lib_file=src/lib.sh
 
-  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+  console_status "Compiling" "${package_name} v${package_version} ($(display_path "${pwd}"))"
 
   if [ -n "${BUILD_RELEASE}" ] || [ "$BUILD_TARGET" = "release" ]; then
     exec_build_release "${MUSH_TARGET_PATH}"

@@ -35,7 +35,7 @@ run_test() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
-  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+  console_status "Compiling" "${package_name} v${package_version} ($(display_path "${pwd}"))"
 
   exec_build_test
 

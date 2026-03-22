@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T07:56:45Z
+# @build_date: 2026-03-22T08:01:45Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -682,7 +682,7 @@ run_build() {
   local out_file=${MUSH_TARGET_PATH}/lib.sh
   local lib_file=src/lib.sh
 
-  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+  console_status "Compiling" "${package_name} v${package_version} ($(display_path "${pwd}"))"
 
   if [ -n "${BUILD_RELEASE}" ] || [ "$BUILD_TARGET" = "release" ]; then
     exec_build_release "${MUSH_TARGET_PATH}"
@@ -1360,7 +1360,7 @@ run_test() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
-  console_status "Compiling" "${package_name} v${package_version} (${pwd})"
+  console_status "Compiling" "${package_name} v${package_version} ($(display_path "${pwd}"))"
 
   exec_build_test
 
