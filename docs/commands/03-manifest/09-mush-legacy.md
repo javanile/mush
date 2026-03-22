@@ -6,83 +6,57 @@ parent: Manifest
 nav_order: 09
 ---
 
-# mush-legacy
+# mush legacy
 
 ## NAME
 
-cargo-legacy - Create a new Cargo package in an existing directory
+mush legacy --- Download and register a legacy shell dependency
 
 ## SYNOPSIS
 
-cargo legacy [options] [url]
+`mush legacy` [_options_] _url_...
 
 ## DESCRIPTION
 
-This command will create a new Cargo manifest in the current directory. Give a path as an argument to create in the given directory.
+Download one or more legacy shell scripts from the given URLs and register
+them in the `[legacy]` section of the current package's `Manifest.toml`.
 
-If there are typically-named Rust source files already in the directory, those will be used. If not, then a sample src/main.rs file will be created, or src/lib.rs if --lib is passed.
+Legacy dependencies are standalone shell scripts that are not proper mush
+packages. They are fetched at manifest time, cached in
+`target/debug/legacy/`, and sourced at runtime via the `legacy` directive
+in source files.
 
-If the directory is not already in a VCS repository, then a new repository is created (see --vcs below).
-
-See cargo-new(1) for a similar command which will create a new package in a new directory.
+This command is intended as an escape hatch for integrating existing shell
+utilities that predate the mush packaging system.
 
 ## OPTIONS
 
-Init Options
---bin
-Create a package with a binary target (src/main.rs). This is the default behavior.
---lib
-Create a package with a library target (src/lib.rs).
---edition edition
-Specify the Rust edition to use. Default is 2021. Possible values: 2015, 2018, 2021
---name name
-Set the package name. Defaults to the directory name.
---vcs vcs
-Initialize a new VCS repository for the given version control system (git, hg, pijul, or fossil) or do not initialize any version control at all (none). If not specified, defaults to git or the configuration value cargo-new.vcs, or none if already inside a VCS repository.
---registry registry
-This sets the publish field in Cargo.toml to the given registry name which will restrict publishing only to that registry.
-Registry names are defined in Cargo config files. If not specified, the default registry defined by the registry.default config key is used. If the default registry is not set and --registry is not used, the publish field will not be set which means that publishing will not be restricted.
+<dl>
 
-### Display Options
+<dt><code>-n</code>, <code>--name</code> <em>name</em></dt>
+<dd>Override the name used to register the dependency (defaults to the
+basename of the URL).</dd>
 
--v
---verbose
-Use verbose output. May be specified twice for "very verbose" output which includes extra output such as dependency warnings and build script output. May also be specified with the term.verbose config value.
--q
---quiet
-Do not print cargo log messages. May also be specified with the term.quiet config value.
---color when
-Control when colored output is used. Valid values:
-auto (default): Automatically detect if color support is available on the terminal.
-always: Always display colors.
-never: Never display colors.
-May also be specified with the term.color config value.
+<dt><code>-h</code>, <code>--help</code></dt>
+<dd>Print help information.</dd>
 
-### Common Options
-
-+toolchain
-If Cargo has been installed with rustup, and the first argument to cargo begins with +, it will be interpreted as a rustup toolchain name (such as +stable or +nightly). See the rustup documentation for more information about how toolchain overrides work.
---config KEY=VALUE or PATH
-Overrides a Cargo configuration value. The argument should be in TOML syntax of KEY=VALUE, or provided as a path to an extra configuration file. This flag may be specified multiple times. See the command-line overrides section for more information.
--h
---help
-Prints help information.
--Z flag
-Unstable (nightly-only) flags to Cargo. Run cargo -Z help for details.
-
-## ENVIRONMENT
-
-See the reference for details on environment variables that Cargo reads.
+</dl>
 
 ## EXIT STATUS
 
-0: Cargo succeeded.
-101: Cargo failed to complete.
-EXAMPLES
-Create a binary Cargo package in the current directory:
+* `0` — mush succeeded.
+* `101` — mush failed to complete.
 
-cargo init
+## EXAMPLES
+
+1. Download and register a legacy utility:
+
+       mush legacy https://example.com/utils/colors.sh
+
+2. Register it under a custom name:
+
+       mush legacy --name colors https://example.com/utils/colors.sh
 
 ## SEE ALSO
 
-cargo(1), cargo-new(1)
+[mush(1)](/commands/mush/), [The Manifest File](/manifest/)
