@@ -45,6 +45,9 @@ run_add() {
 
     [ "${VERBOSE}" -gt 0 ] && console_status "Adding" "'${package_name}' to [${dep_section}]"
 
+    MUSH_TARGET_PATH="target/release"
+    MUSH_DEPS_DIR="${PWD}/target/release/packages"
+    mkdir -p "${MUSH_DEPS_DIR}"
     exec_install_from_index "${package_name}" "${package_version}" "${dep_type}"
     manifest_add_dependency "${package_name}" "${package_version}" "${dep_section}"
 
