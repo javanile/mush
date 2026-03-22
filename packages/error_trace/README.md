@@ -1,33 +1,30 @@
-# 🍄️ Console
+# error_trace
 
-Console is a simple Mush module that print amazing output in Rush-style!
+> **Status: draft** — plugin scaffolding exists, behavior is not yet implemented.
+
+A mush plugin (`type = "plugin"` in `Manifest.toml`) that hooks into the
+debug build pipeline to inject error tracing logic into compiled artifacts.
+
+When complete, `error_trace` will add a `trap ERR` handler to debug builds
+that prints a formatted stack trace (file, line, function call tree) whenever
+a command exits with a non-zero status.
+
+## How plugins work
+
+Unlike regular library packages, `error_trace` is a **plugin**: it
+participates in mush's build pipeline by implementing named hook functions.
+The hook `__plugin_error_trace__feature_error_dumper__hook_build_debug_head_section`
+is called during debug artifact generation and can inject code into the
+artifact's head section.
 
 ## Installation
 
-To use Console, add it as a dependency in your `Manifest.toml`:
-
 ```toml
 [dependencies]
-console = "mush console"
+error_trace = "mush error_trace"
 ```
 
-## Usage
+## Status
 
-Console is incredibly easy to use. Simply follow these steps to get started:
-
-1. Import the module into your project.
-2. Call the provided functions to enjoy its amazing features.
-
-Here's a basic example of how to use MyRustModule in your Rust code:
-
-```shell
-extern package console
-
-main() {
-    console_log "Hello World!"
-}
-```
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+The hook scaffold is in place. Error tracing output and the injection logic
+are not yet implemented.

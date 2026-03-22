@@ -1,33 +1,58 @@
-# 🍄️ Console
+# getoptions
 
-Console is a simple Mush module that print amazing output in Rush-style!
+Wraps [ko1nksm/getoptions](https://github.com/ko1nksm/getoptions) v3.3.0 as
+a mush package. `getoptions` is a POSIX-compliant, zero-dependency option
+parser for shell scripts.
+
+mush itself uses `getoptions` internally to parse all CLI arguments.
 
 ## Installation
 
-To use Console, add it as a dependency in your `Manifest.toml`:
-
 ```toml
 [dependencies]
-console = "mush console"
+getoptions = "mush getoptions"
 ```
+
+## How it works
+
+The package uses `[legacy-fetch]` to download the `getoptions` and
+`gengetoptions` binaries from the official GitHub release, then
+`[legacy-build]` to generate the embeddable library:
+
+```toml
+[legacy-fetch]
+getoptions    = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/getoptions"
+gengetoptions = "file https://github.com/ko1nksm/getoptions/releases/download/v3.3.0/gengetoptions"
+
+[legacy-build]
+getoptions = "gengetoptions library > __getoptions.sh"
+```
+
+The generated `__getoptions.sh` is then available via the `legacy getoptions`
+directive in `src/lib.sh`.
 
 ## Usage
 
-Console is incredibly easy to use. Simply follow these steps to get started:
+```bash
+extern package getoptions
 
-1. Import the module into your project.
-2. Call the provided functions to enjoy its amazing features.
-
-Here's a basic example of how to use MyRustModule in your Rust code:
-
-```shell
-extern package console
+parser_definition() {
+  setup REST help:usage -- "My tool"
+  flag   VERBOSE -v --verbose -- "Enable verbose output"
+  param  OUTPUT  -o --output  -- "Output file"
+  disp   :usage  -h --help
+}
 
 main() {
-    console_log "Hello World!"
+  eval "$(getoptions parser_definition parse "$0")"
+  parse "$@"
+  eval "set -- $REST"
+  # ...
 }
 ```
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+`getoptions` is distributed under the Creative Commons Zero v1.0 Universal
+license by Koichi Nakashima. See the
+[upstream repository](https://github.com/ko1nksm/getoptions) for details.
