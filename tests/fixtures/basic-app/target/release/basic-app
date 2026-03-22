@@ -1,10 +1,22 @@
 #!/usr/bin/env bash
-# @BP010: Release metadata
-# @package: basic-app
-# @build_type: bin
-# @build_with: Mush v0.2.0 (2026-01-27 develop)
-# @build_date: 2026-01-27T18:55:04Z
 set -e
+
+# @section_code: SC000
+# @section_name: blueprint
+# @blueprint_name: SSP
+# @blueprint_version: 1.0
+# @blueprint_url: https://mush.javanile.org/blueprint/
+
+# @section_code: SC001
+# @section_name: file-meta
+# @package: basic-app
+# @file_type: build-entrypoint
+# @build_type: bin
+# @build_with: Mush v0.2.0 (2026-03-22 develop)
+# @build_date: 2026-03-22T00:17:34Z
+
+# @section_code: SC005
+# @section_name: functions
 use() { return 0; }
 extern() { return 0; }
 legacy() { return 0; }
@@ -12,7 +24,12 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
-## BP004: Compile the entrypoint
+
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/main.sh
+# @portion_type: entrypoint
 
 embed myembed
 
@@ -67,6 +84,12 @@ main() {
   myembed sample_var
 
 }
+
+# @section_code: SC007
+# @section_name: source
+# @source_index: 2
+# @source_file: src/myembed.sh
+# @portion_type: embed
 myembed() {
   if [ -z "$1" ]; then
     cat <<'EMBED'
@@ -89,5 +112,7 @@ EMBED
     esac
   fi
 }
-## BP005: Execute the entrypoint
+
+# @section_code: SC006
+# @section_name: entrypoint
 main "$@"

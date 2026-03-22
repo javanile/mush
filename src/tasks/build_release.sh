@@ -61,7 +61,6 @@ exec_build_release_bin() {
   export MUSH_SOURCE_INDEX_FILE="target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_path}" "${build_file}" "" "release" "entrypoint"
-  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
   echo "# @section_code: SC006" >> "${build_file}"
@@ -131,7 +130,6 @@ exec_build_bin_from_src() {
   export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/main.sh" "${build_file}" "" "" "entrypoint"
-  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   echo "" >> "${build_file}"
   echo "# @section_code: SC006" >> "${build_file}"
@@ -187,7 +185,6 @@ exec_build_lib_from_src() {
   export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release" "lib"
-  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   ## Generate binary on target
   cp "${build_file}" "${final_file}"

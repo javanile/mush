@@ -23,7 +23,6 @@ exec_build_bin_debug() {
   export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
-  rm -f "${MUSH_SOURCE_INDEX_FILE}"
 
   # Init debug entrypoint
   {
