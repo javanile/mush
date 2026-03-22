@@ -61,7 +61,18 @@ exec_build_bin_debug() {
   MUSH_TARGET_FILE="${bin_file}"
   MUSH_TARGET_PATH="$(dirname "${bin_file}")"
   MUSH_DEBUG_TARGET_FILE="${PWD}/${bin_file}"
-  MUSH_DEBUG_PATH="${PWD}"
+
+  # Compute the relative path from the artifact back to the package root
+  # at build time, so the artifact is portable across machines/moves.
+  # e.g. target/debug/mybin       -> dirname = target/debug    -> up = "/../.."
+  #      target/debug/examples/ex -> dirname = target/debug/examples -> up = "/../../.."
+  local _dir
+  _dir="$(dirname "${bin_file}")"
+  local _up=""
+  while [ "${_dir}" != "." ] && [ "${_dir}" != "/" ]; do
+    _up="${_up}/.."
+    _dir="$(dirname "${_dir}")"
+  done
 
   {
     echo "# @section_code: SC003"
@@ -70,8 +81,7 @@ exec_build_bin_debug() {
     echo "MUSH_TARGET_FILE=\"${MUSH_TARGET_FILE}\""
     echo "MUSH_TARGET_PATH=\"${MUSH_TARGET_PATH}\""
     echo "MUSH_DEBUG_TARGET_FILE=\"\$(realpath \"\$0\")\""
-    #echo "MUSH_DEBUG_PATH=\"\$(realpath \"\$(dirname \"\$0\")/../..\")\""
-    echo "MUSH_DEBUG_PATH=\"${MUSH_DEBUG_PATH}\""
+    echo "MUSH_DEBUG_PATH=\"\$(cd \"\$(dirname \"\$0\")${_up}\" && pwd)\""
     echo ""
   } >> "${build_file}"
 

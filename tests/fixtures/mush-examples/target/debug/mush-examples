@@ -9,7 +9,7 @@ set -e
 
 # @section_code: SC001
 # @section_name: file-meta
-# @file_path: target/debug/examples/hello
+# @file_path: target/debug/mush-examples
 # @file_type: build-entrypoint
 
 # @section_code: SC002
@@ -18,10 +18,10 @@ set -e
 # @section_code: SC003
 # @section_name: config
 MUSH_PACKAGE_NAME="mush-examples"
-MUSH_TARGET_FILE="target/debug/examples/hello"
-MUSH_TARGET_PATH="target/debug/examples"
+MUSH_TARGET_FILE="target/debug/mush-examples"
+MUSH_TARGET_PATH="target/debug"
 MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
-MUSH_DEBUG_PATH="$(cd "$(dirname "$0")/../../.." && pwd)"
+MUSH_DEBUG_PATH="$(cd "$(dirname "$0")/../.." && pwd)"
 
 # @section_code: SC004
 # @section_name: debug-api
@@ -180,5 +180,5 @@ mush_api_2022_embed() {
 # @section_code: SC005
 # @section_name: execution
 debug init
-debug file "${MUSH_DEBUG_PATH}/examples/hello.sh"
+debug file "${MUSH_DEBUG_PATH}/src/main.sh"
 main "$@"
