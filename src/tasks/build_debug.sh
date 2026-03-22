@@ -9,7 +9,7 @@ exec_build_bin_debug() {
   bin_file=$2
   lib_file=$3
 
-  mkdir -p "$(dirname "${bin_file}")"
+  mkdir -p "$(dirname "${bin_file}")" "$(dirname "${bin_file}")/logs"
 
   #echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
 
@@ -18,9 +18,9 @@ exec_build_bin_debug() {
   local build_file="${bin_file}.tmp"
   local final_file="${bin_file}"
 
-  export MUSH_COMPILED_MODULES="$(dirname "${bin_file}")/modules.log"
+  export MUSH_COMPILED_MODULES="$(dirname "${bin_file}")/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
 
@@ -115,8 +115,8 @@ exec_build_lib_debug() {
   lib_file="$1"
   out_file="$2"
 
-  mkdir -p "$(dirname "${out_file}")"
-  export MUSH_COMPILED_MODULES="$(dirname "${out_file}")/modules.log"
+  mkdir -p "$(dirname "${out_file}")" "$(dirname "${out_file}")/logs"
+  export MUSH_COMPILED_MODULES="$(dirname "${out_file}")/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
   compile_file "${lib_file}"
 

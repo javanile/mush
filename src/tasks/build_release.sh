@@ -56,9 +56,10 @@ exec_build_release_bin() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="target/release/modules.log"
+  mkdir -p target/release/logs
+  export MUSH_COMPILED_MODULES="target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_path}" "${build_file}" "" "release" "entrypoint"
 
@@ -125,9 +126,10 @@ exec_build_bin_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  mkdir -p "${package_src}/target/release/logs"
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/main.sh" "${build_file}" "" "" "entrypoint"
 
@@ -180,9 +182,10 @@ exec_build_lib_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  mkdir -p "${package_src}/target/release/logs"
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release" "lib"
 

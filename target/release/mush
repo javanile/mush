@@ -12,8 +12,8 @@ set -e
 # @package: mush
 # @file_type: build-entrypoint
 # @build_type: bin
-# @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T00:18:51Z
+# @build_with: : 
+# @build_date: 2026-03-22T00:23:20Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -2219,7 +2219,7 @@ exec_build_bin_debug() {
   bin_file=$2
   lib_file=$3
 
-  mkdir -p "$(dirname "${bin_file}")"
+  mkdir -p "$(dirname "${bin_file}")" "$(dirname "${bin_file}")/logs"
 
   #echo "BUILD_DEBUG: ${src_file} -> ${bin_file}"
 
@@ -2228,9 +2228,9 @@ exec_build_bin_debug() {
   local build_file="${bin_file}.tmp"
   local final_file="${bin_file}"
 
-  export MUSH_COMPILED_MODULES="$(dirname "${bin_file}")/modules.log"
+  export MUSH_COMPILED_MODULES="$(dirname "${bin_file}")/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="$(dirname "${bin_file}")/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_file}"
 
@@ -2325,8 +2325,8 @@ exec_build_lib_debug() {
   lib_file="$1"
   out_file="$2"
 
-  mkdir -p "$(dirname "${out_file}")"
-  export MUSH_COMPILED_MODULES="$(dirname "${out_file}")/modules.log"
+  mkdir -p "$(dirname "${out_file}")" "$(dirname "${out_file}")/logs"
+  export MUSH_COMPILED_MODULES="$(dirname "${out_file}")/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
   compile_file "${lib_file}"
 
@@ -2402,9 +2402,10 @@ exec_build_release_bin() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="target/release/modules.log"
+  mkdir -p target/release/logs
+  export MUSH_COMPILED_MODULES="target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${src_path}" "${build_file}" "" "release" "entrypoint"
 
@@ -2471,9 +2472,10 @@ exec_build_bin_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  mkdir -p "${package_src}/target/release/logs"
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/main.sh" "${build_file}" "" "" "entrypoint"
 
@@ -2526,9 +2528,10 @@ exec_build_lib_from_src() {
   echo "# @section_code: SC005" >> "${build_file}"
   echo "# @section_name: functions" >> "${build_file}"
   release_2022 >> "${build_file}"
-  export MUSH_COMPILED_MODULES="${package_src}/target/release/modules.log"
+  mkdir -p "${package_src}/target/release/logs"
+  export MUSH_COMPILED_MODULES="${package_src}/target/release/logs/modules.log"
   > "${MUSH_COMPILED_MODULES}"
-  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/source-index.log"
+  export MUSH_SOURCE_INDEX_FILE="${package_src}/target/release/logs/source-index.log"
   echo "0" > "${MUSH_SOURCE_INDEX_FILE}"
   compile_file "${package_src}/src/lib.sh" "${build_file}" "${package_src}" "release" "lib"
 
