@@ -5,6 +5,8 @@
 #
 # Package name: greeting  →  all functions must start with  greeting_
 
+module pluto
+
 # GOOD: compliant function
 greeting_hello() {
   echo "Hello, ${1:-World}!"

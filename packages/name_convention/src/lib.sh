@@ -2,7 +2,10 @@
 # Plugin: name_convention
 #
 # Enforces that every function defined in the package's source files
-# follows the naming convention:  <package_name>_<function_name>
+# follows the naming convention:
+#   src/main.sh, src/lib.sh   →  <package>_<func>
+#   src/pluto.sh              →  <package>_pluto_<func>
+#   src/pluto/module.sh       →  <package>_pluto_<func>
 #
 # Activation: add [features] name_convention = true to Manifest.toml
 # Hook fires once per source file compiled.
@@ -23,7 +26,35 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
     target/*) return 0 ;;
   esac
 
-  local prefix="${MUSH_PACKAGE_NAME}_"
+  # Derive the required prefix from the source file path:
+  #   src/main.sh, src/lib.sh   → <package>_
+  #   src/pluto.sh              → <package>_pluto_
+  #   src/pluto/module.sh       → <package>_pluto_  (directory module)
+  local src_base src_dir module_name
+  src_base=$(basename "${src_file}" .sh)
+  src_dir=$(dirname "${src_file}")
+  case "${src_base}" in
+    main|lib)
+      module_name=""
+      ;;
+    module)
+      module_name=$(basename "${src_dir}")
+      case "${module_name}" in
+        src|.) module_name="" ;;
+      esac
+      ;;
+    *)
+      module_name="${src_base}"
+      ;;
+  esac
+
+  local prefix
+  if [ -n "${module_name}" ]; then
+    prefix="${MUSH_PACKAGE_NAME}_${module_name}_"
+  else
+    prefix="${MUSH_PACKAGE_NAME}_"
+  fi
+
   local errors=0
   local line_num=0
   local func_name
@@ -69,9 +100,9 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
       main) continue ;;
     esac
 
-    # Check naming convention: must start with <package_name>_
+    # Check naming convention: must start with the required prefix
     case "${func_name}" in
-      "${MUSH_PACKAGE_NAME}_"*)
+      "${prefix}"*)
         # Compliant — no action
         ;;
       *)
@@ -91,8 +122,8 @@ __plugin_name_convention__feature_name_convention__hook_compile_file() {
         printf '%s \e[1;36m|\e[0m \e[1;31m%s%s\e[0m function must start with \e[1m%s\e[0m\n' \
           "${line_pad}" "${col_pad}" "${underline}" "${prefix}" >&2
         printf '%s \e[1;36m|\e[0m\n' "${line_pad}" >&2
-        printf '%s \e[1;36m=\e[0m \e[1;39mhelp:\e[0m rename to \e[1m%s_%s\e[0m\n' \
-          "${line_pad}" "${MUSH_PACKAGE_NAME}" "${func_name}" >&2
+        printf '%s \e[1;36m=\e[0m \e[1;39mhelp:\e[0m rename to \e[1m%s%s\e[0m\n' \
+          "${line_pad}" "${prefix}" "${func_name}" >&2
         ;;
     esac
   done < "${src_file}"
