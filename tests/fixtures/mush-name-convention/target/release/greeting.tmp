@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T07:43:48Z
+# @build_date: 2026-03-22T07:45:09Z
 
 # @section_code: SC005
 # @section_name: functions
