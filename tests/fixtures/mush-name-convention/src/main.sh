@@ -1,9 +1,9 @@
 
-# This file intentionally contains naming convention violations.
-# With the name_convention plugin enabled (via [features]), the build
-# should fail with E0100 errors for the non-compliant functions.
+# Rule 1: all functions in src/main.sh must start with  greeting_
+# Rule 2: functions in src/<module>.sh must start with  greeting_<module>_
 #
-# Package name: greeting  →  all functions must start with  greeting_
+# This file is intentionally compliant to let rule-2 violations in
+# src/pluto.sh surface during the build.
 
 module pluto
 
@@ -12,17 +12,7 @@ greeting_hello() {
   echo "Hello, ${1:-World}!"
 }
 
-# BAD: missing package prefix → should trigger E0100
-greet() {
-  echo "hi"
-}
-
-# BAD: wrong prefix → should trigger E0100
-say_hello() {
-  echo "hello"
-}
-
-# GOOD: compliant entrypoint
+# GOOD: compliant entrypoint (main is always exempt)
 main() {
   greeting_hello "$@"
 }

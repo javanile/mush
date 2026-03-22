@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T08:06:48Z
+# @build_date: 2026-03-22T08:08:13Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -24,3 +24,27 @@ module() { return 0; }
 public() { return 0; }
 embed() { return 0; }
 inject() { return 0; }
+
+# @section_code: SC007
+# @section_name: source
+# @source_index: 1
+# @source_file: src/main.sh
+# @portion_type: entrypoint
+
+# Rule 1: all functions in src/main.sh must start with  greeting_
+# Rule 2: functions in src/<module>.sh must start with  greeting_<module>_
+#
+# This file is intentionally compliant to let rule-2 violations in
+# src/pluto.sh surface during the build.
+
+module pluto
+
+# GOOD: compliant function
+greeting_hello() {
+  echo "Hello, ${1:-World}!"
+}
+
+# GOOD: compliant entrypoint (main is always exempt)
+main() {
+  greeting_hello "$@"
+}
