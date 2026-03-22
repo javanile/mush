@@ -1,0 +1,11 @@
+[package]
+name = "greeting"
+version = "0.1.0"
+edition = "2022"
+description = "Fixture for testing the name_convention plugin."
+
+[features]
+name_convention = true
+
+[dev-dependencies]
+name_convention = "path ../../../packages/name_convention"

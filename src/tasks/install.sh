@@ -240,7 +240,7 @@ exec_install_lib_from_src() {
   local lib_package_dir=${pwd}/${MUSH_TARGET_PATH}/packages/${lib_name}
   local lib_package_file=${lib_package_dir}/lib.sh
   local lib_plugin_dir=${pwd}/${MUSH_TARGET_PATH}/plugins
-  local lib_plugin_file=${lib_plugin_dir}/${lib_name}.sh
+  local lib_plugin_file=${lib_plugin_dir}/${lib_name}/plugin.sh
   local final_file=${package_src}/target/release/lib.sh
 
   local cp=cp
@@ -264,7 +264,7 @@ exec_install_lib_from_src() {
   fi
 
   if [ "${MUSH_PACKAGE_TYPE}" = "plugin" ]; then
-    mkdir -p "${lib_plugin_dir}"
+    mkdir -p "${lib_plugin_dir}/${lib_name}"
     ${cp} "${final_file}" "${lib_plugin_file}"
     ${chmod} +x "${lib_plugin_file}"
   fi
