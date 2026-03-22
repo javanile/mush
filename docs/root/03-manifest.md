@@ -197,10 +197,55 @@ Version constraint syntax:
 
 | Constraint | Meaning |
 | ---------- | ------- |
-| `"*"` | Any version |
+| `"*"` | Any version (latest published release) |
 | `"1.2.0"` | Exact version |
 | `">=1.2.0"` | At least this version |
 | `"^1.2.0"` | Compatible with `1.2.x` (semver caret) |
+
+### Tracking a branch
+
+Some packages are only available on a development branch and have not yet
+published a semver release. To pin a dependency to a specific branch, use the
+**`@branch` shorthand**:
+
+```toml
+[dev-dependencies]
+name_convention = "@develop"
+```
+
+The `@` prefix tells mush that the value is a **branch name**, not a version
+tag. The line above is exactly equivalent to the full explicit form:
+
+```toml
+[dev-dependencies]
+name_convention = "mush name_convention develop"
+```
+
+You can confirm which branches are available for a package with:
+
+```sh
+mush info <package>
+```
+
+For example, `mush info mush-demo` prints:
+
+```
+Name: mush-demo
+Repo: https://github.com/francescobianco/mush-demo
+
+Versions:
+ - main       ← branch
+ - v0.3.0     ← tag
+ - v0.2.0     ← tag
+ - v0.1.0     ← tag
+```
+
+Use `@main`, `@develop`, etc. to track branches; use a bare version string
+(`"1.2.0"`, `"*"`) for published releases.
+
+> **Note:** Branch dependencies are not pinned to a specific commit. Every
+> `mush build` will use whatever HEAD of that branch is in the local cache.
+> For reproducible builds, prefer semver tags.
 
 ### System dependencies — multi-registry support
 

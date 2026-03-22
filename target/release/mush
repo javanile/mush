@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T18:07:18Z
+# @build_date: 2026-03-22T18:16:59Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -854,6 +854,10 @@ run_fetch() {
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
+
+  MUSH_TARGET_PATH="target/release"
+  MUSH_DEPS_DIR="${PWD}/target/release/packages"
+  mkdir -p "${MUSH_DEPS_DIR}"
 
   mush_registry_index_update
 
@@ -2786,6 +2790,14 @@ exec_install_from_index() {
   dependency_type=$3
 
   package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+
+  # Manifest parser converts dashes to underscores; try the dash form as fallback
+  if [ -z "${package_search}" ]; then
+    local dash_name
+    dash_name=$(echo "${package_name}" | tr '_' '-')
+    [ "${dash_name}" != "${package_name}" ] && \
+      package_search=$(grep "^${dash_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+  fi
 
   if [ -z "${package_search}" ]; then
     local version_label="${package_version_constraint:-*}"

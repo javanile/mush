@@ -13,7 +13,7 @@ set -e
 # @file_type: build-entrypoint
 # @build_type: bin
 # @build_with: Mush v0.2.0 (2026-03-22 develop)
-# @build_date: 2026-03-22T17:54:29Z
+# @build_date: 2026-03-22T18:14:49Z
 
 # @section_code: SC005
 # @section_name: functions
@@ -854,6 +854,10 @@ run_fetch() {
   local package_name="${MUSH_PACKAGE_NAME}"
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
+
+  MUSH_TARGET_PATH="target/release"
+  MUSH_DEPS_DIR="${PWD}/target/release/packages"
+  mkdir -p "${MUSH_DEPS_DIR}"
 
   mush_registry_index_update
 
@@ -3846,14 +3850,20 @@ process_dependency() {
     return $?
   fi
 
-  if [ "$3" = "*" ]; then
+  # @branch shorthand: "@develop" → mush <package_name> develop
+  local signature="$3"
+  case "${signature}" in
+    @*) signature="mush ${package_name} ${signature#@}" ;;
+  esac
+
+  if [ "${signature}" = "*" ]; then
     package_source="mush"
     package_full_name="${package_name}"
     package_version_constraint="*"
   else
-    package_source="${3%% *}"
-    package_full_name=$(echo "$3" | awk '{print $2}')
-    package_version_constraint=$(echo "$3" | awk '{print $3}')
+    package_source="${signature%% *}"
+    package_full_name=$(echo "${signature}" | awk '{print $2}')
+    package_version_constraint=$(echo "${signature}" | awk '{print $3}')
   fi
 
   update_strategy=${1:-lazy}

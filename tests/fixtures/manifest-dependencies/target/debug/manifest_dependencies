@@ -1,0 +1,184 @@
+#!/usr/bin/env bash
+set -e
+
+# @section_code: SC000
+# @section_name: blueprint
+# @blueprint_name: SSP
+# @blueprint_version: 1.0
+# @blueprint_url: https://mush.javanile.org/blueprint/
+
+# @section_code: SC001
+# @section_name: file-meta
+# @file_path: target/debug/manifest_dependencies
+# @file_type: build-entrypoint
+
+# @section_code: SC002
+# @section_name: debug-entrypoint-init
+
+# @section_code: SC003
+# @section_name: config
+MUSH_PACKAGE_NAME="manifest_dependencies"
+MUSH_TARGET_FILE="target/debug/manifest_dependencies"
+MUSH_TARGET_PATH="target/debug"
+MUSH_DEBUG_TARGET_FILE="$(realpath "$0")"
+MUSH_DEBUG_PATH="$(cd "$(dirname "$0")/../.." && pwd)"
+
+# @section_code: SC004
+# @section_name: debug-api
+debug() {
+  local api
+  api=$1
+  case "${api}" in
+    init)
+      extern() {
+        local debug_file=$MUSH_DEBUG_FILE
+        if [ "$1" = "package" ]; then
+          local package_name=$MUSH_PACKAGE_NAME
+          local extern_package_name=$2
+          local extern_package_path="${MUSH_DEBUG_PATH}/${MUSH_TARGET_PATH}/packages/${extern_package_name}"
+          local extern_package_lib_file="${MUSH_DEBUG_PATH}/${MUSH_TARGET_PATH}/packages/${extern_package_name}/lib.sh"
+          if [ -d "${extern_package_path}" ]; then
+            debug file "${extern_package_lib_file}"
+            debug init
+          else
+            echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+            error_package_not_found "${extern_package_name}" "${debug_file}"
+            exit 1
+          fi
+        else
+          echo "   Compiling rust-app v0.1.0 (/home/francesco/Develop/Javanile/mush/tests/fixtures/rust-app)"
+          echo "error: expected one of 'package' or '{', found '$1'"
+          echo " --> ${debug_file}:8:8"
+          echo "  |"
+          echo "8 | extern cavallo json;"
+          echo "  |        ^^^^^^^ expected one of 'package' or '{'"
+          echo ""
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      legacy() {
+        local legacy_file="target/debug/legacy/__$1.sh"
+        local legacy_file_path="${MUSH_DEBUG_PATH}/${legacy_file}"
+        if [ ! -f "$legacy_file_path" ]; then
+          echo "File not found '${legacy_file}', type 'mush build' to recover this problem." >&2
+          exit 101
+        fi
+        . "${legacy_file_path}"
+      }
+      module() {
+        local module_name=$1
+        local module_file="src/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        local debug_file=$MUSH_DEBUG_FILE
+        local package_name=$MUSH_PACKAGE_NAME
+        if [ -f "${module_file_path}" ]; then
+          . "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          MUSH_RUNTIME_MODULE=$1
+          . "${module_dir_file_path}"
+        else
+          console_error_code E0583 "file not found for module '${module_name}'"
+          [ "${VERBOSE}" -gt 6 ] && echo "File not found: ${module_file_path} (package_dir: ${extern_package_dir})"
+          echo " --> ${debug_file}:4:1"
+          echo "  |"
+          echo "4 | mod notfound;"
+          echo "  | ^^^^^^^^^^^^^"
+          echo "  |"
+          echo "  = help: to create the module '${module_name}', create file 'src/${module_name}.sh' or 'src/${module_name}/module.sh'"
+          echo ""
+          echo "For more information about this error, try 'mush explain E0583'."
+          echo "error: could not compile '${package_name}' due to previous error"
+          exit 1
+        fi
+      }
+      public() {
+        local module_file="src/$MUSH_RUNTIME_MODULE/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        local module_dir_file="src/$MUSH_RUNTIME_MODULE/$1/module.sh"
+        local module_dir_file_path="${MUSH_DEBUG_PATH}/${module_dir_file}"
+        if [ -f "${module_file_path}" ]; then
+          . "${module_file_path}"
+        elif [ -f "${module_dir_file_path}" ]; then
+          . "${module_dir_file_path}"
+        else
+          echo "Public module not found: '${module_file_path}' or '${module_dir_file_path}'." >&2
+          exit 101
+        fi
+      }
+      use() {
+        return 0
+      }
+      embed() {
+        local module_file="src/${MUSH_RUNTIME_MODULE}/$1.sh"
+        local module_file_path="${MUSH_DEBUG_PATH}/${module_file}"
+        eval "$(mush_api_2022_embed "$1" "${module_file_path}")"
+      }
+      inject() {
+        return 0
+      }
+      ;;
+    file)
+      local previous_debug_file=$MUSH_DEBUG_FILE
+      MUSH_DEBUG_FILE=$2
+      . "$2"
+      MUSH_DEBUG_FILE=$previous_debug_file
+      ;;
+    *)
+  esac
+}
+mush_api_2022_embed() {
+  local module_name
+  local module_file
+  local inject_type
+  local inject_name
+  local inject_file
+  local inject_data
+  module_name=$1
+  module_file=$2
+  echo "${module_name}() {"
+  echo "  if [ -z \"\$1\" ]; then"
+  echo "    cat <<'EMBED'"
+  #cat "$module_file" | tr -s '\n'
+  sed '/^[[:space:]]*$/d' "${module_file}"
+  echo "EMBED"
+  echo "  else"
+  echo "    case \"\$1\" in"
+  grep -n '^inject [a-z][a-z]* [a-zA-Z0-9][a-zA-Z0-9_\.]*$' "${module_file}" | while read -r line; do
+    inject_type=$(echo "${line#*inject}" | awk '{print $1}')
+    inject_name=$(echo "${line#*inject}" | awk '{print $2}')
+    echo "      ${inject_name})"
+    case "${inject_type}" in
+      file)
+        inject_file="$(dirname "${module_file}")/${inject_name}"
+        echo "        cat <<'EMBED'"
+        cat "$inject_file"
+        echo ""
+        echo "EMBED"
+        ;;
+      env)
+        eval inject_data="\$$inject_name"
+        echo "        echo \"$inject_data\""
+        ;;
+      *)
+        echo "ERROR: Unknown inject type '${inject_type}' in line '${line}'"
+        exit 101
+        ;;
+    esac
+    echo "        ;;"
+  done
+  echo "      *)"
+  echo "        echo \"${inject_type}: ${inject_name}\""
+  echo "        ;;"
+  echo "    esac"
+  echo "  fi"
+  echo "}"
+}
+
+# @section_code: SC005
+# @section_name: execution
+debug init
+debug file "${MUSH_DEBUG_PATH}/src/main.sh"
+main "$@"

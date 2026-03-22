@@ -78,6 +78,14 @@ exec_install_from_index() {
 
   package_search=$(grep "^${package_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
 
+  # Manifest parser converts dashes to underscores; try the dash form as fallback
+  if [ -z "${package_search}" ]; then
+    local dash_name
+    dash_name=$(echo "${package_name}" | tr '_' '-')
+    [ "${dash_name}" != "${package_name}" ] && \
+      package_search=$(grep "^${dash_name} " "${MUSH_REGISTRY_INDEX}" | head -n 1)
+  fi
+
   if [ -z "${package_search}" ]; then
     local version_label="${package_version_constraint:-*}"
     console_error "could not find '${package_name}' in registry '${MUSH_REGISTRY_URL}' with version '${version_label}'"

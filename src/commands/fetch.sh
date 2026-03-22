@@ -23,6 +23,10 @@ run_fetch() {
   local package_version="${MUSH_PACKAGE_VERSION}"
   local pwd=${PWD}
 
+  MUSH_TARGET_PATH="target/release"
+  MUSH_DEPS_DIR="${PWD}/target/release/packages"
+  mkdir -p "${MUSH_DEPS_DIR}"
+
   mush_registry_index_update
 
   exec_dependencies
